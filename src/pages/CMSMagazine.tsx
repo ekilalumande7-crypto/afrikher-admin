@@ -24,6 +24,21 @@ interface Magazine {
 
 type ViewMode = 'list' | 'editor';
 
+// ── Field Row Component (OUTSIDE to prevent re-mount on every render) ──
+const FieldRow = ({ label, description, children, noBorder }: {
+  label: string; description?: string; children: React.ReactNode; noBorder?: boolean;
+}) => (
+  <div className={`py-6 ${noBorder ? '' : 'border-b border-gray-100'}`}>
+    <div className="flex items-start justify-between gap-8">
+      <div className="w-56 shrink-0">
+        <p className="text-sm font-semibold text-gray-900">{label}</p>
+        {description && <p className="text-sm text-gray-500 mt-1">{description}</p>}
+      </div>
+      <div className="flex-1">{children}</div>
+    </div>
+  </div>
+);
+
 export default function CMSMagazine() {
   const [magazines, setMagazines] = useState<Magazine[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,6 +50,7 @@ export default function CMSMagazine() {
   const [uploading, setUploading] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [priceText, setPriceText] = useState<string>('');
 
   const loadMagazines = useCallback(async () => {
     try {
@@ -173,7 +189,8 @@ export default function CMSMagazine() {
     if (!editingMagazine) return;
     if (!editingMagazine.title?.trim()) { setError('Le titre est obligatoire'); return; }
     if (!editingMagazine.cover_image) { setError('La couverture est obligatoire'); return; }
-    if (!editingMagazine.price || editingMagazine.price <= 0) { setError('Le prix doit être positif'); return; }
+    const finalPrice = parseFloat(priceText.replace(',', '.'));
+    if (isNaN(finalPrice) || finalPrice <= 0) { setError('Le prix doit être un nombre positif (ex: 9.99, 1.50)'); return; }
 
     try {
       setSaving(true);
@@ -184,7 +201,7 @@ export default function CMSMagazine() {
         slug,
         description: editingMagazine.description?.trim() || '',
         cover_image: editingMagazine.cover_image,
-        price: editingMagazine.price,
+        price: finalPrice,
         currency: editingMagazine.currency || 'EUR',
         page_count: (editingMagazine.pages || []).length,
         pages: editingMagazine.pages || [],
@@ -268,28 +285,15 @@ export default function CMSMagazine() {
       pages: [],
       status: 'draft',
     });
+    setPriceText('9.99');
     setViewMode('editor');
   };
 
   const startEditMagazine = (magazine: Magazine) => {
     setEditingMagazine({ ...magazine });
+    setPriceText(magazine.price != null ? String(magazine.price) : '');
     setViewMode('editor');
   };
-
-  // ── Field Row Component ──
-  const FieldRow = ({ label, description, children, noBorder }: {
-    label: string; description?: string; children: React.ReactNode; noBorder?: boolean;
-  }) => (
-    <div className={`py-6 ${noBorder ? '' : 'border-b border-gray-100'}`}>
-      <div className="flex items-start justify-between gap-8">
-        <div className="w-56 shrink-0">
-          <p className="text-sm font-semibold text-gray-900">{label}</p>
-          {description && <p className="text-sm text-gray-500 mt-1">{description}</p>}
-        </div>
-        <div className="flex-1">{children}</div>
-      </div>
-    </div>
-  );
 
   if (loading) {
     return (
@@ -389,11 +393,19 @@ export default function CMSMagazine() {
             <FieldRow label="Prix" description="Prix unitaire du magazine en euros.">
               <div className="flex items-center gap-3 max-w-xs">
                 <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={editingMagazine.price || ''}
-                  onChange={(e) => setEditingMagazine(prev => prev ? { ...prev, price: parseFloat(e.target.value) || 0 } : null)}
+                  type="text"
+                  inputMode="decimal"
+                  value={priceText}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(',', '.');
+                    if (val === '' || /^\d*\.?\d*$/.test(val)) {
+                      setPriceText(val);
+                      const num = parseFloat(val);
+                      if (!isNaN(num)) {
+                        setEditingMagazine(prev => prev ? { ...prev, price: num } : null);
+                      }
+                    }
+                  }}
                   className="w-32 px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="9.99"
                 />
