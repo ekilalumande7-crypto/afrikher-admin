@@ -22,6 +22,8 @@ import {
   Calendar as CalendarIcon
 } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const menuGroups = [
   {
@@ -76,6 +78,13 @@ const menuGroups = [
 
 export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate('/login');
+  };
 
   return (
     <aside className={cn(
@@ -142,12 +151,16 @@ export default function Sidebar() {
           </div>
           {!collapsed && (
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-white truncate">Admin</p>
-              <p className="text-[10px] text-gray-500 truncate">Administrateur</p>
+              <p className="text-sm font-bold text-white truncate">{user?.full_name || 'Admin'}</p>
+              <p className="text-[10px] text-gray-500 truncate">{user?.email || 'Administrateur'}</p>
             </div>
           )}
           {!collapsed && (
-            <button className="p-2 hover:bg-charcoal rounded-lg text-gray-500 hover:text-white transition-colors">
+            <button
+              onClick={handleLogout}
+              className="p-2 hover:bg-charcoal rounded-lg text-gray-500 hover:text-red-400 transition-colors"
+              title="Se déconnecter"
+            >
               <LogOut size={16} />
             </button>
           )}

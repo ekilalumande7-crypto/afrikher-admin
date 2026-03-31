@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { Settings } from 'lucide-react';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import AdminLayout from './components/AdminLayout';
+import AdminLogin from './pages/AdminLogin';
 import Dashboard from './pages/Dashboard';
 import ArticlesList from './pages/ArticlesList';
 import ArticleEditor from './pages/ArticleEditor';
@@ -25,46 +27,72 @@ const Placeholder = ({ title }: { title: string }) => (
   </div>
 );
 
+// Protected route wrapper
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-[#C9A84C] border-t-transparent animate-spin rounded-full" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
+}
+
 export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Navigate to="/admin" replace />} />
-        
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<Dashboard />} />
-          
-          {/* Éditorial */}
-          <Route path="articles" element={<ArticlesList />} />
-          <Route path="articles/new" element={<ArticleEditor />} />
-          <Route path="articles/:id" element={<ArticleEditor />} />
-          <Route path="categories" element={<Placeholder title="Gestion des Catégories" />} />
-          
-          {/* Boutique */}
-          <Route path="boutique/produits" element={<ProductsList />} />
-          <Route path="boutique/produits/new" element={<ProductEditor />} />
-          <Route path="boutique/produits/:id" element={<ProductEditor />} />
-          <Route path="boutique/commandes" element={<Placeholder title="Gestion des Commandes" />} />
-          
-          {/* Utilisateurs */}
-          <Route path="utilisateurs/lecteurs" element={<UsersList />} />
-          <Route path="utilisateurs/partenaires" element={<UsersList />} />
-          <Route path="utilisateurs/abonnements" element={<Placeholder title="Gestion des Abonnements" />} />
-          
-          {/* CMS */}
-          <Route path="cms/config" element={<CMSConfig />} />
-          <Route path="cms/design" element={<Placeholder title="Design & Thème" />} />
-          
-          {/* Marketing */}
-          <Route path="marketing/newsletter" element={<Placeholder title="Newsletter Marketing" />} />
-          <Route path="marketing/publicites" element={<Placeholder title="Gestion des Publicités" />} />
-          
-          {/* Paramètres */}
-          <Route path="parametres/notifications" element={<Placeholder title="Paramètres de Notifications" />} />
-        </Route>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<AdminLogin />} />
+          <Route path="/" element={<Navigate to="/admin" replace />} />
 
-        <Route path="*" element={<div className="h-screen flex items-center justify-center font-serif text-4xl text-gold">404 - Page non trouvée</div>} />
-      </Routes>
-    </BrowserRouter>
+          <Route path="/admin" element={
+            <ProtectedRoute>
+              <AdminLayout />
+            </ProtectedRoute>
+          }>
+            <Route index element={<Dashboard />} />
+
+            {/* Éditorial */}
+            <Route path="articles" element={<ArticlesList />} />
+            <Route path="articles/new" element={<ArticleEditor />} />
+            <Route path="articles/:id" element={<ArticleEditor />} />
+            <Route path="categories" element={<Placeholder title="Gestion des Catégories" />} />
+
+            {/* Boutique */}
+            <Route path="boutique/produits" element={<ProductsList />} />
+            <Route path="boutique/produits/new" element={<ProductEditor />} />
+            <Route path="boutique/produits/:id" element={<ProductEditor />} />
+            <Route path="boutique/commandes" element={<Placeholder title="Gestion des Commandes" />} />
+
+            {/* Utilisateurs */}
+            <Route path="utilisateurs/lecteurs" element={<UsersList />} />
+            <Route path="utilisateurs/partenaires" element={<UsersList />} />
+            <Route path="utilisateurs/abonnements" element={<Placeholder title="Gestion des Abonnements" />} />
+
+            {/* CMS */}
+            <Route path="cms/config" element={<CMSConfig />} />
+            <Route path="cms/design" element={<Placeholder title="Design & Thème" />} />
+
+            {/* Marketing */}
+            <Route path="marketing/newsletter" element={<Placeholder title="Newsletter Marketing" />} />
+            <Route path="marketing/publicites" element={<Placeholder title="Gestion des Publicités" />} />
+
+            {/* Paramètres */}
+            <Route path="parametres/notifications" element={<Placeholder title="Paramètres de Notifications" />} />
+          </Route>
+
+          <Route path="*" element={<div className="h-screen flex items-center justify-center font-serif text-4xl text-gold">404 - Page non trouvée</div>} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
