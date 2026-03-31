@@ -125,19 +125,74 @@ export default function CMSAccueil() {
     }
   };
 
+  // Convert unsupported image formats (AVIF, WebP, HEIC) to JPEG
+  const convertImageToJpeg = (file: File): Promise<File> => {
+    return new Promise((resolve, reject) => {
+      const supportedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'];
+      if (supportedTypes.includes(file.type)) {
+        resolve(file);
+        return;
+      }
+
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          URL.revokeObjectURL(url);
+          reject(new Error('Canvas context unavailable'));
+          return;
+        }
+        ctx.drawImage(img, 0, 0);
+        canvas.toBlob(
+          (blob) => {
+            URL.revokeObjectURL(url);
+            if (!blob) {
+              reject(new Error('Conversion failed'));
+              return;
+            }
+            const baseName = file.name.replace(/\.[^/.]+$/, '');
+            const converted = new File([blob], `${baseName}.jpg`, { type: 'image/jpeg' });
+            resolve(converted);
+          },
+          'image/jpeg',
+          0.92
+        );
+      };
+
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error(`Format d'image non supporté: ${file.type}`));
+      };
+
+      img.src = url;
+    });
+  };
+
   // Upload image to Supabase Storage
   const handleImageUpload = async (configKey: string, file: File) => {
     try {
       setUploading(configKey);
       setError(null);
 
-      const fileExt = file.name.split('.').pop();
+      // Convert unsupported formats to JPEG
+      const processedFile = await convertImageToJpeg(file);
+
+      const fileExt = processedFile.name.split('.').pop() || 'jpg';
       const fileName = `${configKey}-${Date.now()}.${fileExt}`;
       const filePath = `site/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
         .from('afrikher-public')
-        .upload(filePath, file, { cacheControl: '3600', upsert: true });
+        .upload(filePath, processedFile, {
+          cacheControl: '3600',
+          upsert: true,
+          contentType: processedFile.type,
+        });
 
       if (uploadError) throw uploadError;
 
