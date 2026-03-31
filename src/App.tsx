@@ -10,6 +10,7 @@ import ProductsList from './pages/ProductsList';
 import ProductEditor from './pages/ProductEditor';
 import UsersList from './pages/UsersList';
 import CMSConfig from './pages/CMSConfig';
+import CMSAccueil from './pages/CMSAccueil';
 
 // Placeholder for other pages
 const Placeholder = ({ title }: { title: string }) => (
@@ -66,6 +67,8 @@ export default function App() {
             <Route path="articles/new" element={<ArticleEditor />} />
             <Route path="articles/:id" element={<ArticleEditor />} />
             <Route path="categories" element={<Placeholder title="Gestion des Catégories" />} />
+            <Route path="galerie" element={<Placeholder title="Galerie Photos" />} />
+            <Route path="blog" element={<Placeholder title="Gestion du Blog" />} />
 
             {/* Boutique */}
             <Route path="boutique/produits" element={<ProductsList />} />
@@ -78,7 +81,16 @@ export default function App() {
             <Route path="utilisateurs/partenaires" element={<UsersList pageType="partners" />} />
             <Route path="utilisateurs/abonnements" element={<Placeholder title="Gestion des Abonnements" />} />
 
-            {/* CMS */}
+            {/* Pages du site (CMS) */}
+            <Route path="cms/accueil" element={<CMSAccueil />} />
+            <Route path="cms/magazine" element={<Placeholder title="Page Magazine" />} />
+            <Route path="cms/rubriques" element={<Placeholder title="Page Les Rubriques" />} />
+            <Route path="cms/qui-sommes-nous" element={<Placeholder title="Page Qui sommes-nous" />} />
+            <Route path="cms/abonnement" element={<Placeholder title="Page Abonnement" />} />
+            <Route path="cms/contact" element={<Placeholder title="Page Contact" />} />
+            <Route path="cms/partenaires" element={<Placeholder title="Page Partenaires" />} />
+
+            {/* CMS & Design */}
             <Route path="cms/config" element={<CMSConfig />} />
             <Route path="cms/design" element={<Placeholder title="Design & Thème" />} />
 
