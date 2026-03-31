@@ -1,25 +1,30 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  FileText, 
-  Tags, 
-  ShoppingBag, 
-  ShoppingCart, 
-  Users, 
-  Handshake, 
-  CreditCard, 
-  Settings, 
-  Palette, 
-  Mail, 
-  Megaphone, 
+import {
+  LayoutDashboard,
+  FileText,
+  Tags,
+  ShoppingBag,
+  ShoppingCart,
+  Users,
+  Handshake,
+  CreditCard,
+  Settings,
+  Palette,
+  Mail,
+  Megaphone,
   Bell,
   ChevronLeft,
   ChevronRight,
   LogOut,
-  Search,
   User,
-  Calendar as CalendarIcon
+  Home,
+  BookOpen,
+  Layers,
+  Info,
+  PenTool,
+  Phone,
+  Image
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useAuth } from '../contexts/AuthContext';
@@ -33,10 +38,24 @@ const menuGroups = [
     ]
   },
   {
+    title: "Pages du site",
+    items: [
+      { name: "Accueil", path: "/admin/cms/accueil", icon: Home },
+      { name: "Magazine", path: "/admin/cms/magazine", icon: BookOpen },
+      { name: "Les Rubriques", path: "/admin/cms/rubriques", icon: Layers },
+      { name: "Qui sommes-nous", path: "/admin/cms/qui-sommes-nous", icon: Info },
+      { name: "Blog", path: "/admin/blog", icon: PenTool },
+      { name: "Abonnement", path: "/admin/cms/abonnement", icon: CreditCard },
+      { name: "Contact", path: "/admin/cms/contact", icon: Phone },
+      { name: "Partenaires", path: "/admin/cms/partenaires", icon: Handshake },
+    ]
+  },
+  {
     title: "Éditorial",
     items: [
       { name: "Articles", path: "/admin/articles", icon: FileText },
       { name: "Catégories", path: "/admin/categories", icon: Tags },
+      { name: "Galerie", path: "/admin/galerie", icon: Image },
     ]
   },
   {
@@ -55,7 +74,7 @@ const menuGroups = [
     ]
   },
   {
-    title: "Contenu du site (CMS)",
+    title: "CMS & Design",
     items: [
       { name: "Configuration", path: "/admin/cms/config", icon: Settings },
       { name: "Design & Thème", path: "/admin/cms/design", icon: Palette },
