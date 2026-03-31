@@ -52,6 +52,14 @@ export default function CMSMagazine() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [priceText, setPriceText] = useState<string>('');
 
+  // ── Hero CMS config ──
+  const [heroImage, setHeroImage] = useState('');
+  const [heroTitle, setHeroTitle] = useState('');
+  const [heroSubtitle, setHeroSubtitle] = useState('');
+  const [heroSaving, setHeroSaving] = useState(false);
+  const [heroSaved, setHeroSaved] = useState(false);
+  const [heroUploading, setHeroUploading] = useState(false);
+
   const loadMagazines = useCallback(async () => {
     try {
       setLoading(true);
@@ -70,7 +78,76 @@ export default function CMSMagazine() {
     }
   }, []);
 
-  useEffect(() => { loadMagazines(); }, [loadMagazines]);
+  // Load hero config from site_config
+  const loadHeroConfig = useCallback(async () => {
+    try {
+      const { data } = await supabase
+        .from('site_config')
+        .select('key, value')
+        .in('key', ['magazine_hero_image', 'magazine_hero_title', 'magazine_hero_subtitle']);
+      if (data) {
+        data.forEach((row: { key: string; value: string }) => {
+          if (row.key === 'magazine_hero_image') setHeroImage(row.value || '');
+          if (row.key === 'magazine_hero_title') setHeroTitle(row.value || '');
+          if (row.key === 'magazine_hero_subtitle') setHeroSubtitle(row.value || '');
+        });
+      }
+    } catch (err) {
+      console.error('Error loading hero config:', err);
+    }
+  }, []);
+
+  const saveHeroConfig = async () => {
+    try {
+      setHeroSaving(true);
+      setError(null);
+
+      const updates = [
+        { key: 'magazine_hero_image', value: heroImage },
+        { key: 'magazine_hero_title', value: heroTitle },
+        { key: 'magazine_hero_subtitle', value: heroSubtitle },
+      ];
+
+      for (const item of updates) {
+        const { error: upsertError } = await supabase
+          .from('site_config')
+          .upsert({ key: item.key, value: item.value, updated_at: new Date().toISOString() }, { onConflict: 'key' });
+        if (upsertError) throw upsertError;
+      }
+
+      setHeroSaved(true);
+      setTimeout(() => setHeroSaved(false), 3000);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Erreur inconnue';
+      setError('Erreur sauvegarde hero: ' + message);
+    } finally {
+      setHeroSaving(false);
+    }
+  };
+
+  const handleHeroImageUpload = async (file: File) => {
+    try {
+      setHeroUploading(true);
+      setError(null);
+      const processedFile = await convertImageToJpeg(file);
+      const fileExt = processedFile.name.split('.').pop() || 'jpg';
+      const fileName = `magazine-hero-${Date.now()}.${fileExt}`;
+      const filePath = `site/${fileName}`;
+      const { error: uploadError } = await supabase.storage
+        .from('afrikher-public')
+        .upload(filePath, processedFile, { cacheControl: '3600', upsert: true, contentType: processedFile.type });
+      if (uploadError) throw uploadError;
+      const { data: urlData } = supabase.storage.from('afrikher-public').getPublicUrl(filePath);
+      setHeroImage(urlData.publicUrl);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Erreur inconnue';
+      setError("Erreur upload image hero: " + message);
+    } finally {
+      setHeroUploading(false);
+    }
+  };
+
+  useEffect(() => { loadMagazines(); loadHeroConfig(); }, [loadMagazines, loadHeroConfig]);
 
   const generateSlug = (title: string): string => {
     return title
@@ -585,6 +662,109 @@ export default function CMSMagazine() {
           <p className="text-sm text-green-700">Magazine enregistré avec succès.</p>
         </div>
       )}
+
+      {/* ══════ HERO CONFIGURATION ══════ */}
+      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden mb-8">
+        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div>
+            <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
+              <ImageIcon size={18} className="text-amber-500" />
+              Banniere de la page Magazine
+            </h2>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Image et texte affiches en haut de la page Magazine du site public
+            </p>
+          </div>
+          <button
+            onClick={saveHeroConfig}
+            disabled={heroSaving}
+            className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              heroSaved
+                ? 'bg-green-600 text-white'
+                : 'bg-gray-900 text-white hover:bg-gray-800'
+            }`}
+          >
+            {heroSaving ? <><RefreshCw size={14} className="mr-2 animate-spin" /> Enregistrement...</>
+              : heroSaved ? <><Check size={14} className="mr-2" /> Enregistre !</>
+              : <><Save size={14} className="mr-2" /> Enregistrer</>}
+          </button>
+        </div>
+        <div className="p-6">
+          {/* Hero image preview + upload */}
+          <div className="flex gap-6 mb-6">
+            <div className="w-80 h-48 bg-gray-100 rounded-lg overflow-hidden border border-gray-200 shrink-0 relative">
+              {heroImage ? (
+                <img src={heroImage} alt="Hero Magazine" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
+                  <ImageIcon size={32} className="mb-2" />
+                  <span className="text-xs">Aucune image</span>
+                </div>
+              )}
+              {heroImage && (
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              )}
+            </div>
+            <div className="flex flex-col gap-3 flex-1">
+              <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider">Image de banniere</label>
+              <p className="text-xs text-gray-500">
+                Cette image s'affiche en grand en haut de la page Magazine. Format recommande : 1920x800px minimum, paysage.
+              </p>
+              <label className={`inline-flex items-center w-fit px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer transition-colors ${heroUploading ? 'opacity-50 cursor-wait' : ''}`}>
+                {heroUploading ? (
+                  <><RefreshCw size={14} className="mr-2 animate-spin" /> Upload...</>
+                ) : (
+                  <><Upload size={14} className="mr-2" /> {heroImage ? 'Changer l\'image' : 'Uploader une image'}</>
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => { const f = e.target.files?.[0]; if (f) handleHeroImageUpload(f); }}
+                  disabled={heroUploading}
+                />
+              </label>
+              {heroImage && (
+                <input
+                  type="text"
+                  value={heroImage}
+                  onChange={(e) => setHeroImage(e.target.value)}
+                  className="px-3 py-2 border border-gray-200 rounded-lg text-xs text-gray-500 font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Ou collez une URL d'image"
+                />
+              )}
+            </div>
+          </div>
+
+          {/* Hero title */}
+          <div className="mb-4">
+            <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider block mb-2">
+              Titre principal
+            </label>
+            <input
+              type="text"
+              value={heroTitle}
+              onChange={(e) => setHeroTitle(e.target.value)}
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Le magazine qui celebre la femme africaine entrepreneure"
+            />
+          </div>
+
+          {/* Hero subtitle */}
+          <div>
+            <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider block mb-2">
+              Sous-titre
+            </label>
+            <textarea
+              value={heroSubtitle}
+              onChange={(e) => setHeroSubtitle(e.target.value)}
+              rows={2}
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              placeholder="Portraits, interviews exclusives et analyses pour celles qui batissent l'Afrique de demain."
+            />
+          </div>
+        </div>
+      </div>
 
       {/* Empty state */}
       {magazines.length === 0 && (
