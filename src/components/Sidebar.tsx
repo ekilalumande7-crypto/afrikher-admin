@@ -44,7 +44,6 @@ const menuGroups = [
       { name: "Magazine", path: "/admin/cms/magazine", icon: BookOpen },
       { name: "Les Rubriques", path: "/admin/cms/rubriques", icon: Layers },
       { name: "Qui sommes-nous", path: "/admin/cms/qui-sommes-nous", icon: Info },
-      { name: "Blog", path: "/admin/blog", icon: PenTool },
       { name: "Abonnement", path: "/admin/cms/abonnement", icon: CreditCard },
       { name: "Contact", path: "/admin/cms/contact", icon: Phone },
       { name: "Partenaires", path: "/admin/cms/partenaires", icon: Handshake },
@@ -53,7 +52,7 @@ const menuGroups = [
   {
     title: "Éditorial",
     items: [
-      { name: "Articles", path: "/admin/articles", icon: FileText },
+      { name: "Contenus", path: "/admin/articles", icon: FileText },
       { name: "Catégories", path: "/admin/categories", icon: Tags },
       { name: "Galerie", path: "/admin/galerie", icon: Image },
     ]

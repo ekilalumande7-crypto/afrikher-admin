@@ -71,7 +71,7 @@ export default function App() {
             <Route path="articles/:id" element={<ArticleEditor />} />
             <Route path="categories" element={<Placeholder title="Gestion des Catégories" />} />
             <Route path="galerie" element={<Placeholder title="Galerie Photos" />} />
-            <Route path="blog" element={<Placeholder title="Gestion du Blog" />} />
+            {/* Blog fusionné dans Articles (onglets Éditorial / Blog) */}
 
             {/* Boutique */}
             <Route path="boutique/produits" element={<ProductsList />} />
