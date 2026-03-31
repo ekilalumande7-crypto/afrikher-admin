@@ -1,19 +1,33 @@
 import React, { useState, useEffect } from 'react';
-import { Save, CreditCard, Shield, TestTube, Zap, CheckCircle, AlertCircle, Eye, EyeOff, RefreshCw } from 'lucide-react';
+import { Save, CreditCard, Shield, TestTube, Zap, CheckCircle, AlertCircle, Eye, EyeOff, RefreshCw, Link2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { cn } from '../lib/utils';
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://afrikher-client.vercel.app';
+
 interface FidepayConfig {
+  fidepay_access_token_url: string;
+  fidepay_make_payment_url: string;
   fidepay_public_key: string;
   fidepay_secret_key: string;
   fidepay_mode: 'live' | 'test';
 }
 
+const ALL_KEYS = [
+  'fidepay_access_token_url',
+  'fidepay_make_payment_url',
+  'fidepay_public_key',
+  'fidepay_secret_key',
+  'fidepay_mode',
+];
+
 export default function SettingsPaiements() {
   const [config, setConfig] = useState<FidepayConfig>({
+    fidepay_access_token_url: 'https://admin.fide-pay.com/api/merchant/access-token',
+    fidepay_make_payment_url: 'https://admin.fide-pay.com/api/merchant/make-payment',
     fidepay_public_key: '',
     fidepay_secret_key: '',
-    fidepay_mode: 'test',
+    fidepay_mode: 'live',
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -33,7 +47,7 @@ export default function SettingsPaiements() {
       const { data, error: fetchError } = await supabase
         .from('site_config')
         .select('key, value')
-        .in('key', ['fidepay_public_key', 'fidepay_secret_key', 'fidepay_mode']);
+        .in('key', ALL_KEYS);
 
       if (fetchError) throw fetchError;
 
@@ -45,9 +59,11 @@ export default function SettingsPaiements() {
       }
 
       setConfig({
+        fidepay_access_token_url: configMap['fidepay_access_token_url'] || 'https://admin.fide-pay.com/api/merchant/access-token',
+        fidepay_make_payment_url: configMap['fidepay_make_payment_url'] || 'https://admin.fide-pay.com/api/merchant/make-payment',
         fidepay_public_key: configMap['fidepay_public_key'] || '',
         fidepay_secret_key: configMap['fidepay_secret_key'] || '',
-        fidepay_mode: (configMap['fidepay_mode'] as 'live' | 'test') || 'test',
+        fidepay_mode: (configMap['fidepay_mode'] as 'live' | 'test') || 'live',
       });
     } catch (err) {
       console.error('Error loading FIDEPAY config:', err);
@@ -63,11 +79,7 @@ export default function SettingsPaiements() {
     setSaved(false);
 
     try {
-      const updates = [
-        { key: 'fidepay_public_key', value: config.fidepay_public_key },
-        { key: 'fidepay_secret_key', value: config.fidepay_secret_key },
-        { key: 'fidepay_mode', value: config.fidepay_mode },
-      ];
+      const updates = Object.entries(config).map(([key, value]) => ({ key, value }));
 
       for (const update of updates) {
         const { error: upsertError } = await supabase
@@ -100,29 +112,25 @@ export default function SettingsPaiements() {
         return;
       }
 
-      const baseUrl = config.fidepay_mode === 'live'
-        ? 'https://admin.fide-pay.com/api/merchant'
-        : 'https://admin.fide-pay.com/api/merchant/sandbox';
+      if (!config.fidepay_access_token_url) {
+        setTestResult({ success: false, message: "L'URL access-token est requise." });
+        return;
+      }
 
-      const response = await fetch(`${baseUrl}/access-token`, {
+      // Call server-side API to avoid CORS issues
+      const response = await fetch(`${API_BASE}/api/fidepay/test-connection`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ public_key: config.fidepay_public_key }),
+        body: JSON.stringify({
+          public_key: config.fidepay_public_key,
+          access_token_url: config.fidepay_access_token_url,
+        }),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        if (data.access_token) {
-          setTestResult({ success: true, message: 'Connexion reussie ! Token obtenu avec succes.' });
-        } else {
-          setTestResult({ success: false, message: 'Reponse inattendue de FIDEPAY. Verifiez votre cle publique.' });
-        }
-      } else {
-        const errorText = await response.text();
-        setTestResult({ success: false, message: `Erreur ${response.status}: ${errorText.slice(0, 100)}` });
-      }
+      const data = await response.json();
+      setTestResult({ success: data.success, message: data.message });
     } catch (err) {
-      setTestResult({ success: false, message: 'Impossible de joindre le serveur FIDEPAY. Verifiez votre connexion.' });
+      setTestResult({ success: false, message: 'Impossible de joindre le serveur. Verifiez votre connexion.' });
     } finally {
       setTesting(false);
     }
@@ -135,6 +143,8 @@ export default function SettingsPaiements() {
         <div className="bg-white p-8 rounded-[32px] border border-gray-50 shadow-sm">
           <div className="space-y-6">
             <div className="h-6 bg-gray-100 rounded-xl w-48 animate-pulse" />
+            <div className="h-14 bg-gray-100 rounded-2xl animate-pulse" />
+            <div className="h-14 bg-gray-100 rounded-2xl animate-pulse" />
             <div className="h-14 bg-gray-100 rounded-2xl animate-pulse" />
             <div className="h-14 bg-gray-100 rounded-2xl animate-pulse" />
           </div>
@@ -215,7 +225,7 @@ export default function SettingsPaiements() {
               </div>
             </div>
             <p className="text-xs text-gray-400 leading-relaxed">
-              Utilisez ce mode pour tester les paiements sans transactions reelles. Aucun argent ne sera debite.
+              Utilisez ce mode pour tester les paiements sans transactions reelles.
             </p>
           </button>
 
@@ -243,9 +253,66 @@ export default function SettingsPaiements() {
               </div>
             </div>
             <p className="text-xs text-gray-400 leading-relaxed">
-              Mode de production pour les transactions reelles. Les clients seront debites normalement.
+              Mode de production pour les transactions reelles. Les clients seront debites.
             </p>
           </button>
+        </div>
+      </div>
+
+      {/* API URLs */}
+      <div className="bg-white p-8 rounded-[32px] border border-gray-50 shadow-sm space-y-6">
+        <div className="border-b border-gray-50 pb-6">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-500">
+              <Link2 size={20} />
+            </div>
+            <div>
+              <h3 className="text-xl font-serif font-bold text-dark">URLs API FIDEPAY</h3>
+              <p className="text-sm text-gray-400 mt-0.5">
+                Copiez les URLs depuis la page{' '}
+                <a href="https://merchant.fide-pay.com/dashboard/api-access-key" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline font-medium">
+                  Cle d'acces API
+                </a>
+                {' '}de votre dashboard FIDEPAY.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          {/* Access Token URL */}
+          <div>
+            <label className="block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">
+              URL Access Token
+            </label>
+            <input
+              type="url"
+              value={config.fidepay_access_token_url}
+              onChange={(e) => setConfig({ ...config, fidepay_access_token_url: e.target.value })}
+              placeholder="https://admin.fide-pay.com/api/merchant/access-token"
+              className="w-full p-4 bg-gray-50 border-none rounded-2xl text-sm font-mono outline-none focus:ring-2 focus:ring-gold/20 placeholder:text-gray-300"
+            />
+            <p className="text-[11px] text-gray-400 mt-1.5">
+              Endpoint pour obtenir le token d'authentification.
+            </p>
+          </div>
+
+          {/* Make Payment URL */}
+          <div>
+            <label className="block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">
+              URL Make Payment
+            </label>
+            <input
+              type="url"
+              value={config.fidepay_make_payment_url}
+              onChange={(e) => setConfig({ ...config, fidepay_make_payment_url: e.target.value })}
+              placeholder="https://admin.fide-pay.com/api/merchant/make-payment"
+              className="w-full p-4 bg-gray-50 border-none rounded-2xl text-sm font-mono outline-none focus:ring-2 focus:ring-gold/20 placeholder:text-gray-300"
+            />
+            <p className="text-[11px] text-gray-400 mt-1.5">
+              Endpoint pour creer un paiement.
+            </p>
+          </div>
         </div>
       </div>
 
@@ -260,7 +327,7 @@ export default function SettingsPaiements() {
               <h3 className="text-xl font-serif font-bold text-dark">Cles API FIDEPAY</h3>
               <p className="text-sm text-gray-400 mt-0.5">
                 Obtenez vos cles depuis votre{' '}
-                <a href="https://admin.fide-pay.com" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline font-medium">
+                <a href="https://merchant.fide-pay.com/dashboard/api-access-key" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline font-medium">
                   dashboard FIDEPAY
                 </a>
               </p>
@@ -279,10 +346,11 @@ export default function SettingsPaiements() {
               value={config.fidepay_public_key}
               onChange={(e) => setConfig({ ...config, fidepay_public_key: e.target.value })}
               placeholder="Entrez votre cle publique FIDEPAY..."
+              autoComplete="off"
               className="w-full p-4 bg-gray-50 border-none rounded-2xl text-sm font-mono outline-none focus:ring-2 focus:ring-gold/20 placeholder:text-gray-300"
             />
             <p className="text-[11px] text-gray-400 mt-1.5">
-              Utilisee pour obtenir le token d'acces. Visible cote client.
+              Utilisee pour obtenir le token d'acces.
             </p>
           </div>
 
@@ -297,6 +365,7 @@ export default function SettingsPaiements() {
                 value={config.fidepay_secret_key}
                 onChange={(e) => setConfig({ ...config, fidepay_secret_key: e.target.value })}
                 placeholder="Entrez votre cle secrete FIDEPAY..."
+                autoComplete="off"
                 className="w-full p-4 pr-12 bg-gray-50 border-none rounded-2xl text-sm font-mono outline-none focus:ring-2 focus:ring-gold/20 placeholder:text-gray-300"
               />
               <button
@@ -321,7 +390,7 @@ export default function SettingsPaiements() {
           <p className="text-sm text-gray-400 mt-1">Verifiez que vos cles API fonctionnent correctement.</p>
         </div>
 
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-4 flex-wrap gap-y-3">
           <button
             onClick={handleTestConnection}
             disabled={testing || !config.fidepay_public_key}
