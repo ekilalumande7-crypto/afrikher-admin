@@ -1,33 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
-  Plus, Search, Eye, Edit2, Trash2, CheckCircle, XCircle,
-  FileText, PenTool, BarChart3, Upload, Save, ChevronLeft, X,
-  Image as ImageIcon, RefreshCw, Send, Filter, Globe, BookOpen
+  Plus, Search, Edit2, Trash2, CheckCircle, XCircle,
+  PenTool, Upload, Save, ChevronLeft, X,
+  RefreshCw, Send, Globe, BookOpen
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 // ══════════════════════════════════════════════
 // TYPES
 // ══════════════════════════════════════════════
-
-interface Article {
-  id: string;
-  title: string;
-  slug: string;
-  excerpt: string;
-  content: string;
-  cover_image: string | null;
-  category_id: string | null;
-  author_id: string | null;
-  type: string;
-  status: string;
-  featured: boolean;
-  published_at: string | null;
-  created_at: string;
-  updated_at: string;
-  // source distinguishes editorial vs blog
-  source: 'editorial' | 'blog';
-}
 
 interface BlogPost {
   id: string;
@@ -42,23 +23,15 @@ interface BlogPost {
   created_at: string;
 }
 
-interface Category {
-  id: string;
-  name: string;
-  slug: string;
-}
-
-type ActiveTab = 'editorial' | 'blog' | 'editor';
+type ActiveTab = 'blog' | 'editor';
 
 // ══════════════════════════════════════════════
 // COMPONENT
 // ══════════════════════════════════════════════
 
 export default function ArticlesList() {
-  const [activeTab, setActiveTab] = useState<ActiveTab>('editorial');
-  const [articles, setArticles] = useState<Article[]>([]);
+  const [activeTab, setActiveTab] = useState<ActiveTab>('blog');
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -67,24 +40,17 @@ export default function ArticlesList() {
 
   // Editor state
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editingSource, setEditingSource] = useState<'editorial' | 'blog'>('editorial');
   const [formTitle, setFormTitle] = useState('');
   const [formSlug, setFormSlug] = useState('');
   const [formExcerpt, setFormExcerpt] = useState('');
   const [formContent, setFormContent] = useState('');
   const [formCoverImage, setFormCoverImage] = useState('');
-  const [formCategoryId, setFormCategoryId] = useState('');
-  const [formType, setFormType] = useState('article');
   const [formStatus, setFormStatus] = useState('draft');
-  const [formFeatured, setFormFeatured] = useState(false);
-  const [formImages, setFormImages] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
 
   // Stats
   const [stats, setStats] = useState({
-    totalEditorial: 0,
-    publishedEditorial: 0,
     totalBlog: 0,
     publishedBlog: 0,
   });
@@ -94,15 +60,6 @@ export default function ArticlesList() {
     setLoading(true);
     setError('');
     try {
-      // Fetch articles (editorial)
-      const { data: articlesData, error: artErr } = await supabase
-        .from('articles')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (artErr) throw artErr;
-
-      // Fetch blog posts
       const { data: blogData, error: blogErr } = await supabase
         .from('blog_posts')
         .select('*')
@@ -110,23 +67,10 @@ export default function ArticlesList() {
 
       if (blogErr) throw blogErr;
 
-      // Fetch categories
-      const { data: catData } = await supabase
-        .from('categories')
-        .select('*')
-        .order('name');
-
-      const arts = (articlesData || []).map((a: any) => ({ ...a, source: 'editorial' as const }));
       const blogs = blogData || [];
-      const cats = catData || [];
-
-      setArticles(arts);
       setBlogPosts(blogs);
-      setCategories(cats);
 
       setStats({
-        totalEditorial: arts.length,
-        publishedEditorial: arts.filter((a: any) => a.status === 'published').length,
         totalBlog: blogs.length,
         publishedBlog: blogs.filter((b: any) => b.status === 'published').length,
       });
@@ -155,10 +99,8 @@ export default function ArticlesList() {
     if (!file) return;
     setUploading(true);
     try {
-      const folder = editingSource === 'blog' ? 'blog' : 'articles';
-      const fileName = `${folder}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+      const fileName = `blog/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
 
-      // Convert to JPEG for optimization
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       const img = document.createElement('img');
@@ -213,58 +155,30 @@ export default function ArticlesList() {
     try {
       const finalStatus = publishNow ? 'published' : formStatus;
 
-      if (editingSource === 'editorial') {
-        const payload: any = {
-          title: formTitle.trim(),
-          slug: formSlug.trim() || formTitle.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-          excerpt: formExcerpt.trim(),
-          content: formContent.trim(),
-          cover_image: formCoverImage || null,
-          category_id: formCategoryId || null,
-          type: formType,
-          status: finalStatus,
-          featured: formFeatured,
-          updated_at: new Date().toISOString(),
-        };
+      const payload: any = {
+        title: formTitle.trim(),
+        slug: formSlug.trim() || formTitle.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        excerpt: formExcerpt.trim(),
+        content: formContent.trim(),
+        cover_image: formCoverImage || null,
+        status: finalStatus,
+      };
 
-        if (finalStatus === 'published' && !editingId) {
-          payload.published_at = new Date().toISOString();
-        }
-
-        if (editingId) {
-          const { error: updErr } = await supabase.from('articles').update(payload).eq('id', editingId);
-          if (updErr) throw updErr;
-        } else {
-          const { error: insErr } = await supabase.from('articles').insert(payload);
-          if (insErr) throw insErr;
-        }
-      } else {
-        // Blog post
-        const payload: any = {
-          title: formTitle.trim(),
-          slug: formSlug.trim() || formTitle.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-          excerpt: formExcerpt.trim(),
-          content: formContent.trim(),
-          cover_image: formCoverImage || null,
-          status: finalStatus,
-        };
-
-        if (finalStatus === 'published' && !editingId) {
-          payload.published_at = new Date().toISOString();
-        }
-
-        if (editingId) {
-          const { error: updErr } = await supabase.from('blog_posts').update(payload).eq('id', editingId);
-          if (updErr) throw updErr;
-        } else {
-          const { error: insErr } = await supabase.from('blog_posts').insert(payload);
-          if (insErr) throw insErr;
-        }
+      if (finalStatus === 'published' && !editingId) {
+        payload.published_at = new Date().toISOString();
       }
 
-      setSuccess(editingId ? 'Contenu mis à jour !' : 'Contenu créé !');
+      if (editingId) {
+        const { error: updErr } = await supabase.from('blog_posts').update(payload).eq('id', editingId);
+        if (updErr) throw updErr;
+      } else {
+        const { error: insErr } = await supabase.from('blog_posts').insert(payload);
+        if (insErr) throw insErr;
+      }
+
+      setSuccess(editingId ? 'Article mis à jour !' : 'Article créé !');
       resetForm();
-      setActiveTab(editingSource);
+      setActiveTab('blog');
       await fetchData();
       setTimeout(() => setSuccess(''), 3000);
     } catch (e: any) {
@@ -275,13 +189,12 @@ export default function ArticlesList() {
   };
 
   // ── DELETE ──
-  const handleDelete = async (id: string, source: 'editorial' | 'blog') => {
-    if (!confirm('Supprimer définitivement ce contenu ?')) return;
+  const handleDelete = async (id: string) => {
+    if (!confirm('Supprimer définitivement cet article ?')) return;
     try {
-      const table = source === 'editorial' ? 'articles' : 'blog_posts';
-      const { error: delErr } = await supabase.from(table).delete().eq('id', id);
+      const { error: delErr } = await supabase.from('blog_posts').delete().eq('id', id);
       if (delErr) throw delErr;
-      setSuccess('Contenu supprimé');
+      setSuccess('Article supprimé');
       await fetchData();
       setTimeout(() => setSuccess(''), 2000);
     } catch (e: any) {
@@ -290,14 +203,13 @@ export default function ArticlesList() {
   };
 
   // ── TOGGLE PUBLISH ──
-  const handleTogglePublish = async (id: string, source: 'editorial' | 'blog', currentStatus: string) => {
+  const handleTogglePublish = async (id: string, currentStatus: string) => {
     try {
-      const table = source === 'editorial' ? 'articles' : 'blog_posts';
       const newStatus = currentStatus === 'published' ? 'draft' : 'published';
       const payload: any = { status: newStatus };
       if (newStatus === 'published') payload.published_at = new Date().toISOString();
 
-      const { error: updErr } = await supabase.from(table).update(payload).eq('id', id);
+      const { error: updErr } = await supabase.from('blog_posts').update(payload).eq('id', id);
       if (updErr) throw updErr;
       setSuccess(newStatus === 'published' ? 'Publié !' : 'Dépublié');
       await fetchData();
@@ -308,25 +220,20 @@ export default function ArticlesList() {
   };
 
   // ── EDIT ──
-  const openEditor = (item: any, source: 'editorial' | 'blog') => {
+  const openEditor = (item: any) => {
     setEditingId(item.id);
-    setEditingSource(source);
     setFormTitle(item.title || '');
     setFormSlug(item.slug || '');
     setFormExcerpt(item.excerpt || '');
     setFormContent(item.content || '');
     setFormCoverImage(item.cover_image || '');
-    setFormCategoryId(item.category_id || '');
-    setFormType(item.type || 'article');
     setFormStatus(item.status || 'draft');
-    setFormFeatured(item.featured || false);
     setActiveTab('editor');
   };
 
   // ── NEW ──
-  const openNewEditor = (source: 'editorial' | 'blog') => {
+  const openNewEditor = () => {
     resetForm();
-    setEditingSource(source);
     setActiveTab('editor');
   };
 
@@ -337,30 +244,15 @@ export default function ArticlesList() {
     setFormExcerpt('');
     setFormContent('');
     setFormCoverImage('');
-    setFormCategoryId('');
-    setFormType('article');
     setFormStatus('draft');
-    setFormFeatured(false);
   };
 
   // ── FILTER ──
-  const filteredArticles = articles.filter((a) => {
-    const matchSearch = a.title.toLowerCase().includes(search.toLowerCase());
-    const matchStatus = statusFilter === 'all' || a.status === statusFilter;
-    return matchSearch && matchStatus;
-  });
-
   const filteredBlogPosts = blogPosts.filter((b) => {
     const matchSearch = b.title.toLowerCase().includes(search.toLowerCase());
     const matchStatus = statusFilter === 'all' || b.status === statusFilter;
     return matchSearch && matchStatus;
   });
-
-  const getCategoryName = (catId: string | null) => {
-    if (!catId) return '—';
-    const cat = categories.find((c) => c.id === catId);
-    return cat ? cat.name : '—';
-  };
 
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return '—';
@@ -378,19 +270,19 @@ export default function ArticlesList() {
       {/* HEADER */}
       <div className="flex items-end justify-between">
         <div>
-          <h1 className="text-4xl font-serif font-bold text-dark">Contenus</h1>
-          <p className="text-gray-400 text-sm mt-1">Gérez vos articles éditoriaux et posts de blog.</p>
+          <h1 className="text-4xl font-serif font-bold text-dark">Articles</h1>
+          <p className="text-gray-400 text-sm mt-1">Gérez les articles du blog AFRIKHER.</p>
         </div>
         <div className="flex items-center gap-3">
           <button onClick={fetchData} className="p-3 bg-white text-gray-400 hover:text-gold rounded-2xl border border-gray-100 transition-all" title="Rafraîchir">
             <RefreshCw size={20} />
           </button>
           <button
-            onClick={() => openNewEditor(activeTab === 'blog' ? 'blog' : 'editorial')}
+            onClick={() => openNewEditor()}
             className="flex items-center px-8 py-3.5 bg-dark text-white rounded-2xl hover:bg-charcoal transition-all font-bold tracking-wide shadow-lg shadow-dark/10"
           >
             <Plus size={20} className="mr-2 text-gold" />
-            {activeTab === 'blog' ? 'Nouveau post' : 'Nouvel article'}
+            Nouvel article
           </button>
         </div>
       </div>
@@ -410,30 +302,22 @@ export default function ArticlesList() {
       )}
 
       {/* STATS */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white p-6 rounded-2xl border border-gray-50 shadow-sm">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="p-2 bg-blue-50 rounded-xl"><FileText size={18} className="text-blue-500" /></div>
-            <span className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Éditorial</span>
-          </div>
-          <p className="text-3xl font-bold text-dark">{stats.totalEditorial}</p>
-          <p className="text-xs text-gray-400 mt-1">{stats.publishedEditorial} publiés</p>
-        </div>
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <div className="bg-white p-6 rounded-2xl border border-gray-50 shadow-sm">
           <div className="flex items-center gap-3 mb-3">
             <div className="p-2 bg-purple-50 rounded-xl"><PenTool size={18} className="text-purple-500" /></div>
-            <span className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Blog</span>
+            <span className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Total</span>
           </div>
           <p className="text-3xl font-bold text-dark">{stats.totalBlog}</p>
-          <p className="text-xs text-gray-400 mt-1">{stats.publishedBlog} publiés</p>
+          <p className="text-xs text-gray-400 mt-1">articles</p>
         </div>
         <div className="bg-white p-6 rounded-2xl border border-gray-50 shadow-sm">
           <div className="flex items-center gap-3 mb-3">
             <div className="p-2 bg-green-50 rounded-xl"><Globe size={18} className="text-green-500" /></div>
             <span className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Publiés</span>
           </div>
-          <p className="text-3xl font-bold text-dark">{stats.publishedEditorial + stats.publishedBlog}</p>
-          <p className="text-xs text-gray-400 mt-1">total en ligne</p>
+          <p className="text-3xl font-bold text-dark">{stats.publishedBlog}</p>
+          <p className="text-xs text-gray-400 mt-1">en ligne</p>
         </div>
         <div className="bg-white p-6 rounded-2xl border border-gray-50 shadow-sm">
           <div className="flex items-center gap-3 mb-3">
@@ -441,36 +325,10 @@ export default function ArticlesList() {
             <span className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Brouillons</span>
           </div>
           <p className="text-3xl font-bold text-dark">
-            {(stats.totalEditorial - stats.publishedEditorial) + (stats.totalBlog - stats.publishedBlog)}
+            {stats.totalBlog - stats.publishedBlog}
           </p>
           <p className="text-xs text-gray-400 mt-1">à finaliser</p>
         </div>
-      </div>
-
-      {/* TABS */}
-      <div className="flex items-center gap-1 bg-white p-1.5 rounded-2xl border border-gray-50 shadow-sm w-fit">
-        {(['editorial', 'blog'] as const).map((tab) => (
-          <button
-            key={tab}
-            onClick={() => { setActiveTab(tab); resetForm(); }}
-            className={`px-8 py-3 rounded-xl text-sm font-bold transition-all ${
-              activeTab === tab
-                ? 'bg-dark text-gold shadow-lg shadow-dark/10'
-                : 'text-gray-400 hover:text-dark hover:bg-gray-50'
-            }`}
-          >
-            {tab === 'editorial' ? (
-              <span className="flex items-center gap-2"><FileText size={16} /> Éditorial ({stats.totalEditorial})</span>
-            ) : (
-              <span className="flex items-center gap-2"><PenTool size={16} /> Blog ({stats.totalBlog})</span>
-            )}
-          </button>
-        ))}
-        {activeTab === 'editor' && (
-          <div className="px-8 py-3 rounded-xl text-sm font-bold bg-gold text-white shadow-lg">
-            <span className="flex items-center gap-2"><Edit2 size={16} /> Éditeur</span>
-          </div>
-        )}
       </div>
 
       {/* SEARCH + FILTER BAR */}
@@ -499,128 +357,17 @@ export default function ArticlesList() {
         </div>
       )}
 
-      {/* ═══ EDITORIAL TAB ═══ */}
-      {activeTab === 'editorial' && (
-        <div className="bg-white rounded-[32px] border border-gray-50 shadow-sm overflow-hidden">
-          {loading ? (
-            <div className="p-20 text-center text-gold font-serif text-xl">Chargement des articles...</div>
-          ) : filteredArticles.length === 0 ? (
-            <div className="p-20 text-center">
-              <FileText size={48} className="mx-auto text-gray-200 mb-4" />
-              <p className="text-gray-400 font-medium">Aucun article éditorial</p>
-              <button onClick={() => openNewEditor('editorial')} className="mt-4 px-6 py-2 bg-dark text-gold rounded-xl font-bold text-sm">
-                Créer le premier article
-              </button>
-            </div>
-          ) : (
-            <>
-              <table className="w-full text-left">
-                <thead className="bg-gray-50/50 text-[10px] uppercase tracking-widest font-bold text-gray-400">
-                  <tr>
-                    <th className="px-8 py-5">Titre</th>
-                    <th className="px-8 py-5">Catégorie</th>
-                    <th className="px-8 py-5">Type</th>
-                    <th className="px-8 py-5">Statut</th>
-                    <th className="px-8 py-5">Date</th>
-                    <th className="px-8 py-5 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-50">
-                  {filteredArticles.map((article) => (
-                    <tr key={article.id} className="hover:bg-gray-50/50 transition-colors group">
-                      <td className="px-8 py-4">
-                        <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 rounded-xl bg-cream overflow-hidden shrink-0 shadow-sm">
-                            {article.cover_image ? (
-                              <img src={article.cover_image} alt="" className="w-full h-full object-cover" />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center text-gray-300">
-                                <FileText size={20} />
-                              </div>
-                            )}
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-sm font-bold text-dark truncate max-w-[300px] group-hover:text-gold transition-colors">
-                              {article.title}
-                            </p>
-                            <p className="text-[10px] text-gray-400 truncate">{article.slug}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-8 py-4">
-                        <span className="text-xs font-bold text-gray-500 bg-gray-100 px-3 py-1 rounded-lg">
-                          {getCategoryName(article.category_id)}
-                        </span>
-                      </td>
-                      <td className="px-8 py-4">
-                        <span className="text-xs text-gray-500 capitalize">{article.type}</span>
-                      </td>
-                      <td className="px-8 py-4">
-                        <span className={`text-[10px] px-3 py-1.5 rounded-lg font-bold uppercase tracking-wider ${
-                          article.status === 'published'
-                            ? 'bg-green-50 text-green-600'
-                            : article.status === 'archived'
-                            ? 'bg-gray-100 text-gray-500'
-                            : 'bg-gold/10 text-gold'
-                        }`}>
-                          {article.status === 'published' ? 'Publié' : article.status === 'archived' ? 'Archivé' : 'Brouillon'}
-                        </span>
-                      </td>
-                      <td className="px-8 py-4">
-                        <span className="text-xs text-gray-400">{formatDate(article.published_at || article.created_at)}</span>
-                      </td>
-                      <td className="px-8 py-4 text-right">
-                        <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button
-                            onClick={() => handleTogglePublish(article.id, 'editorial', article.status)}
-                            className={`p-2 rounded-lg transition-all ${
-                              article.status === 'published'
-                                ? 'text-green-500 hover:bg-green-50'
-                                : 'text-gray-400 hover:bg-gold/10 hover:text-gold'
-                            }`}
-                            title={article.status === 'published' ? 'Dépublier' : 'Publier'}
-                          >
-                            {article.status === 'published' ? <XCircle size={16} /> : <CheckCircle size={16} />}
-                          </button>
-                          <button
-                            onClick={() => openEditor(article, 'editorial')}
-                            className="p-2 text-gray-400 hover:text-gold hover:bg-gold/10 rounded-lg transition-all"
-                            title="Modifier"
-                          >
-                            <Edit2 size={16} />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(article.id, 'editorial')}
-                            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
-                            title="Supprimer"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <div className="p-6 bg-gray-50/30 border-t border-gray-50 text-xs text-gray-400 font-medium">
-                {filteredArticles.length} article(s) éditorial
-              </div>
-            </>
-          )}
-        </div>
-      )}
-
-      {/* ═══ BLOG TAB ═══ */}
+      {/* ═══ BLOG LIST ═══ */}
       {activeTab === 'blog' && (
         <div className="bg-white rounded-[32px] border border-gray-50 shadow-sm overflow-hidden">
           {loading ? (
-            <div className="p-20 text-center text-gold font-serif text-xl">Chargement des posts...</div>
+            <div className="p-20 text-center text-gold font-serif text-xl">Chargement des articles...</div>
           ) : filteredBlogPosts.length === 0 ? (
             <div className="p-20 text-center">
               <PenTool size={48} className="mx-auto text-gray-200 mb-4" />
-              <p className="text-gray-400 font-medium">Aucun article de blog</p>
-              <button onClick={() => openNewEditor('blog')} className="mt-4 px-6 py-2 bg-dark text-gold rounded-xl font-bold text-sm">
-                Créer le premier post
+              <p className="text-gray-400 font-medium">Aucun article</p>
+              <button onClick={() => openNewEditor()} className="mt-4 px-6 py-2 bg-dark text-gold rounded-xl font-bold text-sm">
+                Créer le premier article
               </button>
             </div>
           ) : (
@@ -669,7 +416,7 @@ export default function ArticlesList() {
                       <td className="px-8 py-4 text-right">
                         <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button
-                            onClick={() => handleTogglePublish(post.id, 'blog', post.status)}
+                            onClick={() => handleTogglePublish(post.id, post.status)}
                             className={`p-2 rounded-lg transition-all ${
                               post.status === 'published'
                                 ? 'text-green-500 hover:bg-green-50'
@@ -680,14 +427,14 @@ export default function ArticlesList() {
                             {post.status === 'published' ? <XCircle size={16} /> : <CheckCircle size={16} />}
                           </button>
                           <button
-                            onClick={() => openEditor(post, 'blog')}
+                            onClick={() => openEditor(post)}
                             className="p-2 text-gray-400 hover:text-gold hover:bg-gold/10 rounded-lg transition-all"
                             title="Modifier"
                           >
                             <Edit2 size={16} />
                           </button>
                           <button
-                            onClick={() => handleDelete(post.id, 'blog')}
+                            onClick={() => handleDelete(post.id)}
                             className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
                             title="Supprimer"
                           >
@@ -700,7 +447,7 @@ export default function ArticlesList() {
                 </tbody>
               </table>
               <div className="p-6 bg-gray-50/30 border-t border-gray-50 text-xs text-gray-400 font-medium">
-                {filteredBlogPosts.length} post(s) blog
+                {filteredBlogPosts.length} article(s)
               </div>
             </>
           )}
@@ -712,18 +459,16 @@ export default function ArticlesList() {
         <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-300">
           <div className="flex items-center gap-4">
             <button
-              onClick={() => { setActiveTab(editingSource); resetForm(); }}
+              onClick={() => { setActiveTab('blog'); resetForm(); }}
               className="p-2 hover:bg-white rounded-full transition-colors text-gray-400 hover:text-dark"
             >
               <ChevronLeft size={24} />
             </button>
             <div>
               <h2 className="text-2xl font-serif font-bold text-dark">
-                {editingId ? 'Modifier' : 'Nouveau'} {editingSource === 'blog' ? 'post blog' : 'article éditorial'}
+                {editingId ? 'Modifier l\'article' : 'Nouvel article'}
               </h2>
-              <p className="text-xs text-gray-400 mt-1">
-                {editingSource === 'editorial' ? 'Table: articles' : 'Table: blog_posts'}
-              </p>
+              <p className="text-xs text-gray-400 mt-1">Blog AFRIKHER</p>
             </div>
           </div>
 
@@ -823,46 +568,6 @@ export default function ArticlesList() {
                     <option value="archived">Archivé</option>
                   </select>
                 </div>
-
-                {editingSource === 'editorial' && (
-                  <>
-                    <div>
-                      <label className="block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">Catégorie</label>
-                      <select
-                        value={formCategoryId}
-                        onChange={(e) => setFormCategoryId(e.target.value)}
-                        className="w-full p-3 bg-gray-50 border-none rounded-xl text-sm font-bold outline-none"
-                      >
-                        <option value="">— Aucune —</option>
-                        {categories.map((cat) => (
-                          <option key={cat.id} value={cat.id}>{cat.name}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">Type</label>
-                      <select
-                        value={formType}
-                        onChange={(e) => setFormType(e.target.value)}
-                        className="w-full p-3 bg-gray-50 border-none rounded-xl text-sm font-bold outline-none"
-                      >
-                        <option value="article">Article</option>
-                        <option value="interview">Interview</option>
-                        <option value="dossier">Dossier</option>
-                        <option value="portrait">Portrait</option>
-                      </select>
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-                      <span className="text-sm font-bold text-dark">Mettre en avant</span>
-                      <button
-                        onClick={() => setFormFeatured(!formFeatured)}
-                        className={`w-10 h-5 rounded-full transition-all relative ${formFeatured ? 'bg-gold' : 'bg-gray-300'}`}
-                      >
-                        <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-all ${formFeatured ? 'right-0.5' : 'left-0.5'}`} />
-                      </button>
-                    </div>
-                  </>
-                )}
               </div>
 
               {/* Action buttons */}
