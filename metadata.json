@@ -1,0 +1,9 @@
+{
+  "name": "AFRIKHER Admin Dashboard",
+  "description": "Premium editorial admin dashboard for the AFRIKHER platform, featuring content management, e-commerce tracking, and user administration.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ]
+}
