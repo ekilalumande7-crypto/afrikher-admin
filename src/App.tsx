@@ -12,6 +12,7 @@ import UsersList from './pages/UsersList';
 import CMSConfig from './pages/CMSConfig';
 import CMSAccueil from './pages/CMSAccueil';
 import CMSMagazine from './pages/CMSMagazine';
+import CMSRubriques from './pages/CMSRubriques';
 
 // Placeholder for other pages
 const Placeholder = ({ title }: { title: string }) => (
@@ -85,7 +86,7 @@ export default function App() {
             {/* Pages du site (CMS) */}
             <Route path="cms/accueil" element={<CMSAccueil />} />
             <Route path="cms/magazine" element={<CMSMagazine />} />
-            <Route path="cms/rubriques" element={<Placeholder title="Page Les Rubriques" />} />
+            <Route path="cms/rubriques" element={<CMSRubriques />} />
             <Route path="cms/qui-sommes-nous" element={<Placeholder title="Page Qui sommes-nous" />} />
             <Route path="cms/abonnement" element={<Placeholder title="Page Abonnement" />} />
             <Route path="cms/contact" element={<Placeholder title="Page Contact" />} />
