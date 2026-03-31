@@ -14,6 +14,7 @@ import CMSAccueil from './pages/CMSAccueil';
 import CMSMagazine from './pages/CMSMagazine';
 import CMSRubriques from './pages/CMSRubriques';
 import CMSQuiSommesNous from './pages/CMSQuiSommesNous';
+import SettingsPaiements from './pages/SettingsPaiements';
 
 // Placeholder for other pages
 const Placeholder = ({ title }: { title: string }) => (
@@ -102,6 +103,7 @@ export default function App() {
             <Route path="marketing/publicites" element={<Placeholder title="Gestion des Publicités" />} />
 
             {/* Paramètres */}
+            <Route path="parametres/paiements" element={<SettingsPaiements />} />
             <Route path="parametres/notifications" element={<Placeholder title="Paramètres de Notifications" />} />
           </Route>
 

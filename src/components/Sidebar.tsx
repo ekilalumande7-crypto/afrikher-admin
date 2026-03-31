@@ -89,6 +89,7 @@ const menuGroups = [
   {
     title: "Paramètres",
     items: [
+      { name: "Paiements", path: "/admin/parametres/paiements", icon: CreditCard },
       { name: "Notifications", path: "/admin/parametres/notifications", icon: Bell },
     ]
   }
