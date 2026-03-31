@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, Filter, Eye, Edit2, Trash2, CheckCircle, XCircle, Shield, Calendar, RefreshCw } from 'lucide-react';
+import { Search, Shield, Calendar, RefreshCw } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { supabase } from '../lib/supabase';
 
@@ -12,22 +12,39 @@ interface UserProfile {
   created_at: string;
 }
 
-export default function UsersList() {
+interface UsersListProps {
+  pageType: 'readers' | 'partners';
+}
+
+export default function UsersList({ pageType }: UsersListProps) {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [roleFilter, setRoleFilter] = useState<string>('all');
+
+  const isReadersPage = pageType === 'readers';
+  const pageTitle = isReadersPage ? 'Lecteurs' : 'Partenaires';
+  const pageDescription = isReadersPage
+    ? 'Utilisateurs inscrits sur le site public.'
+    : 'Partenaires inscrits sur le portail partenaire.';
 
   const fetchUsers = async () => {
     setLoading(true);
     setError(null);
 
     try {
-      // Fetch profiles from Supabase
-      const { data: profiles, error: profilesError } = await supabase
+      // Fetch profiles from Supabase filtered by page type
+      let query = supabase
         .from('profiles')
-        .select('id, full_name, role, is_blocked, created_at')
+        .select('id, full_name, role, is_blocked, created_at');
+
+      if (isReadersPage) {
+        query = query.eq('role', 'reader');
+      } else {
+        query = query.in('role', ['partner', 'pending_partner', 'rejected_partner']);
+      }
+
+      const { data: profiles, error: profilesError } = await query
         .order('created_at', { ascending: false });
 
       if (profilesError) {
@@ -94,15 +111,13 @@ export default function UsersList() {
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [pageType]);
 
-  // Filter users based on search and role
+  // Filter users based on search only (role already filtered by Supabase query)
   const filteredUsers = users.filter(user => {
-    const matchesSearch = searchQuery === '' ||
+    return searchQuery === '' ||
       (user.full_name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
       (user.email || '').toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesRole = roleFilter === 'all' || user.role === roleFilter;
-    return matchesSearch && matchesRole;
   });
 
   const toggleBlock = async (userId: string, currentlyBlocked: boolean) => {
@@ -120,9 +135,9 @@ export default function UsersList() {
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="flex items-end justify-between">
         <div>
-          <h1 className="text-4xl font-serif font-bold text-dark">Utilisateurs</h1>
+          <h1 className="text-4xl font-serif font-bold text-dark">{pageTitle}</h1>
           <p className="text-gray-400 text-sm mt-1">
-            {users.length} utilisateur{users.length !== 1 ? 's' : ''} inscrit{users.length !== 1 ? 's' : ''} — données en temps réel depuis Supabase.
+            {users.length} {pageTitle.toLowerCase()} inscrit{users.length !== 1 ? 's' : ''} — {pageDescription}
           </p>
         </div>
         <button
@@ -152,17 +167,17 @@ export default function UsersList() {
               className="w-full pl-14 pr-6 py-4 bg-gray-50 border-none rounded-2xl text-sm focus:bg-white focus:ring-2 focus:ring-gold/20 outline-none transition-all placeholder:text-gray-300"
             />
           </div>
-          <select
-            value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value)}
-            className="px-6 py-4 bg-gray-50 text-dark rounded-2xl text-sm font-bold border border-transparent hover:border-gold/20 outline-none focus:ring-2 focus:ring-gold/20"
-          >
-            <option value="all">Tous les rôles</option>
-            <option value="reader">Lecteurs</option>
-            <option value="admin">Admins</option>
-            <option value="partner">Partenaires</option>
-            <option value="pending_partner">En attente</option>
-          </select>
+          {!isReadersPage && (
+            <div className="flex items-center space-x-2">
+              <span className="text-xs text-gray-400 font-medium">Statut:</span>
+              <span className="text-xs px-3 py-1.5 bg-gold/10 text-gold rounded-lg font-bold">
+                {users.filter(u => u.role === 'partner').length} actif{users.filter(u => u.role === 'partner').length !== 1 ? 's' : ''}
+              </span>
+              <span className="text-xs px-3 py-1.5 bg-orange-50 text-orange-500 rounded-lg font-bold">
+                {users.filter(u => u.role === 'pending_partner').length} en attente
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -193,7 +208,7 @@ export default function UsersList() {
             ) : filteredUsers.length === 0 ? (
               <tr>
                 <td colSpan={6} className="px-10 py-20 text-center text-gray-400">
-                  {searchQuery || roleFilter !== 'all' ? 'Aucun utilisateur ne correspond aux critères.' : 'Aucun utilisateur inscrit.'}
+                  {searchQuery ? 'Aucun résultat pour cette recherche.' : `Aucun ${isReadersPage ? 'lecteur' : 'partenaire'} inscrit.`}
                 </td>
               </tr>
             ) : filteredUsers.map((user) => (
@@ -268,8 +283,8 @@ export default function UsersList() {
         </table>
         <div className="p-8 bg-gray-50/30 border-t border-gray-50 flex items-center justify-between">
           <p className="text-xs text-gray-400 font-medium">
-            {filteredUsers.length} utilisateur{filteredUsers.length !== 1 ? 's' : ''} affiché{filteredUsers.length !== 1 ? 's' : ''}
-            {(searchQuery || roleFilter !== 'all') ? ` (sur ${users.length} total)` : ''}
+            {filteredUsers.length} {pageTitle.toLowerCase()} affiché{filteredUsers.length !== 1 ? 's' : ''}
+            {searchQuery ? ` (sur ${users.length} total)` : ''}
           </p>
         </div>
       </div>

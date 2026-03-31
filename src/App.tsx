@@ -74,8 +74,8 @@ export default function App() {
             <Route path="boutique/commandes" element={<Placeholder title="Gestion des Commandes" />} />
 
             {/* Utilisateurs */}
-            <Route path="utilisateurs/lecteurs" element={<UsersList />} />
-            <Route path="utilisateurs/partenaires" element={<UsersList />} />
+            <Route path="utilisateurs/lecteurs" element={<UsersList pageType="readers" />} />
+            <Route path="utilisateurs/partenaires" element={<UsersList pageType="partners" />} />
             <Route path="utilisateurs/abonnements" element={<Placeholder title="Gestion des Abonnements" />} />
 
             {/* CMS */}
