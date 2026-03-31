@@ -136,11 +136,19 @@ export default function UsersList({ pageType }: UsersListProps) {
     setAddError('');
 
     try {
-      // Create user via Supabase Auth admin API through the Next.js API
+      // Get auth token for API call
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error('Session expirée. Reconnectez-vous.');
+      }
+
       const apiBase = import.meta.env.VITE_API_BASE_URL || '';
-      const res = await fetch(`${apiBase}/admin/partners/create`, {
+      const res = await fetch(`${apiBase}/api/admin/partners/create`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
         body: JSON.stringify(addForm),
       });
 
