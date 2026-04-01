@@ -66,20 +66,16 @@ const statusLabels: Record<string, string> = {
   draft: 'Brouillon',
 };
 
-// Monthly revenue mock data (will be replaced when orders have real data)
-const monthlyData = [
-  { month: 'Oct', revenue: 1200 },
-  { month: 'Nov', revenue: 1800 },
-  { month: 'Déc', revenue: 2400 },
-  { month: 'Jan', revenue: 1900 },
-  { month: 'Fév', revenue: 2800 },
-  { month: 'Mar', revenue: 3200 },
-];
+// French month names for chart labels
+const MONTH_NAMES_FR = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
+const FULL_MONTH_NAMES_FR = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
 
 export default function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([]);
   const [recentArticles, setRecentArticles] = useState<RecentArticle[]>([]);
+  const [monthlyData, setMonthlyData] = useState<{ month: string; revenue: number }[]>([]);
+  const [totalRevenue, setTotalRevenue] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -120,20 +116,60 @@ export default function Dashboard() {
         supabase.from('articles').select('id, title, slug, status, created_at, categories(name)').order('created_at', { ascending: false }).limit(5),
       ]);
 
-      // Calculate revenue this month
+      // Fetch ALL orders with totals for revenue calculations (paid + pending)
       const now = new Date();
       const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-      const revenueRes = await supabase
+
+      // Get all orders for revenue calculations (last 6 months)
+      const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1).toISOString();
+      const allOrdersRes = await supabase
+        .from('orders')
+        .select('total, status, created_at')
+        .gte('created_at', sixMonthsAgo);
+
+      const allOrders = allOrdersRes.data || [];
+
+      // Revenue this month (paid orders only)
+      const revenueMonth = allOrders
+        .filter((o: any) => o.status === 'paid' && o.created_at >= startOfMonth)
+        .reduce((sum: number, o: any) => sum + (parseFloat(o.total) || 0), 0);
+
+      // Total revenue (all paid orders)
+      const allPaidRes = await supabase
         .from('orders')
         .select('total')
-        .eq('status', 'paid')
-        .gte('created_at', startOfMonth);
+        .eq('status', 'paid');
+      const totalRev = (allPaidRes.data || []).reduce((sum: number, o: any) => sum + (parseFloat(o.total) || 0), 0);
+      setTotalRevenue(totalRev);
 
-      const revenueMonth = (revenueRes.data || []).reduce((sum: number, o: any) => sum + (parseFloat(o.total) || 0), 0);
+      // Build monthly revenue data for chart (last 6 months)
+      const monthlyRevData: { month: string; revenue: number }[] = [];
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const monthStart = new Date(d.getFullYear(), d.getMonth(), 1);
+        const monthEnd = new Date(d.getFullYear(), d.getMonth() + 1, 1);
+        const monthRev = allOrders
+          .filter((o: any) => {
+            const created = new Date(o.created_at);
+            return (o.status === 'paid' || o.status === 'pending') && created >= monthStart && created < monthEnd;
+          })
+          .reduce((sum: number, o: any) => sum + (parseFloat(o.total) || 0), 0);
+        monthlyRevData.push({
+          month: MONTH_NAMES_FR[d.getMonth()],
+          revenue: Math.round(monthRev * 100) / 100,
+        });
+      }
+      setMonthlyData(monthlyRevData);
+
+      // Also fetch blog_posts count
+      const blogRes = await supabase.from('blog_posts').select('id', { count: 'exact', head: true });
+      const totalArticlesCount = (articlesRes.count || 0) + (blogRes.count || 0);
+      const publishedBlogRes = await supabase.from('blog_posts').select('id', { count: 'exact', head: true }).eq('status', 'published');
+      const totalPublished = (publishedRes.count || 0) + (publishedBlogRes.count || 0);
 
       setStats({
-        totalArticles: articlesRes.count || 0,
-        publishedArticles: publishedRes.count || 0,
+        totalArticles: totalArticlesCount,
+        publishedArticles: totalPublished,
         totalOrders: ordersRes.count || 0,
         revenueMonth,
         activeSubscribers: subscribersRes.count || 0,
@@ -149,12 +185,27 @@ export default function Dashboard() {
       }));
       setRecentOrders(orders);
 
-      // Process recent articles
-      const articles = (recentArticlesRes.data || []).map((a: any) => ({
-        ...a,
-        category_name: a.categories?.name || 'Non catégorisé',
-      }));
-      setRecentArticles(articles);
+      // Fetch recent blog posts too
+      const recentBlogRes = await supabase
+        .from('blog_posts')
+        .select('id, title, slug, status, created_at')
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      // Merge articles and blog posts, sort by date, take top 5
+      const allArticles = [
+        ...(recentArticlesRes.data || []).map((a: any) => ({
+          ...a,
+          category_name: a.categories?.name || 'Éditorial',
+        })),
+        ...(recentBlogRes.data || []).map((b: any) => ({
+          ...b,
+          category_name: 'Blog',
+        })),
+      ]
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+        .slice(0, 5);
+      setRecentArticles(allArticles);
 
     } catch (err) {
       console.error('Dashboard fetch error:', err);
@@ -236,19 +287,21 @@ export default function Dashboard() {
             <p className="text-3xl font-bold" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
               {(stats?.revenueMonth || 0).toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €
             </p>
-            <p className="text-[#9A9A8A] text-xs mt-2">Mars 2026</p>
+            <p className="text-[#9A9A8A] text-xs mt-2">{FULL_MONTH_NAMES_FR[new Date().getMonth()]} {new Date().getFullYear()}</p>
           </div>
 
-          {/* Subscribers */}
+          {/* Total Revenue */}
           <div className="bg-white rounded-2xl p-6 border border-gray-100">
             <div className="flex items-center justify-between mb-4">
-              <span className="text-[#9A9A8A] text-xs font-medium uppercase tracking-wider">Abonnés actifs</span>
-              <UserPlus size={18} className="text-[#C9A84C]" />
+              <span className="text-[#9A9A8A] text-xs font-medium uppercase tracking-wider">Revenu total</span>
+              <TrendingUp size={18} className="text-[#C9A84C]" />
             </div>
             <p className="text-3xl font-bold text-[#0A0A0A]" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
-              {stats?.activeSubscribers || 0}
+              {totalRevenue.toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €
             </p>
-            <p className="text-[#9A9A8A] text-xs mt-2">Abonnements magazine</p>
+            <p className="text-[#9A9A8A] text-xs mt-2">
+              {stats?.activeSubscribers || 0} abonné{(stats?.activeSubscribers || 0) > 1 ? 's' : ''} actif{(stats?.activeSubscribers || 0) > 1 ? 's' : ''}
+            </p>
           </div>
         </div>
 
