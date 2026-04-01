@@ -158,13 +158,13 @@ export default function SettingsPaiements() {
       {/* Header */}
       <div className="flex items-end justify-between">
         <div>
-          <h1 className="text-4xl font-serif font-bold text-dark">Paiements</h1>
+          <h1 className="text-4xl font-sans font-bold text-slate-900">Paiements</h1>
           <p className="text-gray-400 text-sm mt-1">Configurez votre integration FIDEPAY pour recevoir les paiements.</p>
         </div>
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center px-8 py-3.5 bg-dark text-white rounded-2xl hover:bg-charcoal transition-all font-bold tracking-wide shadow-lg shadow-dark/10 disabled:opacity-50"
+          className="flex items-center px-8 py-3.5 bg-white text-slate-900 rounded-2xl hover:bg-slate-100 transition-all font-bold tracking-wide shadow-lg shadow-slate-200 disabled:opacity-50"
         >
           {saving ? (
             <span className="flex items-center">
@@ -178,7 +178,7 @@ export default function SettingsPaiements() {
             </span>
           ) : (
             <span className="flex items-center">
-              <Save size={20} className="mr-2 text-gold" />
+              <Save size={20} className="mr-2 text-green-600" />
               Enregistrer
             </span>
           )}
@@ -196,7 +196,7 @@ export default function SettingsPaiements() {
       {/* Mode selector */}
       <div className="bg-white p-8 rounded-[32px] border border-gray-50 shadow-sm space-y-6">
         <div className="border-b border-gray-50 pb-6">
-          <h3 className="text-xl font-serif font-bold text-dark">Mode de paiement</h3>
+          <h3 className="text-xl font-sans font-bold text-slate-900">Mode de paiement</h3>
           <p className="text-sm text-gray-400 mt-1">Choisissez entre le mode test (sandbox) et le mode production (live).</p>
         </div>
 
@@ -206,21 +206,21 @@ export default function SettingsPaiements() {
             className={cn(
               "p-6 rounded-2xl border-2 transition-all text-left",
               config.fidepay_mode === 'test'
-                ? "border-gold bg-gold/5"
+                ? "border-gold bg-green-50"
                 : "border-gray-100 hover:border-gray-200"
             )}
           >
             <div className="flex items-center space-x-3 mb-3">
               <div className={cn(
                 "w-10 h-10 rounded-xl flex items-center justify-center",
-                config.fidepay_mode === 'test' ? "bg-gold/10 text-gold" : "bg-gray-100 text-gray-400"
+                config.fidepay_mode === 'test' ? "bg-green-50 text-green-600" : "bg-gray-100 text-gray-400"
               )}>
                 <TestTube size={20} />
               </div>
               <div>
-                <h4 className="font-bold text-dark text-sm">Mode Test (Sandbox)</h4>
+                <h4 className="font-bold text-slate-900 text-sm">Mode Test (Sandbox)</h4>
                 {config.fidepay_mode === 'test' && (
-                  <span className="text-[10px] font-bold text-gold uppercase tracking-widest">Actif</span>
+                  <span className="text-[10px] font-bold text-green-600 uppercase tracking-widest">Actif</span>
                 )}
               </div>
             </div>
@@ -246,7 +246,7 @@ export default function SettingsPaiements() {
                 <Zap size={20} />
               </div>
               <div>
-                <h4 className="font-bold text-dark text-sm">Mode Production (Live)</h4>
+                <h4 className="font-bold text-slate-900 text-sm">Mode Production (Live)</h4>
                 {config.fidepay_mode === 'live' && (
                   <span className="text-[10px] font-bold text-green-600 uppercase tracking-widest">Actif</span>
                 )}
@@ -267,10 +267,10 @@ export default function SettingsPaiements() {
               <Link2 size={20} />
             </div>
             <div>
-              <h3 className="text-xl font-serif font-bold text-dark">URLs API FIDEPAY</h3>
+              <h3 className="text-xl font-sans font-bold text-slate-900">URLs API FIDEPAY</h3>
               <p className="text-sm text-gray-400 mt-0.5">
                 Copiez les URLs depuis la page{' '}
-                <a href="https://merchant.fide-pay.com/dashboard/api-access-key" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline font-medium">
+                <a href="https://merchant.fide-pay.com/dashboard/api-access-key" target="_blank" rel="noopener noreferrer" className="text-green-600 hover:underline font-medium">
                   Cle d'acces API
                 </a>
                 {' '}de votre dashboard FIDEPAY.
@@ -290,7 +290,7 @@ export default function SettingsPaiements() {
               value={config.fidepay_access_token_url}
               onChange={(e) => setConfig({ ...config, fidepay_access_token_url: e.target.value })}
               placeholder="https://admin.fide-pay.com/api/merchant/access-token"
-              className="w-full p-4 bg-gray-50 border-none rounded-2xl text-sm font-mono outline-none focus:ring-2 focus:ring-gold/20 placeholder:text-gray-300"
+              className="w-full p-4 bg-gray-50 border-none rounded-2xl text-sm font-mono outline-none focus:ring-2 focus:ring-green-500/20 placeholder:text-gray-300"
             />
             <p className="text-[11px] text-gray-400 mt-1.5">
               Endpoint pour obtenir le token d'authentification.
@@ -307,7 +307,7 @@ export default function SettingsPaiements() {
               value={config.fidepay_make_payment_url}
               onChange={(e) => setConfig({ ...config, fidepay_make_payment_url: e.target.value })}
               placeholder="https://admin.fide-pay.com/api/merchant/make-payment"
-              className="w-full p-4 bg-gray-50 border-none rounded-2xl text-sm font-mono outline-none focus:ring-2 focus:ring-gold/20 placeholder:text-gray-300"
+              className="w-full p-4 bg-gray-50 border-none rounded-2xl text-sm font-mono outline-none focus:ring-2 focus:ring-green-500/20 placeholder:text-gray-300"
             />
             <p className="text-[11px] text-gray-400 mt-1.5">
               Endpoint pour creer un paiement.
@@ -320,14 +320,14 @@ export default function SettingsPaiements() {
       <div className="bg-white p-8 rounded-[32px] border border-gray-50 shadow-sm space-y-6">
         <div className="border-b border-gray-50 pb-6">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gold/10 rounded-xl flex items-center justify-center text-gold">
+            <div className="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center text-green-600">
               <CreditCard size={20} />
             </div>
             <div>
-              <h3 className="text-xl font-serif font-bold text-dark">Cles API FIDEPAY</h3>
+              <h3 className="text-xl font-sans font-bold text-slate-900">Cles API FIDEPAY</h3>
               <p className="text-sm text-gray-400 mt-0.5">
                 Obtenez vos cles depuis votre{' '}
-                <a href="https://merchant.fide-pay.com/dashboard/api-access-key" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline font-medium">
+                <a href="https://merchant.fide-pay.com/dashboard/api-access-key" target="_blank" rel="noopener noreferrer" className="text-green-600 hover:underline font-medium">
                   dashboard FIDEPAY
                 </a>
               </p>
@@ -347,7 +347,7 @@ export default function SettingsPaiements() {
               onChange={(e) => setConfig({ ...config, fidepay_public_key: e.target.value })}
               placeholder="Entrez votre cle publique FIDEPAY..."
               autoComplete="off"
-              className="w-full p-4 bg-gray-50 border-none rounded-2xl text-sm font-mono outline-none focus:ring-2 focus:ring-gold/20 placeholder:text-gray-300"
+              className="w-full p-4 bg-gray-50 border-none rounded-2xl text-sm font-mono outline-none focus:ring-2 focus:ring-green-500/20 placeholder:text-gray-300"
             />
             <p className="text-[11px] text-gray-400 mt-1.5">
               Utilisee pour obtenir le token d'acces.
@@ -366,12 +366,12 @@ export default function SettingsPaiements() {
                 onChange={(e) => setConfig({ ...config, fidepay_secret_key: e.target.value })}
                 placeholder="Entrez votre cle secrete FIDEPAY..."
                 autoComplete="off"
-                className="w-full p-4 pr-12 bg-gray-50 border-none rounded-2xl text-sm font-mono outline-none focus:ring-2 focus:ring-gold/20 placeholder:text-gray-300"
+                className="w-full p-4 pr-12 bg-gray-50 border-none rounded-2xl text-sm font-mono outline-none focus:ring-2 focus:ring-green-500/20 placeholder:text-gray-300"
               />
               <button
                 type="button"
                 onClick={() => setShowSecret(!showSecret)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-dark transition-colors"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-slate-900 transition-colors"
               >
                 {showSecret ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
@@ -386,7 +386,7 @@ export default function SettingsPaiements() {
       {/* Test connection */}
       <div className="bg-white p-8 rounded-[32px] border border-gray-50 shadow-sm space-y-6">
         <div className="border-b border-gray-50 pb-6">
-          <h3 className="text-xl font-serif font-bold text-dark">Tester la connexion</h3>
+          <h3 className="text-xl font-sans font-bold text-slate-900">Tester la connexion</h3>
           <p className="text-sm text-gray-400 mt-1">Verifiez que vos cles API fonctionnent correctement.</p>
         </div>
 
@@ -398,7 +398,7 @@ export default function SettingsPaiements() {
               "flex items-center px-6 py-3 rounded-2xl font-bold text-sm transition-all",
               testing
                 ? "bg-gray-100 text-gray-400"
-                : "bg-gold/10 text-gold hover:bg-gold/20"
+                : "bg-green-50 text-green-600 hover:bg-green-600/20"
             )}
           >
             {testing ? (
@@ -432,12 +432,12 @@ export default function SettingsPaiements() {
       </div>
 
       {/* Security notice */}
-      <div className="bg-gold/5 p-8 rounded-[32px] border border-gold/10 flex items-start space-x-6">
-        <div className="w-12 h-12 bg-gold rounded-2xl flex items-center justify-center text-white shrink-0">
+      <div className="bg-green-50 p-8 rounded-[32px] border border-gold/10 flex items-start space-x-6">
+        <div className="w-12 h-12 bg-green-600 rounded-2xl flex items-center justify-center text-slate-900 shrink-0">
           <Shield size={24} />
         </div>
         <div>
-          <h4 className="text-lg font-serif font-bold text-dark">Securite</h4>
+          <h4 className="text-lg font-sans font-bold text-slate-900">Securite</h4>
           <p className="text-sm text-gray-500 mt-1 leading-relaxed">
             Vos cles API sont stockees de maniere securisee dans la base de donnees. La cle secrete n'est jamais exposee cote client.
             Les paiements sont traites exclusivement par FIDEPAY, qui integre Stripe et Mobile Money.

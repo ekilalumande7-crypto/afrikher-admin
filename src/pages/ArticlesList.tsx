@@ -270,18 +270,18 @@ export default function ArticlesList() {
       {/* HEADER */}
       <div className="flex items-end justify-between">
         <div>
-          <h1 className="text-4xl font-serif font-bold text-dark">Articles</h1>
+          <h1 className="text-4xl font-sans font-bold text-slate-900">Articles</h1>
           <p className="text-gray-400 text-sm mt-1">Gérez les articles du blog AFRIKHER.</p>
         </div>
         <div className="flex items-center gap-3">
-          <button onClick={fetchData} className="p-3 bg-white text-gray-400 hover:text-gold rounded-2xl border border-gray-100 transition-all" title="Rafraîchir">
+          <button onClick={fetchData} className="p-3 bg-white text-gray-400 hover:text-green-600 rounded-2xl border border-gray-100 transition-all" title="Rafraîchir">
             <RefreshCw size={20} />
           </button>
           <button
             onClick={() => openNewEditor()}
-            className="flex items-center px-8 py-3.5 bg-dark text-white rounded-2xl hover:bg-charcoal transition-all font-bold tracking-wide shadow-lg shadow-dark/10"
+            className="flex items-center px-8 py-3.5 bg-white text-slate-900 rounded-2xl hover:bg-slate-100 transition-all font-bold tracking-wide shadow-lg shadow-slate-200"
           >
-            <Plus size={20} className="mr-2 text-gold" />
+            <Plus size={20} className="mr-2 text-green-600" />
             Nouvel article
           </button>
         </div>
@@ -308,7 +308,7 @@ export default function ArticlesList() {
             <div className="p-2 bg-purple-50 rounded-xl"><PenTool size={18} className="text-purple-500" /></div>
             <span className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Total</span>
           </div>
-          <p className="text-3xl font-bold text-dark">{stats.totalBlog}</p>
+          <p className="text-3xl font-bold text-slate-900">{stats.totalBlog}</p>
           <p className="text-xs text-gray-400 mt-1">articles</p>
         </div>
         <div className="bg-white p-6 rounded-2xl border border-gray-50 shadow-sm">
@@ -316,15 +316,15 @@ export default function ArticlesList() {
             <div className="p-2 bg-green-50 rounded-xl"><Globe size={18} className="text-green-500" /></div>
             <span className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Publiés</span>
           </div>
-          <p className="text-3xl font-bold text-dark">{stats.publishedBlog}</p>
+          <p className="text-3xl font-bold text-slate-900">{stats.publishedBlog}</p>
           <p className="text-xs text-gray-400 mt-1">en ligne</p>
         </div>
         <div className="bg-white p-6 rounded-2xl border border-gray-50 shadow-sm">
           <div className="flex items-center gap-3 mb-3">
-            <div className="p-2 bg-gold/10 rounded-xl"><BookOpen size={18} className="text-gold" /></div>
+            <div className="p-2 bg-green-50 rounded-xl"><BookOpen size={18} className="text-green-600" /></div>
             <span className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Brouillons</span>
           </div>
-          <p className="text-3xl font-bold text-dark">
+          <p className="text-3xl font-bold text-slate-900">
             {stats.totalBlog - stats.publishedBlog}
           </p>
           <p className="text-xs text-gray-400 mt-1">à finaliser</p>
@@ -341,13 +341,13 @@ export default function ArticlesList() {
               placeholder="Rechercher par titre..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-gold/20 outline-none transition-all placeholder:text-gray-300"
+              className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-green-500/20 outline-none transition-all placeholder:text-gray-300"
             />
           </div>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-3 bg-gray-50 border-none rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-gold/20"
+            className="px-4 py-3 bg-gray-50 border-none rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-green-500/20"
           >
             <option value="all">Tous les statuts</option>
             <option value="published">Publiés</option>
@@ -361,12 +361,12 @@ export default function ArticlesList() {
       {activeTab === 'blog' && (
         <div className="bg-white rounded-[32px] border border-gray-50 shadow-sm overflow-hidden">
           {loading ? (
-            <div className="p-20 text-center text-gold font-serif text-xl">Chargement des articles...</div>
+            <div className="p-20 text-center text-green-600 font-sans text-xl">Chargement des articles...</div>
           ) : filteredBlogPosts.length === 0 ? (
             <div className="p-20 text-center">
               <PenTool size={48} className="mx-auto text-gray-200 mb-4" />
               <p className="text-gray-400 font-medium">Aucun article</p>
-              <button onClick={() => openNewEditor()} className="mt-4 px-6 py-2 bg-dark text-gold rounded-xl font-bold text-sm">
+              <button onClick={() => openNewEditor()} className="mt-4 px-6 py-2 bg-white text-green-600 rounded-xl font-bold text-sm">
                 Créer le premier article
               </button>
             </div>
@@ -396,7 +396,7 @@ export default function ArticlesList() {
                             )}
                           </div>
                           <div className="min-w-0">
-                            <p className="text-sm font-bold text-dark truncate max-w-[400px] group-hover:text-gold transition-colors">
+                            <p className="text-sm font-bold text-slate-900 truncate max-w-[400px] group-hover:text-green-600 transition-colors">
                               {post.title}
                             </p>
                             <p className="text-[10px] text-gray-400 truncate">{post.slug}</p>
@@ -405,7 +405,7 @@ export default function ArticlesList() {
                       </td>
                       <td className="px-8 py-4">
                         <span className={`text-[10px] px-3 py-1.5 rounded-lg font-bold uppercase tracking-wider ${
-                          post.status === 'published' ? 'bg-green-50 text-green-600' : 'bg-gold/10 text-gold'
+                          post.status === 'published' ? 'bg-green-50 text-green-600' : 'bg-green-50 text-green-600'
                         }`}>
                           {post.status === 'published' ? 'Publié' : 'Brouillon'}
                         </span>
@@ -420,7 +420,7 @@ export default function ArticlesList() {
                             className={`p-2 rounded-lg transition-all ${
                               post.status === 'published'
                                 ? 'text-green-500 hover:bg-green-50'
-                                : 'text-gray-400 hover:bg-gold/10 hover:text-gold'
+                                : 'text-gray-400 hover:bg-green-50 hover:text-green-600'
                             }`}
                             title={post.status === 'published' ? 'Dépublier' : 'Publier'}
                           >
@@ -428,7 +428,7 @@ export default function ArticlesList() {
                           </button>
                           <button
                             onClick={() => openEditor(post)}
-                            className="p-2 text-gray-400 hover:text-gold hover:bg-gold/10 rounded-lg transition-all"
+                            className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"
                             title="Modifier"
                           >
                             <Edit2 size={16} />
@@ -460,12 +460,12 @@ export default function ArticlesList() {
           <div className="flex items-center gap-4">
             <button
               onClick={() => { setActiveTab('blog'); resetForm(); }}
-              className="p-2 hover:bg-white rounded-full transition-colors text-gray-400 hover:text-dark"
+              className="p-2 hover:bg-white rounded-full transition-colors text-gray-400 hover:text-slate-900"
             >
               <ChevronLeft size={24} />
             </button>
             <div>
-              <h2 className="text-2xl font-serif font-bold text-dark">
+              <h2 className="text-2xl font-sans font-bold text-slate-900">
                 {editingId ? 'Modifier l\'article' : 'Nouvel article'}
               </h2>
               <p className="text-xs text-gray-400 mt-1">Blog AFRIKHER</p>
@@ -483,7 +483,7 @@ export default function ArticlesList() {
                     value={formTitle}
                     onChange={(e) => setFormTitle(e.target.value)}
                     placeholder="Titre de l'article..."
-                    className="w-full text-2xl font-serif font-bold text-dark border-none focus:ring-0 placeholder:text-gray-200 outline-none bg-transparent"
+                    className="w-full text-2xl font-sans font-bold text-slate-900 border-none focus:ring-0 placeholder:text-gray-200 outline-none bg-transparent"
                   />
                 </div>
 
@@ -504,7 +504,7 @@ export default function ArticlesList() {
                     onChange={(e) => setFormExcerpt(e.target.value)}
                     placeholder="Court résumé pour les listes..."
                     rows={3}
-                    className="w-full p-4 bg-gray-50 border-none rounded-xl text-sm outline-none resize-none focus:ring-2 focus:ring-gold/20"
+                    className="w-full p-4 bg-gray-50 border-none rounded-xl text-sm outline-none resize-none focus:ring-2 focus:ring-green-500/20"
                   />
                 </div>
 
@@ -515,7 +515,7 @@ export default function ArticlesList() {
                     onChange={(e) => setFormContent(e.target.value)}
                     placeholder="<p>Écrivez votre contenu ici...</p>"
                     rows={15}
-                    className="w-full p-4 bg-gray-50 border-none rounded-xl text-sm font-mono outline-none resize-y focus:ring-2 focus:ring-gold/20"
+                    className="w-full p-4 bg-gray-50 border-none rounded-xl text-sm font-mono outline-none resize-y focus:ring-2 focus:ring-green-500/20"
                   />
                 </div>
               </div>
@@ -525,11 +525,11 @@ export default function ArticlesList() {
             <div className="space-y-6">
               {/* Cover image */}
               <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-4">
-                <h3 className="text-sm font-bold text-dark border-b border-gray-50 pb-3">Image de couverture</h3>
+                <h3 className="text-sm font-bold text-slate-900 border-b border-gray-50 pb-3">Image de couverture</h3>
                 {formCoverImage ? (
                   <div className="relative group rounded-xl overflow-hidden">
                     <img src={formCoverImage} alt="" className="w-full aspect-video object-cover" />
-                    <div className="absolute inset-0 bg-dark/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <div className="absolute inset-0 bg-white/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                       <button onClick={() => setFormCoverImage('')} className="p-2 bg-white rounded-full text-red-500">
                         <X size={16} />
                       </button>
@@ -537,9 +537,9 @@ export default function ArticlesList() {
                   </div>
                 ) : (
                   <label className="block cursor-pointer">
-                    <div className="aspect-video rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center hover:border-gold/30 hover:bg-gold/5 transition-all">
+                    <div className="aspect-video rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center hover:border-gold/30 hover:bg-green-50 transition-all">
                       {uploading ? (
-                        <RefreshCw size={24} className="text-gold animate-spin" />
+                        <RefreshCw size={24} className="text-green-600 animate-spin" />
                       ) : (
                         <>
                           <Upload size={24} className="text-gray-300 mb-2" />
@@ -554,7 +554,7 @@ export default function ArticlesList() {
 
               {/* Settings */}
               <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-4">
-                <h3 className="text-sm font-bold text-dark border-b border-gray-50 pb-3">Paramètres</h3>
+                <h3 className="text-sm font-bold text-slate-900 border-b border-gray-50 pb-3">Paramètres</h3>
 
                 <div>
                   <label className="block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">Statut</label>
@@ -575,7 +575,7 @@ export default function ArticlesList() {
                 <button
                   onClick={() => handleSave(false)}
                   disabled={saving}
-                  className="w-full flex items-center justify-center px-6 py-3 border-2 border-dark text-dark rounded-xl hover:bg-dark hover:text-white transition-all font-bold text-sm disabled:opacity-50"
+                  className="w-full flex items-center justify-center px-6 py-3 border-2 border-dark text-slate-900 rounded-xl hover:bg-white hover:text-slate-900 transition-all font-bold text-sm disabled:opacity-50"
                 >
                   <Save size={16} className="mr-2" />
                   {saving ? 'Enregistrement...' : 'Enregistrer brouillon'}
@@ -583,7 +583,7 @@ export default function ArticlesList() {
                 <button
                   onClick={() => handleSave(true)}
                   disabled={saving}
-                  className="w-full flex items-center justify-center px-6 py-3 bg-gold text-white rounded-xl hover:bg-gold/90 transition-all font-bold text-sm shadow-lg shadow-gold/20 disabled:opacity-50"
+                  className="w-full flex items-center justify-center px-6 py-3 bg-green-600 text-slate-900 rounded-xl hover:bg-green-600/90 transition-all font-bold text-sm shadow-lg shadow-gold/20 disabled:opacity-50"
                 >
                   <Send size={16} className="mr-2" />
                   {saving ? 'Publication...' : 'Publier maintenant'}

@@ -107,19 +107,19 @@ export default function Sidebar() {
 
   return (
     <aside className={cn(
-      "h-screen bg-dark text-white flex flex-col transition-all duration-300 border-r border-charcoal sticky top-0 z-20",
+      "h-screen bg-white text-slate-900 flex flex-col transition-all duration-300 border-r border-slate-200 sticky top-0 z-20",
       collapsed ? "w-20" : "w-72"
     )}>
       <div className="p-6 flex items-center justify-between">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-gold rounded-xl flex items-center justify-center text-dark font-serif text-xl font-bold">
+          <div className="w-10 h-10 bg-gold rounded-xl flex items-center justify-center text-slate-900 font-serif text-xl font-bold">
             A
           </div>
-          {!collapsed && <span className="text-xl font-serif font-bold text-white tracking-tight">AFRIKHER</span>}
+          {!collapsed && <span className="text-xl font-serif font-bold text-slate-900 tracking-tight">AFRIKHER</span>}
         </div>
-        <button 
+        <button
           onClick={() => setCollapsed(!collapsed)}
-          className="p-1.5 hover:bg-charcoal rounded-lg transition-colors text-gray-500"
+          className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors text-slate-600"
         >
           {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
         </button>
@@ -129,7 +129,7 @@ export default function Sidebar() {
         {menuGroups.map((group, idx) => (
           <div key={idx} className="mb-6">
             {!collapsed && (
-              <h3 className="px-8 text-[11px] uppercase tracking-[0.2em] text-gray-500 font-bold mb-3">
+              <h3 className="px-8 text-[11px] uppercase tracking-[0.2em] text-slate-500 font-bold mb-3">
                 {group.title}
               </h3>
             )}
@@ -141,17 +141,17 @@ export default function Sidebar() {
                     end={item.path === '/admin'}
                     className={({ isActive }) => cn(
                       "flex items-center px-8 py-3 text-sm transition-all group mb-1",
-                      isActive 
-                        ? "text-gold bg-gold/5 font-bold" 
-                        : "text-gray-400 hover:text-white hover:bg-charcoal/30"
+                      isActive
+                        ? "text-green-700 bg-green-50 font-bold"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                     )}
                   >
                     {({ isActive }) => (
                       <>
                         {isActive && (
-                          <div className="absolute left-0 top-0 bottom-0 w-1 bg-gold rounded-r-full shadow-[0_0_10px_rgba(201,168,76,0.5)]" />
+                          <div className="absolute left-0 top-0 bottom-0 w-1 bg-green-700 rounded-r-full shadow-[0_0_10px_rgba(39,174,96,0.3)]" />
                         )}
-                        <item.icon size={20} className={cn("shrink-0", isActive ? "text-gold" : "text-gray-500 group-hover:text-gray-300")} />
+                        <item.icon size={20} className={cn("shrink-0", isActive ? "text-green-700" : "text-slate-500 group-hover:text-slate-700")} />
                         {!collapsed && <span className="ml-3 font-medium">{item.name}</span>}
                       </>
                     )}
@@ -163,21 +163,21 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      <div className="p-4 border-t border-charcoal">
-        <div className="bg-charcoal/30 p-3 rounded-2xl flex items-center space-x-3 border border-charcoal/50">
+      <div className="p-4 border-t border-slate-200">
+        <div className="bg-slate-50 p-3 rounded-2xl flex items-center space-x-3 border border-slate-200">
           <div className="w-10 h-10 rounded-xl bg-gold/10 flex items-center justify-center text-gold overflow-hidden">
             <User size={20} />
           </div>
           {!collapsed && (
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-white truncate">{user?.full_name || 'Admin'}</p>
-              <p className="text-[10px] text-gray-500 truncate">{user?.email || 'Administrateur'}</p>
+              <p className="text-sm font-bold text-slate-900 truncate">{user?.full_name || 'Admin'}</p>
+              <p className="text-[10px] text-slate-500 truncate">{user?.email || 'Administrateur'}</p>
             </div>
           )}
           {!collapsed && (
             <button
               onClick={handleLogout}
-              className="p-2 hover:bg-charcoal rounded-lg text-gray-500 hover:text-red-400 transition-colors"
+              className="p-2 hover:bg-slate-200 rounded-lg text-slate-500 hover:text-red-600 transition-colors"
               title="Se déconnecter"
             >
               <LogOut size={16} />

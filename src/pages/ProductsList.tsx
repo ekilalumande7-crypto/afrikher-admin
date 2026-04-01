@@ -439,14 +439,14 @@ export default function ProductsList() {
       {/* Header */}
       <div className="flex items-end justify-between">
         <div>
-          <h1 className="text-4xl font-serif font-bold text-dark">Boutique</h1>
+          <h1 className="text-4xl font-sans font-bold text-slate-900">Boutique</h1>
           <p className="text-gray-400 text-sm mt-1">Gérez votre catalogue de produits, stocks et produits partenaires.</p>
         </div>
         <button
           onClick={() => openEditor()}
-          className="flex items-center px-8 py-3.5 bg-dark text-white rounded-2xl hover:bg-charcoal transition-all font-bold tracking-wide shadow-lg shadow-dark/10"
+          className="flex items-center px-8 py-3.5 bg-white text-slate-900 rounded-2xl hover:bg-slate-100 transition-all font-bold tracking-wide shadow-lg shadow-slate-200"
         >
-          <Plus size={20} className="mr-2 text-gold" />
+          <Plus size={20} className="mr-2 text-green-600" />
           Nouveau produit
         </button>
       </div>
@@ -457,7 +457,7 @@ export default function ProductsList() {
           { title: 'Total Produits', value: stats.total, icon: Package, color: 'text-blue-600', bg: 'bg-blue-50' },
           { title: 'Actifs', value: stats.active, icon: CheckCircle, color: 'text-emerald-600', bg: 'bg-emerald-50' },
           { title: 'Rupture', value: stats.outOfStock, icon: XCircle, color: 'text-red-600', bg: 'bg-red-50' },
-          { title: 'En attente partenaires', value: stats.pending, icon: Users, color: 'text-gold', bg: 'bg-gold/10' },
+          { title: 'En attente partenaires', value: stats.pending, icon: Users, color: 'text-green-600', bg: 'bg-green-50' },
         ].map((stat, i) => (
           <div key={i} className="bg-white p-6 rounded-[32px] border border-gray-50 shadow-sm flex items-center space-x-4">
             <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${stat.bg} ${stat.color}`}>
@@ -465,7 +465,7 @@ export default function ProductsList() {
             </div>
             <div>
               <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">{stat.title}</p>
-              <p className="text-2xl font-serif font-bold text-dark">{stat.value}</p>
+              <p className="text-2xl font-sans font-bold text-slate-900">{stat.value}</p>
             </div>
           </div>
         ))}
@@ -481,7 +481,7 @@ export default function ProductsList() {
             key={t.id}
             onClick={() => setTab(t.id)}
             className={`flex items-center px-6 py-3 rounded-xl text-sm font-bold transition-all ${
-              tab === t.id ? 'bg-white text-dark shadow-sm' : 'text-gray-400 hover:text-dark'
+              tab === t.id ? 'bg-white text-slate-900 shadow-sm' : 'text-gray-400 hover:text-slate-900'
             }`}
           >
             <t.icon size={16} className="mr-2" />
@@ -504,13 +504,13 @@ export default function ProductsList() {
                 placeholder="Rechercher un produit..."
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-gold/20 outline-none transition-all"
+                className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-green-500/20 outline-none transition-all"
               />
             </div>
             <select
               value={filterType}
               onChange={e => setFilterType(e.target.value)}
-              className="px-4 py-3 bg-gray-50 border-none rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-gold/20"
+              className="px-4 py-3 bg-gray-50 border-none rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-green-500/20"
             >
               <option value="all">Tous les types</option>
               {PRODUCT_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
@@ -518,14 +518,14 @@ export default function ProductsList() {
             <select
               value={filterStatus}
               onChange={e => setFilterStatus(e.target.value)}
-              className="px-4 py-3 bg-gray-50 border-none rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-gold/20"
+              className="px-4 py-3 bg-gray-50 border-none rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-green-500/20"
             >
               <option value="all">Tous les statuts</option>
               <option value="active">Actif</option>
               <option value="inactive">Inactif</option>
               <option value="out_of_stock">Rupture</option>
             </select>
-            <button onClick={() => { fetchProducts(); }} className="p-3 bg-gray-50 hover:bg-cream rounded-xl transition-all text-gray-400 hover:text-gold">
+            <button onClick={() => { fetchProducts(); }} className="p-3 bg-gray-50 hover:bg-cream rounded-xl transition-all text-gray-400 hover:text-green-600">
               <RefreshCw size={18} />
             </button>
           </div>
@@ -571,7 +571,7 @@ export default function ProductsList() {
                             )}
                           </div>
                           <div>
-                            <p className="text-sm font-bold text-dark group-hover:text-gold transition-colors">{product.name}</p>
+                            <p className="text-sm font-bold text-slate-900 group-hover:text-green-600 transition-colors">{product.name}</p>
                             <p className="text-[10px] text-gray-400 mt-0.5 line-clamp-1 max-w-[200px]">{product.description}</p>
                           </div>
                         </div>
@@ -582,7 +582,7 @@ export default function ProductsList() {
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="text-sm font-bold text-dark">{product.price.toFixed(2)} €</span>
+                        <span className="text-sm font-bold text-slate-900">{product.price.toFixed(2)} €</span>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center space-x-2">
@@ -605,8 +605,8 @@ export default function ProductsList() {
                       <td className="px-6 py-4">
                         {product.partner_id ? (
                           <div>
-                            <p className="text-xs font-bold text-dark">{product.partner_company || product.partner_name}</p>
-                            <p className="text-[10px] text-gold">{((product.commission_rate || 0.15) * 100).toFixed(0)}% commission</p>
+                            <p className="text-xs font-bold text-slate-900">{product.partner_company || product.partner_name}</p>
+                            <p className="text-[10px] text-green-600">{((product.commission_rate || 0.15) * 100).toFixed(0)}% commission</p>
                           </div>
                         ) : (
                           <span className="text-[10px] text-gray-300 uppercase tracking-wider">AFRIKHER</span>
@@ -627,7 +627,7 @@ export default function ProductsList() {
                         <div className="flex items-center justify-end space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button
                             onClick={() => openEditor(product)}
-                            className="p-2.5 bg-white text-gray-400 hover:text-gold rounded-xl shadow-sm transition-all"
+                            className="p-2.5 bg-white text-gray-400 hover:text-green-600 rounded-xl shadow-sm transition-all"
                             title="Modifier"
                           >
                             <Edit2 size={16} />
@@ -657,9 +657,9 @@ export default function ProductsList() {
         <div className="space-y-6">
           {/* Pending */}
           {pendingPartner.length > 0 && (
-            <div className="bg-gold/5 border border-gold/20 p-6 rounded-[32px]">
-              <h3 className="font-serif font-bold text-dark text-lg mb-4 flex items-center">
-                <AlertCircle size={20} className="text-gold mr-2" />
+            <div className="bg-green-50 border border-gold/20 p-6 rounded-[32px]">
+              <h3 className="font-sans font-bold text-slate-900 text-lg mb-4 flex items-center">
+                <AlertCircle size={20} className="text-green-600 mr-2" />
                 En attente d'approbation ({pendingPartner.length})
               </h3>
               <div className="space-y-4">
@@ -674,9 +674,9 @@ export default function ProductsList() {
                         )}
                       </div>
                       <div>
-                        <p className="font-bold text-dark text-sm">{pp.name}</p>
+                        <p className="font-bold text-slate-900 text-sm">{pp.name}</p>
                         <p className="text-xs text-gray-400">{typeLabel(pp.type)} — {pp.price.toFixed(2)} €</p>
-                        <p className="text-[10px] text-gold mt-1">Par: {pp.partner_company || pp.partner_name || 'Partenaire'}</p>
+                        <p className="text-[10px] text-green-600 mt-1">Par: {pp.partner_company || pp.partner_name || 'Partenaire'}</p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-3">
@@ -704,7 +704,7 @@ export default function ProductsList() {
           {/* All partner products */}
           <div className="bg-white rounded-[32px] border border-gray-50 shadow-sm overflow-hidden">
             <div className="p-6 border-b border-gray-50">
-              <h3 className="font-serif font-bold text-dark text-lg">Tous les produits partenaires</h3>
+              <h3 className="font-sans font-bold text-slate-900 text-lg">Tous les produits partenaires</h3>
             </div>
             {partnerProducts.length === 0 ? (
               <div className="p-16 text-center">
@@ -736,24 +736,24 @@ export default function ProductsList() {
                             )}
                           </div>
                           <div>
-                            <p className="text-sm font-bold text-dark">{pp.name}</p>
+                            <p className="text-sm font-bold text-slate-900">{pp.name}</p>
                             <p className="text-[10px] text-gray-400">{typeLabel(pp.type)}</p>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <p className="text-xs font-bold text-dark">{pp.partner_company || pp.partner_name}</p>
+                        <p className="text-xs font-bold text-slate-900">{pp.partner_company || pp.partner_name}</p>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="text-sm font-bold text-dark">{pp.price.toFixed(2)} €</span>
+                        <span className="text-sm font-bold text-slate-900">{pp.price.toFixed(2)} €</span>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center space-x-2">
-                          <Percent size={14} className="text-gold" />
+                          <Percent size={14} className="text-green-600" />
                           <select
                             defaultValue="15"
                             onChange={e => setCommissionRate(pp.partner_id, parseInt(e.target.value) / 100)}
-                            className="text-xs font-bold bg-gray-50 border-none rounded-lg px-2 py-1 outline-none focus:ring-1 focus:ring-gold/20"
+                            className="text-xs font-bold bg-gray-50 border-none rounded-lg px-2 py-1 outline-none focus:ring-1 focus:ring-green-500/20"
                           >
                             <option value="10">10%</option>
                             <option value="15">15%</option>
@@ -766,7 +766,7 @@ export default function ProductsList() {
                       <td className="px-6 py-4">
                         <span className={`text-[10px] px-3 py-1.5 rounded-lg font-bold uppercase tracking-wider ${
                           pp.status === 'approved' || pp.status === 'active' ? 'bg-green-50 text-green-600' :
-                          pp.status === 'pending_approval' ? 'bg-gold/10 text-gold' :
+                          pp.status === 'pending_approval' ? 'bg-green-50 text-green-600' :
                           pp.status === 'rejected' ? 'bg-red-50 text-red-600' :
                           'bg-gray-100 text-gray-500'
                         }`}>
@@ -802,10 +802,10 @@ export default function ProductsList() {
       {tab === 'editor' && (
         <div className="space-y-8">
           <div className="flex items-center space-x-4">
-            <button onClick={() => setTab('catalogue')} className="p-2 hover:bg-white rounded-full transition-colors text-gray-400 hover:text-dark">
+            <button onClick={() => setTab('catalogue')} className="p-2 hover:bg-white rounded-full transition-colors text-gray-400 hover:text-slate-900">
               <ChevronLeft size={24} />
             </button>
-            <h2 className="text-2xl font-serif font-bold text-dark">
+            <h2 className="text-2xl font-sans font-bold text-slate-900">
               {isNew ? 'Nouveau produit' : `Modifier : ${editingProduct?.name}`}
             </h2>
           </div>
@@ -815,7 +815,7 @@ export default function ProductsList() {
             <div className="lg:col-span-2 space-y-6">
               {/* Info */}
               <div className="bg-white p-8 rounded-[32px] border border-gray-50 shadow-sm space-y-5">
-                <h3 className="text-lg font-serif font-bold text-dark border-b border-gray-50 pb-3">Informations</h3>
+                <h3 className="text-lg font-sans font-bold text-slate-900 border-b border-gray-50 pb-3">Informations</h3>
                 <div>
                   <label className="block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">Nom du produit *</label>
                   <input
@@ -823,7 +823,7 @@ export default function ProductsList() {
                     value={formName}
                     onChange={e => setFormName(e.target.value)}
                     placeholder="Ex: Bouquet Souveraine"
-                    className="w-full p-4 bg-gray-50 border-none rounded-2xl text-sm focus:bg-white focus:ring-2 focus:ring-gold/20 outline-none transition-all"
+                    className="w-full p-4 bg-gray-50 border-none rounded-2xl text-sm focus:bg-white focus:ring-2 focus:ring-green-500/20 outline-none transition-all"
                   />
                 </div>
                 <div>
@@ -832,26 +832,26 @@ export default function ProductsList() {
                     value={formDesc}
                     onChange={e => setFormDesc(e.target.value)}
                     placeholder="Description détaillée du produit..."
-                    className="w-full h-40 p-4 bg-gray-50 border-none rounded-2xl text-sm focus:bg-white focus:ring-2 focus:ring-gold/20 outline-none transition-all resize-none"
+                    className="w-full h-40 p-4 bg-gray-50 border-none rounded-2xl text-sm focus:bg-white focus:ring-2 focus:ring-green-500/20 outline-none transition-all resize-none"
                   />
                 </div>
               </div>
 
               {/* Images */}
               <div className="bg-white p-8 rounded-[32px] border border-gray-50 shadow-sm space-y-5">
-                <h3 className="text-lg font-serif font-bold text-dark border-b border-gray-50 pb-3">Images</h3>
+                <h3 className="text-lg font-sans font-bold text-slate-900 border-b border-gray-50 pb-3">Images</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {formImages.map((img, i) => (
                     <div key={i} className="aspect-square rounded-xl overflow-hidden relative group border border-gray-100">
                       <img src={img} alt="" className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-dark/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <div className="absolute inset-0 bg-white/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                         <button onClick={() => setFormImages(formImages.filter((_, j) => j !== i))} className="p-2 bg-white rounded-full text-red-500 shadow-lg">
                           <Trash2 size={16} />
                         </button>
                       </div>
                     </div>
                   ))}
-                  <label className="aspect-square rounded-xl border-2 border-dashed border-gray-200 hover:border-gold/30 hover:bg-gold/5 transition-all flex flex-col items-center justify-center text-gray-400 hover:text-gold cursor-pointer">
+                  <label className="aspect-square rounded-xl border-2 border-dashed border-gray-200 hover:border-gold/30 hover:bg-green-50 transition-all flex flex-col items-center justify-center text-gray-400 hover:text-green-600 cursor-pointer">
                     {uploading ? (
                       <div className="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin" />
                     ) : (
@@ -867,7 +867,7 @@ export default function ProductsList() {
 
               {/* Price & Stock */}
               <div className="bg-white p-8 rounded-[32px] border border-gray-50 shadow-sm space-y-5">
-                <h3 className="text-lg font-serif font-bold text-dark border-b border-gray-50 pb-3">Prix & Stock</h3>
+                <h3 className="text-lg font-sans font-bold text-slate-900 border-b border-gray-50 pb-3">Prix & Stock</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">Prix (€) *</label>
@@ -877,7 +877,7 @@ export default function ProductsList() {
                       value={formPrice}
                       onChange={e => setFormPrice(e.target.value)}
                       placeholder="0.00"
-                      className="w-full p-4 bg-gray-50 border-none rounded-2xl text-sm focus:bg-white focus:ring-2 focus:ring-gold/20 outline-none transition-all"
+                      className="w-full p-4 bg-gray-50 border-none rounded-2xl text-sm focus:bg-white focus:ring-2 focus:ring-green-500/20 outline-none transition-all"
                     />
                   </div>
                   <div>
@@ -888,12 +888,12 @@ export default function ProductsList() {
                       onChange={e => setFormStock(e.target.value)}
                       placeholder="0"
                       disabled={formUnlimited}
-                      className="w-full p-4 bg-gray-50 border-none rounded-2xl text-sm focus:bg-white focus:ring-2 focus:ring-gold/20 outline-none transition-all disabled:opacity-50"
+                      className="w-full p-4 bg-gray-50 border-none rounded-2xl text-sm focus:bg-white focus:ring-2 focus:ring-green-500/20 outline-none transition-all disabled:opacity-50"
                     />
                   </div>
                 </div>
                 <label className="flex items-center space-x-3 cursor-pointer">
-                  <input type="checkbox" checked={formUnlimited} onChange={e => setFormUnlimited(e.target.checked)} className="rounded border-gray-300 text-gold focus:ring-gold" />
+                  <input type="checkbox" checked={formUnlimited} onChange={e => setFormUnlimited(e.target.checked)} className="rounded border-gray-300 text-green-600 focus:ring-gold" />
                   <span className="text-sm text-gray-500">Stock illimité (produit digital ou service)</span>
                 </label>
               </div>
@@ -903,13 +903,13 @@ export default function ProductsList() {
             <div className="space-y-6">
               {/* Type & Status */}
               <div className="bg-white p-8 rounded-[32px] border border-gray-50 shadow-sm space-y-5">
-                <h3 className="text-lg font-serif font-bold text-dark border-b border-gray-50 pb-3">Organisation</h3>
+                <h3 className="text-lg font-sans font-bold text-slate-900 border-b border-gray-50 pb-3">Organisation</h3>
                 <div>
                   <label className="block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">Type de produit</label>
                   <select
                     value={formType}
                     onChange={e => setFormType(e.target.value)}
-                    className="w-full p-4 bg-gray-50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-gold/20"
+                    className="w-full p-4 bg-gray-50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-green-500/20"
                   >
                     {PRODUCT_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
                   </select>
@@ -926,14 +926,14 @@ export default function ProductsList() {
                         key={s.id}
                         onClick={() => setFormStatus(s.id)}
                         className={`w-full p-3 rounded-xl border text-left transition-all flex items-center justify-between ${
-                          formStatus === s.id ? 'border-gold bg-gold/5' : 'border-gray-50 hover:border-gray-200'
+                          formStatus === s.id ? 'border-gold bg-green-50' : 'border-gray-50 hover:border-gray-200'
                         }`}
                       >
                         <div>
-                          <p className="text-sm font-bold text-dark">{s.label}</p>
+                          <p className="text-sm font-bold text-slate-900">{s.label}</p>
                           <p className="text-[10px] text-gray-400">{s.desc}</p>
                         </div>
-                        {formStatus === s.id && <CheckCircle size={16} className="text-gold" />}
+                        {formStatus === s.id && <CheckCircle size={16} className="text-green-600" />}
                       </button>
                     ))}
                   </div>
@@ -944,13 +944,13 @@ export default function ProductsList() {
               <button
                 onClick={saveProduct}
                 disabled={saving}
-                className="w-full flex items-center justify-center px-8 py-4 bg-dark text-white rounded-2xl hover:bg-charcoal transition-all font-bold tracking-wide shadow-lg shadow-dark/10 disabled:opacity-50"
+                className="w-full flex items-center justify-center px-8 py-4 bg-white text-slate-900 rounded-2xl hover:bg-slate-100 transition-all font-bold tracking-wide shadow-lg shadow-slate-200 disabled:opacity-50"
               >
                 {saving ? (
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 ) : (
                   <>
-                    <Save size={20} className="mr-2 text-gold" />
+                    <Save size={20} className="mr-2 text-green-600" />
                     {isNew ? 'Créer le produit' : 'Enregistrer'}
                   </>
                 )}
@@ -972,24 +972,24 @@ export default function ProductsList() {
       {/* REJECT MODAL */}
       {/* ══════════════════════════════════════════════ */}
       {rejectingId && (
-        <div className="fixed inset-0 z-[200] bg-dark/60 backdrop-blur-sm flex items-center justify-center p-6" onClick={() => setRejectingId(null)}>
+        <div className="fixed inset-0 z-[200] bg-white/60 backdrop-blur-sm flex items-center justify-center p-6" onClick={() => setRejectingId(null)}>
           <div className="bg-white rounded-[32px] p-8 max-w-md w-full shadow-2xl" onClick={e => e.stopPropagation()}>
-            <h3 className="font-serif font-bold text-dark text-xl mb-4">Refuser le produit</h3>
+            <h3 className="font-sans font-bold text-slate-900 text-xl mb-4">Refuser le produit</h3>
             <p className="text-sm text-gray-400 mb-4">Indiquez la raison du refus (sera envoyée au partenaire).</p>
             <textarea
               value={rejectReason}
               onChange={e => setRejectReason(e.target.value)}
               placeholder="Raison du refus..."
-              className="w-full h-28 p-4 bg-gray-50 border-none rounded-2xl text-sm focus:bg-white focus:ring-2 focus:ring-gold/20 outline-none transition-all resize-none mb-4"
+              className="w-full h-28 p-4 bg-gray-50 border-none rounded-2xl text-sm focus:bg-white focus:ring-2 focus:ring-green-500/20 outline-none transition-all resize-none mb-4"
             />
             <div className="flex space-x-3">
-              <button onClick={() => setRejectingId(null)} className="flex-1 py-3 bg-gray-100 text-dark rounded-xl font-bold text-sm hover:bg-gray-200 transition-all">
+              <button onClick={() => setRejectingId(null)} className="flex-1 py-3 bg-gray-100 text-slate-900 rounded-xl font-bold text-sm hover:bg-gray-200 transition-all">
                 Annuler
               </button>
               <button
                 onClick={rejectPartnerProduct}
                 disabled={!rejectReason.trim()}
-                className="flex-1 py-3 bg-red-500 text-white rounded-xl font-bold text-sm hover:bg-red-600 transition-all disabled:opacity-50"
+                className="flex-1 py-3 bg-red-500 text-slate-900 rounded-xl font-bold text-sm hover:bg-red-600 transition-all disabled:opacity-50"
               >
                 Confirmer le refus
               </button>

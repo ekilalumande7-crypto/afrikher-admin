@@ -217,9 +217,9 @@ export default function CMSAccueil() {
             disabled={saving || !hasChanges}
             className={`flex items-center px-5 py-2 rounded-lg text-sm font-medium transition-colors ${
               hasChanges
-                ? 'bg-gray-900 text-white hover:bg-gray-800'
+                ? 'bg-gray-900 text-slate-900 hover:bg-gray-800'
                 : saved
-                  ? 'bg-green-600 text-white'
+                  ? 'bg-green-600 text-slate-900'
                   : 'bg-gray-100 text-gray-400 cursor-not-allowed'
             }`}
           >
@@ -507,7 +507,7 @@ export default function CMSAccueil() {
                       <button key={opt.value} onClick={() => updateConfig('hero_alignment', opt.value)}
                         className={`px-5 py-2 rounded-lg text-sm font-medium border transition-colors ${
                           (config.hero_alignment || 'left') === opt.value
-                            ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+                            ? 'bg-gray-900 text-slate-900 border-gray-900' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
                         }`}>{opt.label}</button>
                     ))}
                   </div>

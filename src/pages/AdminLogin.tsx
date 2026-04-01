@@ -12,7 +12,7 @@ export default function AdminLogin() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="w-12 h-12 border-4 border-[#C9A84C] border-t-transparent animate-spin rounded-full" />
       </div>
     );
@@ -35,18 +35,18 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#C9A84C]/10 mb-6">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-600/10 mb-6">
             <Shield size={36} className="text-[#C9A84C]" />
           </div>
-          <h1 className="text-3xl font-serif font-bold text-[#F5F0E8] tracking-wide">AFRIKHER</h1>
+          <h1 className="text-3xl font-sans font-bold text-slate-900 tracking-wide">AFRIKHER</h1>
           <p className="text-[#C9A84C] text-xs uppercase tracking-[0.3em] mt-2 font-bold">
             Portail Administrateur
           </p>
-          <div className="mt-6 px-6 py-3 bg-[#C9A84C]/10 border border-[#C9A84C]/20 rounded-xl inline-block">
+          <div className="mt-6 px-6 py-3 bg-green-600/10 border border-slate-300 rounded-xl inline-block">
             <p className="text-[#C9A84C] text-xs font-bold uppercase tracking-widest flex items-center gap-2">
               <AlertCircle size={14} />
               Accès strictement réservé aux administrateurs
@@ -55,7 +55,7 @@ export default function AdminLogin() {
         </div>
 
         {/* Login Form */}
-        <form onSubmit={handleSubmit} className="bg-[#2A2A2A]/50 border border-[#C9A84C]/10 rounded-3xl p-8 space-y-6">
+        <form onSubmit={handleSubmit} className="bg-white shadow-lg border border-slate-200 rounded-3xl p-8 space-y-6">
           {error && (
             <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-5 py-4 rounded-xl text-sm flex items-start gap-3">
               <AlertCircle size={18} className="flex-shrink-0 mt-0.5" />
@@ -75,7 +75,7 @@ export default function AdminLogin() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 placeholder="admin@afrikher.com"
-                className="w-full pl-12 pr-4 py-4 bg-[#0A0A0A] border border-[#C9A84C]/20 rounded-xl text-[#F5F0E8] text-sm focus:outline-none focus:border-[#C9A84C] transition-colors placeholder:text-[#9A9A8A]/50"
+                className="w-full pl-12 pr-4 py-4 bg-white border border-slate-300 rounded-xl text-slate-900 text-sm focus:outline-none focus:border-green-500 transition-colors placeholder:text-slate-400"
               />
             </div>
           </div>
@@ -92,7 +92,7 @@ export default function AdminLogin() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 placeholder="••••••••"
-                className="w-full pl-12 pr-4 py-4 bg-[#0A0A0A] border border-[#C9A84C]/20 rounded-xl text-[#F5F0E8] text-sm focus:outline-none focus:border-[#C9A84C] transition-colors placeholder:text-[#9A9A8A]/50"
+                className="w-full pl-12 pr-4 py-4 bg-white border border-slate-300 rounded-xl text-slate-900 text-sm focus:outline-none focus:border-green-500 transition-colors placeholder:text-slate-400"
               />
             </div>
           </div>
@@ -100,10 +100,10 @@ export default function AdminLogin() {
           <button
             type="submit"
             disabled={submitting || !email || !password}
-            className="w-full py-4 bg-[#C9A84C] text-[#0A0A0A] rounded-xl text-sm uppercase tracking-widest font-bold hover:bg-[#E8C97A] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full py-4 bg-green-600 text-[#0A0A0A] rounded-xl text-sm uppercase tracking-widest font-bold hover:bg-green-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {submitting ? (
-              <div className="w-5 h-5 border-2 border-[#0A0A0A] border-t-transparent animate-spin rounded-full" />
+              <div className="w-5 h-5 border-2 border-white border-t-transparent animate-spin rounded-full" />
             ) : (
               <>
                 Se connecter

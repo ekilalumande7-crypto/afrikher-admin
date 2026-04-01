@@ -279,7 +279,7 @@ export default function Dashboard() {
         {/* Revenue Card + Subscribers */}
         <div className="space-y-5">
           {/* Revenue This Month */}
-          <div className="bg-[#0A0A0A] rounded-2xl p-6 text-white">
+          <div className="bg-white rounded-2xl p-6 text-slate-900 border border-slate-200">
             <div className="flex items-center justify-between mb-4">
               <span className="text-[#9A9A8A] text-xs font-medium uppercase tracking-wider">Revenu du mois</span>
               <CreditCard size={18} className="text-[#C9A84C]" />
@@ -463,7 +463,7 @@ function KPICard({
       <div className="flex items-center justify-between mb-3">
         <span className="text-[#9A9A8A] text-xs font-medium uppercase tracking-wider">{label}</span>
         <div className="w-9 h-9 rounded-xl bg-[#C9A84C]/10 flex items-center justify-center group-hover:bg-[#C9A84C] transition-colors">
-          <Icon size={16} className="text-[#C9A84C] group-hover:text-white transition-colors" />
+          <Icon size={16} className="text-[#C9A84C] group-hover:text-slate-900 transition-colors" />
         </div>
       </div>
       <p className="text-3xl font-bold text-[#0A0A0A]" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>

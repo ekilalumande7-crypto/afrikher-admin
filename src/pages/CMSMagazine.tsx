@@ -408,8 +408,8 @@ export default function CMSMagazine() {
               disabled={saving}
               className={`flex items-center px-5 py-2 rounded-lg text-sm font-medium transition-colors ${
                 saved
-                  ? 'bg-green-600 text-white'
-                  : 'bg-gray-900 text-white hover:bg-gray-800'
+                  ? 'bg-green-600 text-slate-900'
+                  : 'bg-gray-900 text-slate-900 hover:bg-gray-800'
               }`}
             >
               {saving ? <><RefreshCw size={14} className="mr-2 animate-spin" /> Enregistrement...</>
@@ -572,7 +572,7 @@ export default function CMSMagazine() {
                         <div className="aspect-[3/4] bg-gray-100 rounded overflow-hidden border border-gray-200">
                           <img src={pageUrl} alt={`Page ${index + 1}`} className="w-full h-full object-cover" />
                         </div>
-                        <span className="absolute bottom-1 left-1 bg-black/70 text-white text-[10px] px-1.5 py-0.5 rounded font-mono">
+                        <span className="absolute bottom-1 left-1 bg-black/70 text-slate-900 text-[10px] px-1.5 py-0.5 rounded font-mono">
                           {index + 1}
                         </span>
                         {/* Actions overlay */}
@@ -580,7 +580,7 @@ export default function CMSMagazine() {
                           {index > 0 && (
                             <button
                               onClick={() => movePage(index, 'up')}
-                              className="w-6 h-6 bg-white rounded-full flex items-center justify-center text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"
+                              className="w-6 h-6 bg-white rounded-full flex items-center justify-center text-gray-700 hover:bg-blue-500 hover:text-slate-900 transition-colors"
                               title="Monter"
                             >
                               <ArrowUp size={12} />
@@ -589,7 +589,7 @@ export default function CMSMagazine() {
                           {index < (editingMagazine.pages || []).length - 1 && (
                             <button
                               onClick={() => movePage(index, 'down')}
-                              className="w-6 h-6 bg-white rounded-full flex items-center justify-center text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"
+                              className="w-6 h-6 bg-white rounded-full flex items-center justify-center text-gray-700 hover:bg-blue-500 hover:text-slate-900 transition-colors"
                               title="Descendre"
                             >
                               <ArrowDown size={12} />
@@ -597,7 +597,7 @@ export default function CMSMagazine() {
                           )}
                           <button
                             onClick={() => removePage(index)}
-                            className="w-6 h-6 bg-white rounded-full flex items-center justify-center text-gray-700 hover:bg-red-500 hover:text-white transition-colors"
+                            className="w-6 h-6 bg-white rounded-full flex items-center justify-center text-gray-700 hover:bg-red-500 hover:text-slate-900 transition-colors"
                             title="Supprimer"
                           >
                             <X size={12} />
@@ -638,7 +638,7 @@ export default function CMSMagazine() {
           </a>
           <button
             onClick={startNewMagazine}
-            className="flex items-center px-5 py-2 rounded-lg text-sm font-medium bg-gray-900 text-white hover:bg-gray-800 transition-colors"
+            className="flex items-center px-5 py-2 rounded-lg text-sm font-medium bg-gray-900 text-slate-900 hover:bg-gray-800 transition-colors"
           >
             <Plus size={14} className="mr-2" />
             Nouveau magazine
@@ -680,8 +680,8 @@ export default function CMSMagazine() {
             disabled={heroSaving}
             className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               heroSaved
-                ? 'bg-green-600 text-white'
-                : 'bg-gray-900 text-white hover:bg-gray-800'
+                ? 'bg-green-600 text-slate-900'
+                : 'bg-gray-900 text-slate-900 hover:bg-gray-800'
             }`}
           >
             {heroSaving ? <><RefreshCw size={14} className="mr-2 animate-spin" /> Enregistrement...</>
@@ -776,7 +776,7 @@ export default function CMSMagazine() {
           </p>
           <button
             onClick={startNewMagazine}
-            className="inline-flex items-center px-6 py-3 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors"
+            className="inline-flex items-center px-6 py-3 bg-gray-900 text-slate-900 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors"
           >
             <Plus size={14} className="mr-2" />
             Créer un magazine

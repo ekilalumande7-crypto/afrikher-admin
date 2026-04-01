@@ -287,7 +287,7 @@ export default function CMSQuiSommesNous() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-40">
-        <RefreshCw size={32} className="animate-spin text-gold" />
+        <RefreshCw size={32} className="animate-spin text-green-600" />
       </div>
     );
   }
@@ -305,7 +305,7 @@ export default function CMSQuiSommesNous() {
       {/* ── Header ── */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-serif font-bold text-dark">Qui sommes-nous</h1>
+          <h1 className="text-3xl font-sans font-bold text-slate-900">Qui sommes-nous</h1>
           <p className="text-gray-400 mt-1">Présentez AFRIKHER et sa fondatrice</p>
         </div>
         <div className="flex items-center gap-3">
@@ -313,14 +313,14 @@ export default function CMSQuiSommesNous() {
             href="https://afrikher-client.vercel.app/qui-sommes-nous"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-2xl text-sm text-gray-600 hover:border-gold hover:text-gold transition-all"
+            className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-2xl text-sm text-gray-600 hover:border-gold hover:text-green-600 transition-all"
           >
             <Eye size={16} /> Voir la page
           </a>
           <button
             onClick={saveAll}
             disabled={saving}
-            className="flex items-center gap-2 px-6 py-2.5 bg-dark text-white rounded-2xl font-semibold text-sm hover:bg-charcoal transition-all shadow-lg shadow-dark/10 disabled:opacity-50"
+            className="flex items-center gap-2 px-6 py-2.5 bg-white text-slate-900 rounded-2xl font-semibold text-sm hover:bg-slate-100 transition-all shadow-lg shadow-slate-200 disabled:opacity-50"
           >
             {saving ? <RefreshCw size={16} className="animate-spin" /> : saved ? <Check size={16} /> : <Save size={16} />}
             {saving ? 'Sauvegarde...' : saved ? 'Sauvegardé !' : 'Enregistrer tout'}
@@ -344,15 +344,15 @@ export default function CMSQuiSommesNous() {
             onClick={() => setActiveTab(tab.key)}
             className={`flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${
               activeTab === tab.key
-                ? 'bg-dark text-white shadow-lg shadow-dark/10'
-                : 'text-gray-500 hover:text-dark hover:bg-gray-50'
+                ? 'bg-white text-slate-900 shadow-lg shadow-slate-200'
+                : 'text-gray-500 hover:text-slate-900 hover:bg-gray-50'
             }`}
           >
             <tab.icon size={16} />
             {tab.label}
             {tab.count !== undefined && (
               <span className={`ml-1 text-xs px-2 py-0.5 rounded-full ${
-                activeTab === tab.key ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
+                activeTab === tab.key ? 'bg-white/20 text-slate-900' : 'bg-gray-100 text-gray-500'
               }`}>{tab.count}</span>
             )}
           </button>
@@ -365,8 +365,8 @@ export default function CMSQuiSommesNous() {
       {activeTab === 'presentation' && (
         <div className="bg-white rounded-[28px] border border-gray-50 shadow-sm overflow-hidden">
           <div className="px-8 py-6 border-b border-gray-100 bg-gradient-to-r from-cream/30 to-transparent">
-            <h2 className="text-xl font-serif font-bold text-dark flex items-center gap-3">
-              <Heart size={22} className="text-gold" />
+            <h2 className="text-xl font-sans font-bold text-slate-900 flex items-center gap-3">
+              <Heart size={22} className="text-green-600" />
               Présentation AFRIKHER
             </h2>
             <p className="text-sm text-gray-500 mt-1">Le texte principal de la page "Qui sommes-nous"</p>
@@ -374,13 +374,13 @@ export default function CMSQuiSommesNous() {
           <div className="px-8 pb-8">
             <FieldRow label="Titre" description="Titre principal de la page">
               <input type="text" value={aboutTitre} onChange={e => setAboutTitre(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/10 transition-all"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all"
                 placeholder="Qui sommes-nous ?" />
             </FieldRow>
 
             <FieldRow label="Sous-titre" description="Phrase d'accroche sous le titre">
               <input type="text" value={aboutSousTitre} onChange={e => setAboutSousTitre(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/10 transition-all"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all"
                 placeholder="Plus qu'un magazine" />
             </FieldRow>
 
@@ -390,7 +390,7 @@ export default function CMSQuiSommesNous() {
                   <div className="relative group">
                     <img src={aboutImage} alt="" className="w-40 h-28 rounded-xl object-cover border border-gray-100" />
                     <button onClick={() => setAboutImage('')}
-                      className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-slate-900 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                       <X size={12} />
                     </button>
                   </div>
@@ -399,7 +399,7 @@ export default function CMSQuiSommesNous() {
                     <ImageIcon size={28} />
                   </div>
                 )}
-                <label className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-600 hover:border-gold hover:text-gold cursor-pointer transition-all">
+                <label className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-600 hover:border-gold hover:text-green-600 cursor-pointer transition-all">
                   {uploading === 'about-main' ? <RefreshCw size={14} className="animate-spin" /> : <Upload size={14} />}
                   {uploading === 'about-main' ? 'Upload...' : 'Choisir une image'}
                   <input type="file" accept="image/*" className="hidden"
@@ -415,19 +415,19 @@ export default function CMSQuiSommesNous() {
 
             <FieldRow label="Texte principal" description="Premier paragraphe de présentation">
               <textarea value={aboutTexte} onChange={e => setAboutTexte(e.target.value)} rows={4}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/10 transition-all resize-none"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all resize-none"
                 placeholder="AFRIKHER est une plateforme..." />
             </FieldRow>
 
             <FieldRow label="Texte secondaire" description="Deuxième paragraphe (mission, vision)">
               <textarea value={aboutTexte2} onChange={e => setAboutTexte2(e.target.value)} rows={4}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/10 transition-all resize-none"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all resize-none"
                 placeholder="Notre mission..." />
             </FieldRow>
 
             <FieldRow label="Citation" description="Phrase en exergue, affichée en doré" noBorder>
               <input type="text" value={aboutCitation} onChange={e => setAboutCitation(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/10 transition-all italic"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all italic"
                 placeholder="L'élégance hors du commun..." />
             </FieldRow>
           </div>
@@ -440,8 +440,8 @@ export default function CMSQuiSommesNous() {
       {activeTab === 'fondatrice' && (
         <div className="bg-white rounded-[28px] border border-gray-50 shadow-sm overflow-hidden">
           <div className="px-8 py-6 border-b border-gray-100 bg-gradient-to-r from-cream/30 to-transparent">
-            <h2 className="text-xl font-serif font-bold text-dark flex items-center gap-3">
-              <User size={22} className="text-gold" />
+            <h2 className="text-xl font-sans font-bold text-slate-900 flex items-center gap-3">
+              <User size={22} className="text-green-600" />
               La Fondatrice
             </h2>
             <p className="text-sm text-gray-500 mt-1">Informations sur Hadassa Hélène EKILA-LUMANDE</p>
@@ -453,7 +453,7 @@ export default function CMSQuiSommesNous() {
                   <div className="relative group">
                     <img src={fondPhoto} alt="" className="w-28 h-28 rounded-full object-cover border-2 border-gray-100" />
                     <button onClick={() => setFondPhoto('')}
-                      className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-slate-900 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                       <X size={12} />
                     </button>
                   </div>
@@ -462,7 +462,7 @@ export default function CMSQuiSommesNous() {
                     <User size={28} />
                   </div>
                 )}
-                <label className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-600 hover:border-gold hover:text-gold cursor-pointer transition-all">
+                <label className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-600 hover:border-gold hover:text-green-600 cursor-pointer transition-all">
                   {uploading === 'fondatrice' ? <RefreshCw size={14} className="animate-spin" /> : <Upload size={14} />}
                   {uploading === 'fondatrice' ? 'Upload...' : 'Choisir une photo'}
                   <input type="file" accept="image/*" className="hidden"
@@ -478,29 +478,29 @@ export default function CMSQuiSommesNous() {
 
             <FieldRow label="Nom complet" description="Nom affiché sur la page">
               <input type="text" value={fondNom} onChange={e => setFondNom(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/10 transition-all font-semibold" />
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all font-semibold" />
             </FieldRow>
 
             <FieldRow label="Titre / Fonction" description="Titre officiel">
               <input type="text" value={fondTitre} onChange={e => setFondTitre(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/10 transition-all" />
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all" />
             </FieldRow>
 
             <FieldRow label="Biographie (partie 1)" description="Premier paragraphe de la bio">
               <textarea value={fondBio} onChange={e => setFondBio(e.target.value)} rows={4}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/10 transition-all resize-none" />
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all resize-none" />
             </FieldRow>
 
             <FieldRow label="Biographie (partie 2)" description="Deuxième paragraphe (optionnel)">
               <textarea value={fondBio2} onChange={e => setFondBio2(e.target.value)} rows={4}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/10 transition-all resize-none" />
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all resize-none" />
             </FieldRow>
 
             <FieldRow label="Citation personnelle" description="Phrase inspirante de la fondatrice" noBorder>
               <div className="flex items-start gap-3">
-                <Quote size={18} className="text-gold shrink-0 mt-3" />
+                <Quote size={18} className="text-green-600 shrink-0 mt-3" />
                 <textarea value={fondCitation} onChange={e => setFondCitation(e.target.value)} rows={2}
-                  className="flex-1 px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/10 transition-all resize-none italic" />
+                  className="flex-1 px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all resize-none italic" />
               </div>
             </FieldRow>
           </div>
@@ -514,7 +514,7 @@ export default function CMSQuiSommesNous() {
         <div className="space-y-6">
           <div className="flex justify-end">
             <button onClick={addValeur}
-              className="flex items-center gap-2 px-5 py-2.5 bg-gold text-white rounded-2xl font-semibold text-sm hover:bg-gold/90 transition-all shadow-lg shadow-gold/20">
+              className="flex items-center gap-2 px-5 py-2.5 bg-green-600 text-slate-900 rounded-2xl font-semibold text-sm hover:bg-green-600/90 transition-all shadow-lg shadow-gold/20">
               <Plus size={16} /> Ajouter une valeur
             </button>
           </div>
@@ -524,7 +524,7 @@ export default function CMSQuiSommesNous() {
               <div className="px-8 py-5 border-b border-gray-100 flex items-center justify-between bg-gradient-to-r from-cream/30 to-transparent">
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">{valeur.icone}</span>
-                  <h3 className="text-lg font-serif font-bold text-dark">{valeur.titre || 'Sans titre'}</h3>
+                  <h3 className="text-lg font-sans font-bold text-slate-900">{valeur.titre || 'Sans titre'}</h3>
                 </div>
                 <button onClick={() => { if (confirm('Supprimer cette valeur ?')) removeValeur(valeur.id); }}
                   className="p-2 hover:bg-red-50 rounded-xl transition-colors text-gray-400 hover:text-red-500">
@@ -534,15 +534,15 @@ export default function CMSQuiSommesNous() {
               <div className="px-8 pb-6">
                 <FieldRow label="Icône" description="Emoji ou symbole (1 caractère)">
                   <input type="text" value={valeur.icone} onChange={e => updateValeur(valeur.id, 'icone', e.target.value)}
-                    className="w-20 px-4 py-3 border border-gray-200 rounded-xl text-center text-xl focus:outline-none focus:border-gold transition-all" maxLength={2} />
+                    className="w-20 px-4 py-3 border border-gray-200 rounded-xl text-center text-xl focus:outline-none focus:border-green-500 transition-all" maxLength={2} />
                 </FieldRow>
                 <FieldRow label="Titre">
                   <input type="text" value={valeur.titre} onChange={e => updateValeur(valeur.id, 'titre', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm font-semibold focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/10 transition-all" />
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm font-semibold focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all" />
                 </FieldRow>
                 <FieldRow label="Description" noBorder>
                   <textarea value={valeur.description} onChange={e => updateValeur(valeur.id, 'description', e.target.value)} rows={2}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/10 transition-all resize-none" />
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all resize-none" />
                 </FieldRow>
               </div>
             </div>
@@ -557,12 +557,12 @@ export default function CMSQuiSommesNous() {
         <div className="bg-white rounded-[28px] border border-gray-50 shadow-sm overflow-hidden">
           <div className="px-8 py-6 border-b border-gray-100 flex items-center justify-between bg-gradient-to-r from-cream/30 to-transparent">
             <div>
-              <h2 className="text-xl font-serif font-bold text-dark flex items-center gap-3">
-                <ImageIcon size={22} className="text-gold" /> Galerie Photos
+              <h2 className="text-xl font-sans font-bold text-slate-900 flex items-center gap-3">
+                <ImageIcon size={22} className="text-green-600" /> Galerie Photos
               </h2>
               <p className="text-sm text-gray-500 mt-1">Photos de l'équipe, événements, coulisses</p>
             </div>
-            <label className="flex items-center gap-2 px-5 py-2.5 bg-gold text-white rounded-2xl font-semibold text-sm hover:bg-gold/90 cursor-pointer transition-all shadow-lg shadow-gold/20">
+            <label className="flex items-center gap-2 px-5 py-2.5 bg-green-600 text-slate-900 rounded-2xl font-semibold text-sm hover:bg-green-600/90 cursor-pointer transition-all shadow-lg shadow-gold/20">
               {uploading ? <RefreshCw size={16} className="animate-spin" /> : <Plus size={16} />}
               Ajouter des photos
               <input type="file" accept="image/*" multiple className="hidden"
@@ -587,12 +587,12 @@ export default function CMSQuiSommesNous() {
                       <img src={photo.url} alt={photo.legende} className="w-full h-full object-cover" />
                     </div>
                     <button onClick={() => setPhotos(prev => prev.filter(p => p.id !== photo.id))}
-                      className="absolute top-2 right-2 w-7 h-7 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                      className="absolute top-2 right-2 w-7 h-7 bg-red-500 text-slate-900 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
                       <X size={12} />
                     </button>
                     <input type="text" value={photo.legende}
                       onChange={e => setPhotos(prev => prev.map(p => p.id === photo.id ? { ...p, legende: e.target.value } : p))}
-                      placeholder="Légende..." className="mt-2 w-full px-3 py-2 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-gold transition-all" />
+                      placeholder="Légende..." className="mt-2 w-full px-3 py-2 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-green-500 transition-all" />
                   </div>
                 ))}
               </div>
@@ -608,13 +608,13 @@ export default function CMSQuiSommesNous() {
         <div className="bg-white rounded-[28px] border border-gray-50 shadow-sm overflow-hidden">
           <div className="px-8 py-6 border-b border-gray-100 flex items-center justify-between bg-gradient-to-r from-cream/30 to-transparent">
             <div>
-              <h2 className="text-xl font-serif font-bold text-dark flex items-center gap-3">
-                <Video size={22} className="text-gold" /> Vidéos
+              <h2 className="text-xl font-sans font-bold text-slate-900 flex items-center gap-3">
+                <Video size={22} className="text-green-600" /> Vidéos
               </h2>
               <p className="text-sm text-gray-500 mt-1">Vidéos YouTube ou Vimeo</p>
             </div>
             <button onClick={addVideo}
-              className="flex items-center gap-2 px-5 py-2.5 bg-gold text-white rounded-2xl font-semibold text-sm hover:bg-gold/90 transition-all shadow-lg shadow-gold/20">
+              className="flex items-center gap-2 px-5 py-2.5 bg-green-600 text-slate-900 rounded-2xl font-semibold text-sm hover:bg-green-600/90 transition-all shadow-lg shadow-gold/20">
               <Plus size={16} /> Ajouter une vidéo
             </button>
           </div>
@@ -637,13 +637,13 @@ export default function CMSQuiSommesNous() {
                         <label className="block text-xs font-semibold text-gray-700 mb-1">Titre</label>
                         <input type="text" value={video.titre}
                           onChange={e => setVideos(prev => prev.map(v => v.id === video.id ? { ...v, titre: e.target.value } : v))}
-                          className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-gold transition-all" placeholder="Titre" />
+                          className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 transition-all" placeholder="Titre" />
                       </div>
                       <div>
                         <label className="block text-xs font-semibold text-gray-700 mb-1">URL YouTube/Vimeo</label>
                         <input type="url" value={video.url}
                           onChange={e => setVideos(prev => prev.map(v => v.id === video.id ? { ...v, url: e.target.value } : v))}
-                          className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-gold transition-all" placeholder="https://youtube.com/watch?v=..." />
+                          className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 transition-all" placeholder="https://youtube.com/watch?v=..." />
                       </div>
                     </div>
                     {video.url && video.url.includes('youtu') && (
@@ -663,7 +663,7 @@ export default function CMSQuiSommesNous() {
       {/* ── Bottom Save ── */}
       <div className="flex justify-end pt-4 pb-8">
         <button onClick={saveAll} disabled={saving}
-          className="flex items-center gap-2 px-8 py-3 bg-dark text-white rounded-2xl font-semibold text-sm hover:bg-charcoal transition-all shadow-lg shadow-dark/10 disabled:opacity-50">
+          className="flex items-center gap-2 px-8 py-3 bg-white text-slate-900 rounded-2xl font-semibold text-sm hover:bg-slate-100 transition-all shadow-lg shadow-slate-200 disabled:opacity-50">
           {saving ? <RefreshCw size={16} className="animate-spin" /> : saved ? <Check size={16} /> : <Save size={16} />}
           {saving ? 'Sauvegarde...' : saved ? 'Sauvegardé !' : 'Enregistrer toutes les modifications'}
         </button>

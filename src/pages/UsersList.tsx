@@ -250,7 +250,7 @@ export default function UsersList({ pageType }: UsersListProps) {
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="flex items-end justify-between">
         <div>
-          <h1 className="text-4xl font-serif font-bold text-dark">{pageTitle}</h1>
+          <h1 className="text-4xl font-sans font-bold text-slate-900">{pageTitle}</h1>
           <p className="text-gray-400 text-sm mt-1">
             {users.length} {pageTitle.toLowerCase()} — {pageDescription}
           </p>
@@ -259,7 +259,7 @@ export default function UsersList({ pageType }: UsersListProps) {
           {!isReadersPage && (
             <button
               onClick={() => setShowAddModal(true)}
-              className="flex items-center px-6 py-3 bg-gold text-dark rounded-2xl hover:bg-gold/90 transition-all font-bold tracking-wide shadow-lg shadow-gold/10"
+              className="flex items-center px-6 py-3 bg-green-600 text-slate-900 rounded-2xl hover:bg-green-600/90 transition-all font-bold tracking-wide shadow-lg shadow-gold/10"
             >
               <UserPlus size={18} className="mr-2" />
               Ajouter
@@ -267,9 +267,9 @@ export default function UsersList({ pageType }: UsersListProps) {
           )}
           <button
             onClick={fetchUsers}
-            className="flex items-center px-6 py-3 bg-dark text-white rounded-2xl hover:bg-charcoal transition-all font-bold tracking-wide shadow-lg shadow-dark/10"
+            className="flex items-center px-6 py-3 bg-white text-slate-900 rounded-2xl hover:bg-slate-100 transition-all font-bold tracking-wide shadow-lg shadow-slate-200"
           >
-            <RefreshCw size={18} className="mr-2 text-gold" />
+            <RefreshCw size={18} className="mr-2 text-green-600" />
             Actualiser
           </button>
         </div>
@@ -289,7 +289,7 @@ export default function UsersList({ pageType }: UsersListProps) {
               placeholder="Rechercher par nom, email, entreprise..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-14 pr-6 py-4 bg-gray-50 border-none rounded-2xl text-sm focus:bg-white focus:ring-2 focus:ring-gold/20 outline-none transition-all placeholder:text-gray-300"
+              className="w-full pl-14 pr-6 py-4 bg-gray-50 border-none rounded-2xl text-sm focus:bg-white focus:ring-2 focus:ring-green-500/20 outline-none transition-all placeholder:text-gray-300"
             />
           </div>
           {!isReadersPage && (
@@ -306,7 +306,7 @@ export default function UsersList({ pageType }: UsersListProps) {
                   className={cn(
                     "text-xs px-3 py-1.5 rounded-lg font-bold transition-all",
                     statusFilter === f.key
-                      ? "bg-gold/20 text-gold"
+                      ? "bg-green-600/20 text-green-600"
                       : "bg-gray-50 text-gray-400 hover:bg-gray-100"
                   )}
                 >
@@ -324,7 +324,7 @@ export default function UsersList({ pageType }: UsersListProps) {
           <thead className="bg-gray-50/50 text-[10px] uppercase tracking-widest font-bold text-gray-400">
             <tr>
               <th className="px-8 py-6 w-12">
-                <input type="checkbox" className="rounded-md border-gray-200 text-gold focus:ring-gold w-4 h-4" />
+                <input type="checkbox" className="rounded-md border-gray-200 text-green-600 focus:ring-gold w-4 h-4" />
               </th>
               <th className="px-6 py-6">Utilisateur</th>
               {!isReadersPage && <th className="px-6 py-6">Entreprise</th>}
@@ -352,15 +352,15 @@ export default function UsersList({ pageType }: UsersListProps) {
               return (
                 <tr key={user.id} className="hover:bg-gray-50/50 transition-colors group">
                   <td className="px-8 py-5">
-                    <input type="checkbox" className="rounded-md border-gray-200 text-gold focus:ring-gold w-4 h-4" />
+                    <input type="checkbox" className="rounded-md border-gray-200 text-green-600 focus:ring-gold w-4 h-4" />
                   </td>
                   <td className="px-6 py-5">
                     <div className="flex items-center space-x-4">
-                      <div className="w-10 h-10 rounded-xl bg-gold/10 flex items-center justify-center text-gold font-bold text-sm">
+                      <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center text-green-600 font-bold text-sm">
                         {(user.full_name || user.email || '?').charAt(0).toUpperCase()}
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-dark">{user.full_name || 'Sans nom'}</p>
+                        <p className="text-sm font-bold text-slate-900">{user.full_name || 'Sans nom'}</p>
                         <p className="text-[10px] text-gray-400 mt-0.5">{user.email || user.id.slice(0, 12)}</p>
                       </div>
                     </div>
@@ -368,7 +368,7 @@ export default function UsersList({ pageType }: UsersListProps) {
                   {!isReadersPage && (
                     <td className="px-6 py-5">
                       <div>
-                        <p className="text-sm text-dark">{user.company_name || '—'}</p>
+                        <p className="text-sm text-slate-900">{user.company_name || '—'}</p>
                         {user.sector && <p className="text-[10px] text-gray-400">{user.sector}</p>}
                       </div>
                     </td>
@@ -441,7 +441,7 @@ export default function UsersList({ pageType }: UsersListProps) {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowAddModal(false)} />
           <div className="relative bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl">
-            <h2 className="text-2xl font-serif font-bold mb-6">Ajouter un partenaire</h2>
+            <h2 className="text-2xl font-sans font-bold mb-6">Ajouter un partenaire</h2>
 
             <div className="space-y-4">
               <div>
@@ -450,7 +450,7 @@ export default function UsersList({ pageType }: UsersListProps) {
                   type="text"
                   value={addForm.full_name}
                   onChange={(e) => setAddForm(f => ({ ...f, full_name: e.target.value }))}
-                  className="w-full px-4 py-3 bg-gray-50 rounded-xl text-sm focus:ring-2 focus:ring-gold/20 outline-none"
+                  className="w-full px-4 py-3 bg-gray-50 rounded-xl text-sm focus:ring-2 focus:ring-green-500/20 outline-none"
                   placeholder="Prenom Nom"
                 />
               </div>
@@ -460,7 +460,7 @@ export default function UsersList({ pageType }: UsersListProps) {
                   type="email"
                   value={addForm.email}
                   onChange={(e) => setAddForm(f => ({ ...f, email: e.target.value }))}
-                  className="w-full px-4 py-3 bg-gray-50 rounded-xl text-sm focus:ring-2 focus:ring-gold/20 outline-none"
+                  className="w-full px-4 py-3 bg-gray-50 rounded-xl text-sm focus:ring-2 focus:ring-green-500/20 outline-none"
                   placeholder="email@exemple.com"
                 />
               </div>
@@ -470,7 +470,7 @@ export default function UsersList({ pageType }: UsersListProps) {
                   type="text"
                   value={addForm.password}
                   onChange={(e) => setAddForm(f => ({ ...f, password: e.target.value }))}
-                  className="w-full px-4 py-3 bg-gray-50 rounded-xl text-sm focus:ring-2 focus:ring-gold/20 outline-none"
+                  className="w-full px-4 py-3 bg-gray-50 rounded-xl text-sm focus:ring-2 focus:ring-green-500/20 outline-none"
                 />
                 <p className="text-[10px] text-gray-400 mt-1">Le partenaire pourra modifier son mot de passe.</p>
               </div>
@@ -480,7 +480,7 @@ export default function UsersList({ pageType }: UsersListProps) {
                   type="text"
                   value={addForm.company_name}
                   onChange={(e) => setAddForm(f => ({ ...f, company_name: e.target.value }))}
-                  className="w-full px-4 py-3 bg-gray-50 rounded-xl text-sm focus:ring-2 focus:ring-gold/20 outline-none"
+                  className="w-full px-4 py-3 bg-gray-50 rounded-xl text-sm focus:ring-2 focus:ring-green-500/20 outline-none"
                   placeholder="Nom de l'entreprise"
                 />
               </div>
@@ -489,7 +489,7 @@ export default function UsersList({ pageType }: UsersListProps) {
                 <select
                   value={addForm.sector}
                   onChange={(e) => setAddForm(f => ({ ...f, sector: e.target.value }))}
-                  className="w-full px-4 py-3 bg-gray-50 rounded-xl text-sm focus:ring-2 focus:ring-gold/20 outline-none"
+                  className="w-full px-4 py-3 bg-gray-50 rounded-xl text-sm focus:ring-2 focus:ring-green-500/20 outline-none"
                 >
                   <option value="">Selectionner un secteur</option>
                   <option value="FinTech">FinTech</option>
@@ -509,7 +509,7 @@ export default function UsersList({ pageType }: UsersListProps) {
                 <button
                   onClick={handleAddPartner}
                   disabled={addLoading}
-                  className="flex-1 py-3 bg-dark text-white rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-charcoal transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="flex-1 py-3 bg-white text-slate-900 rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-slate-100 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {addLoading ? (
                     <div className="w-4 h-4 border-2 border-white border-t-transparent animate-spin rounded-full" />
