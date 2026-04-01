@@ -8,6 +8,7 @@ import ArticlesList from './pages/ArticlesList';
 import ArticleEditor from './pages/ArticleEditor';
 import ProductsList from './pages/ProductsList';
 import ProductEditor from './pages/ProductEditor';
+import OrdersList from './pages/OrdersList';
 import UsersList from './pages/UsersList';
 import CMSConfig from './pages/CMSConfig';
 import CMSAccueil from './pages/CMSAccueil';
@@ -78,7 +79,7 @@ export default function App() {
             <Route path="boutique/produits" element={<ProductsList />} />
             <Route path="boutique/produits/new" element={<ProductEditor />} />
             <Route path="boutique/produits/:id" element={<ProductEditor />} />
-            <Route path="boutique/commandes" element={<Placeholder title="Gestion des Commandes" />} />
+            <Route path="boutique/commandes" element={<OrdersList />} />
 
             {/* Utilisateurs */}
             <Route path="utilisateurs/lecteurs" element={<UsersList pageType="readers" />} />
