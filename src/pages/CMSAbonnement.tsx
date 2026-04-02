@@ -409,6 +409,24 @@ export default function CMSAbonnement() {
                   </div>
                 </FieldRow>
 
+                <FieldRow label="Prix avant réduction" description="Laisser vide si pas de réduction. Le prix barré sera affiché à côté du prix actuel.">
+                  <div className="flex items-center gap-2 max-w-xs">
+                    <input type="text" inputMode="decimal"
+                      value={config.sub_monthly_original_price || ''}
+                      onChange={(e) => updateConfig('sub_monthly_original_price', e.target.value)}
+                      className="w-24 px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Ex: 20" />
+                    <span className="text-lg font-medium text-gray-600">€</span>
+                  </div>
+                </FieldRow>
+
+                <FieldRow label="Label réduction" description="Texte affiché sur le badge de réduction (ex: -25%, Promo, etc.)">
+                  <input type="text" value={config.sub_monthly_discount_label || ''}
+                    onChange={(e) => updateConfig('sub_monthly_discount_label', e.target.value)}
+                    className="w-full max-w-xs px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Ex: -25%" />
+                </FieldRow>
+
                 <FieldRow label="Description" description="Texte court sous le prix.">
                   <input type="text" value={config.sub_monthly_description || ''}
                     onChange={(e) => updateConfig('sub_monthly_description', e.target.value)}
@@ -471,6 +489,24 @@ export default function CMSAbonnement() {
                       className="w-20 px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="an" />
                   </div>
+                </FieldRow>
+
+                <FieldRow label="Prix avant réduction" description="Laisser vide si pas de réduction. Le prix barré sera affiché à côté du prix actuel.">
+                  <div className="flex items-center gap-2 max-w-xs">
+                    <input type="text" inputMode="decimal"
+                      value={config.sub_annual_original_price || ''}
+                      onChange={(e) => updateConfig('sub_annual_original_price', e.target.value)}
+                      className="w-24 px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Ex: 200" />
+                    <span className="text-lg font-medium text-gray-600">€</span>
+                  </div>
+                </FieldRow>
+
+                <FieldRow label="Label réduction" description="Texte affiché sur le badge de réduction (ex: -17%, Promo, etc.)">
+                  <input type="text" value={config.sub_annual_discount_label || ''}
+                    onChange={(e) => updateConfig('sub_annual_discount_label', e.target.value)}
+                    className="w-full max-w-xs px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Ex: -17%" />
                 </FieldRow>
 
                 <FieldRow label="Description" description="Texte court sous le prix.">
