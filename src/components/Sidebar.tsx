@@ -32,7 +32,7 @@ import { useNavigate } from 'react-router-dom';
 
 const menuGroups = [
   {
-    title: "G\u00e9n\u00e9ral",
+    title: "Général",
     items: [
       { name: "Tableau de bord", path: "/admin", icon: LayoutDashboard },
     ]
@@ -50,10 +50,10 @@ const menuGroups = [
     ]
   },
   {
-    title: "\u00c9ditorial",
+    title: "Éditorial",
     items: [
       { name: "Contenus", path: "/admin/articles", icon: FileText },
-      { name: "Cat\u00e9gories", path: "/admin/categories", icon: Tags },
+      { name: "Catégories", path: "/admin/categories", icon: Tags },
       { name: "Galerie", path: "/admin/galerie", icon: Image },
     ]
   },
@@ -69,18 +69,18 @@ const menuGroups = [
     items: [
       { name: "Lecteurs", path: "/admin/utilisateurs/lecteurs", icon: Users },
       { name: "Gestion Partenaires", path: "/admin/utilisateurs/partenaires", icon: Handshake },
-      { name: "Gestion Abonn\u00e9s", path: "/admin/utilisateurs/abonnements", icon: Users },
+      { name: "Gestion Abonnés", path: "/admin/utilisateurs/abonnements", icon: Users },
     ]
   },
   {
     title: "Marketing",
     items: [
       { name: "Newsletter", path: "/admin/marketing/newsletter", icon: Mail },
-      { name: "Publicit\u00e9s", path: "/admin/marketing/publicites", icon: Megaphone },
+      { name: "Publicités", path: "/admin/marketing/publicites", icon: Megaphone },
     ]
   },
   {
-    title: "Param\u00e8tres",
+    title: "Paramètres",
     items: [
       { name: "Configuration", path: "/admin/cms/config", icon: Settings },
       { name: "Paiements", path: "/admin/parametres/paiements", icon: CreditCard },
