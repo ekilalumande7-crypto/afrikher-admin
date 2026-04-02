@@ -16,6 +16,7 @@ import CMSMagazine from './pages/CMSMagazine';
 import CMSRubriques from './pages/CMSRubriques';
 import CMSQuiSommesNous from './pages/CMSQuiSommesNous';
 import CMSAbonnement from './pages/CMSAbonnement';
+import CMSContact from './pages/CMSContact';
 import SettingsPaiements from './pages/SettingsPaiements';
 
 // Placeholder for other pages
@@ -93,7 +94,7 @@ export default function App() {
             <Route path="cms/rubriques" element={<CMSRubriques />} />
             <Route path="cms/qui-sommes-nous" element={<CMSQuiSommesNous />} />
             <Route path="cms/abonnement" element={<CMSAbonnement />} />
-            <Route path="cms/contact" element={<Placeholder title="Page Contact" />} />
+            <Route path="cms/contact" element={<CMSContact />} />
             <Route path="cms/partenaires" element={<Placeholder title="Page Partenaires" />} />
 
             {/* CMS & Design */}
