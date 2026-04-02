@@ -11,6 +11,122 @@ interface FaqItem {
   answer: string;
 }
 
+// ========================================
+// Sub-components defined OUTSIDE the main component
+// to prevent focus loss on re-render
+// ========================================
+
+function FieldRow({ label, description, children, noBorder }: {
+  label: string;
+  description?: string;
+  children: React.ReactNode;
+  noBorder?: boolean;
+}) {
+  return (
+    <div className={`py-6 ${noBorder ? '' : 'border-b border-gray-100'}`}>
+      <div className="flex items-start justify-between gap-8">
+        <div className="w-72 shrink-0">
+          <p className="text-sm font-semibold text-gray-900">{label}</p>
+          {description && <p className="text-sm text-gray-500 mt-1">{description}</p>}
+        </div>
+        <div className="flex-1">{children}</div>
+      </div>
+    </div>
+  );
+}
+
+function FeatureEditor({ features, onUpdate, onRemove, onAdd }: {
+  features: string[];
+  onUpdate: (index: number, value: string) => void;
+  onRemove: (index: number) => void;
+  onAdd: () => void;
+}) {
+  return (
+    <div className="space-y-2">
+      {features.map((feature, i) => (
+        <div key={i} className="flex items-center gap-2">
+          <GripVertical size={14} className="text-gray-300 shrink-0" />
+          <input
+            type="text"
+            value={feature}
+            onChange={(e) => onUpdate(i, e.target.value)}
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Avantage..."
+          />
+          <button
+            onClick={() => onRemove(i)}
+            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+          >
+            <Trash2 size={14} />
+          </button>
+        </div>
+      ))}
+      <button
+        onClick={onAdd}
+        className="flex items-center gap-2 px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+      >
+        <Plus size={14} /> Ajouter un avantage
+      </button>
+    </div>
+  );
+}
+
+function FaqEditor({ items, onUpdateItem, onRemoveItem, onAddItem }: {
+  items: FaqItem[];
+  onUpdateItem: (index: number, field: 'question' | 'answer', value: string) => void;
+  onRemoveItem: (index: number) => void;
+  onAddItem: () => void;
+}) {
+  return (
+    <div className="space-y-4">
+      {items.map((item, i) => (
+        <div key={i} className="p-4 border border-gray-200 rounded-xl bg-gray-50 space-y-3">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex-1 space-y-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Question</label>
+                <input
+                  type="text"
+                  value={item.question}
+                  onChange={(e) => onUpdateItem(i, 'question', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                  placeholder="Ex: Puis-je annuler à tout moment ?"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Réponse</label>
+                <textarea
+                  value={item.answer}
+                  onChange={(e) => onUpdateItem(i, 'answer', e.target.value)}
+                  rows={2}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none bg-white"
+                  placeholder="La réponse à cette question..."
+                />
+              </div>
+            </div>
+            <button
+              onClick={() => onRemoveItem(i)}
+              className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors mt-5"
+            >
+              <Trash2 size={16} />
+            </button>
+          </div>
+        </div>
+      ))}
+      <button
+        onClick={onAddItem}
+        className="flex items-center gap-2 px-4 py-2.5 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors border border-dashed border-blue-300"
+      >
+        <Plus size={14} /> Ajouter une question
+      </button>
+    </div>
+  );
+}
+
+// ========================================
+// Main component
+// ========================================
+
 export default function CMSAbonnement() {
   const [config, setConfig] = useState<SiteConfigMap>({});
   const [originalConfig, setOriginalConfig] = useState<SiteConfigMap>({});
@@ -30,6 +146,7 @@ export default function CMSAbonnement() {
         .select('key, value')
         .like('key', 'sub_%');
       if (fetchError) throw fetchError;
+
       const configMap: SiteConfigMap = {};
       data?.forEach((row: { key: string; value: string }) => {
         configMap[row.key] = row.value || '';
@@ -52,10 +169,10 @@ export default function CMSAbonnement() {
     setHasChanges(changed);
   }, [config, originalConfig]);
 
-  const updateConfig = (key: string, value: string) => {
+  const updateConfig = useCallback((key: string, value: string) => {
     setConfig(prev => ({ ...prev, [key]: value }));
     setSaved(false);
-  };
+  }, []);
 
   const handleSave = async () => {
     try {
@@ -63,6 +180,7 @@ export default function CMSAbonnement() {
       setError(null);
       const changedKeys = Object.keys(config).filter(key => config[key] !== originalConfig[key]);
       if (changedKeys.length === 0) { setSaved(true); setSaving(false); return; }
+
       for (const key of changedKeys) {
         const { error: upsertError } = await supabase
           .from('site_config')
@@ -81,104 +199,71 @@ export default function CMSAbonnement() {
     }
   };
 
-  // Features (plan advantages) helpers
-  const getFeatures = (key: string): string[] => {
+  // Features helpers
+  const getFeatures = useCallback((key: string): string[] => {
     const val = config[key] || '';
     return val ? val.split('||').filter(Boolean) : [];
-  };
-  const setFeatures = (key: string, features: string[]) => {
-    updateConfig(key, features.join('||'));
-  };
-  const addFeature = (key: string) => {
-    const features = getFeatures(key);
-    features.push('');
-    setFeatures(key, features);
-  };
-  const removeFeature = (key: string, index: number) => {
-    const features = getFeatures(key);
-    features.splice(index, 1);
-    setFeatures(key, features);
-  };
-  const updateFeature = (key: string, index: number, value: string) => {
-    const features = getFeatures(key);
-    features[index] = value;
-    setFeatures(key, features);
-  };
+  }, [config]);
 
-  // FAQ items helpers
-  const getFaqItems = (): FaqItem[] => {
+  const setFeatures = useCallback((key: string, features: string[]) => {
+    updateConfig(key, features.join('||'));
+  }, [updateConfig]);
+
+  const addFeature = useCallback((key: string) => {
+    const val = config[key] || '';
+    const features = val ? val.split('||').filter(Boolean) : [];
+    features.push('');
+    updateConfig(key, features.join('||'));
+  }, [config, updateConfig]);
+
+  const removeFeature = useCallback((key: string, index: number) => {
+    const val = config[key] || '';
+    const features = val ? val.split('||').filter(Boolean) : [];
+    features.splice(index, 1);
+    updateConfig(key, features.join('||'));
+  }, [config, updateConfig]);
+
+  const updateFeature = useCallback((key: string, index: number, value: string) => {
+    const val = config[key] || '';
+    const features = val ? val.split('||') : [];
+    if (index < features.length) {
+      features[index] = value;
+    }
+    updateConfig(key, features.join('||'));
+  }, [config, updateConfig]);
+
+  // FAQ helpers
+  const getFaqItems = useCallback((): FaqItem[] => {
     const val = config.sub_faq_items || '';
     if (!val) return [];
     return val.split('||||').filter(Boolean).map(pair => {
       const parts = pair.split('||');
       return { question: parts[0] || '', answer: parts[1] || '' };
     });
-  };
-  const setFaqItems = (items: FaqItem[]) => {
+  }, [config]);
+
+  const setFaqItems = useCallback((items: FaqItem[]) => {
     const val = items.map(i => `${i.question}||${i.answer}`).join('||||');
     updateConfig('sub_faq_items', val);
-  };
-  const addFaqItem = () => {
+  }, [updateConfig]);
+
+  const addFaqItem = useCallback(() => {
     const items = getFaqItems();
     items.push({ question: '', answer: '' });
     setFaqItems(items);
-  };
-  const removeFaqItem = (index: number) => {
+  }, [getFaqItems, setFaqItems]);
+
+  const removeFaqItem = useCallback((index: number) => {
     const items = getFaqItems();
     items.splice(index, 1);
     setFaqItems(items);
-  };
-  const updateFaqItem = (index: number, field: 'question' | 'answer', value: string) => {
+  }, [getFaqItems, setFaqItems]);
+
+  const updateFaqItem = useCallback((index: number, field: 'question' | 'answer', value: string) => {
     const items = getFaqItems();
     items[index][field] = value;
     setFaqItems(items);
-  };
-
-  const FieldRow = ({ label, description, children, noBorder }: {
-    label: string; description?: string; children: React.ReactNode; noBorder?: boolean;
-  }) => (
-    <div className={`py-6 ${noBorder ? '' : 'border-b border-gray-100'}`}>
-      <div className="flex items-start justify-between gap-8">
-        <div className="w-72 shrink-0">
-          <p className="text-sm font-semibold text-gray-900">{label}</p>
-          {description && <p className="text-sm text-gray-500 mt-1">{description}</p>}
-        </div>
-        <div className="flex-1">{children}</div>
-      </div>
-    </div>
-  );
-
-  const FeatureEditor = ({ configKey }: { configKey: string }) => {
-    const features = getFeatures(configKey);
-    return (
-      <div className="space-y-2">
-        {features.map((feature, i) => (
-          <div key={i} className="flex items-center gap-2">
-            <GripVertical size={14} className="text-gray-300 shrink-0" />
-            <input
-              type="text"
-              value={feature}
-              onChange={(e) => updateFeature(configKey, i, e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Avantage..."
-            />
-            <button
-              onClick={() => removeFeature(configKey, i)}
-              className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-            >
-              <Trash2 size={14} />
-            </button>
-          </div>
-        ))}
-        <button
-          onClick={() => addFeature(configKey)}
-          className="flex items-center gap-2 px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-        >
-          <Plus size={14} /> Ajouter un avantage
-        </button>
-      </div>
-    );
-  };
+  }, [getFaqItems, setFaqItems]);
 
   if (loading) {
     return (
@@ -198,6 +283,10 @@ export default function CMSAbonnement() {
     { id: 'faq' as const, label: 'FAQ' },
   ];
 
+  const monthlyFeatures = getFeatures('sub_monthly_features');
+  const annualFeatures = getFeatures('sub_annual_features');
+  const faqItems = getFaqItems();
+
   return (
     <div className="max-w-6xl mx-auto">
       {/* Header */}
@@ -215,8 +304,8 @@ export default function CMSAbonnement() {
               : 'bg-gray-100 text-gray-400 cursor-not-allowed'
             }`}>
             {saving ? <><RefreshCw size={14} className="mr-2 animate-spin" /> Enregistrement...</>
-            : saved ? <><Check size={14} className="mr-2" /> Enregistré</>
-            : <><Save size={14} className="mr-2" /> Enregistrer</>}
+             : saved ? <><Check size={14} className="mr-2" /> Enregistré</>
+             : <><Save size={14} className="mr-2" /> Enregistrer</>}
           </button>
         </div>
       </div>
@@ -239,7 +328,7 @@ export default function CMSAbonnement() {
       {/* Main layout */}
       <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
         <div className="flex min-h-[600px]">
-          {/* Sidebar */}
+          {/* Sidebar tabs */}
           <nav className="w-52 border-r border-gray-200 py-4 shrink-0">
             {tabs.map((tab) => (
               <button key={tab.id} onClick={() => setActiveTab(tab.id)}
@@ -264,8 +353,7 @@ export default function CMSAbonnement() {
 
                 <FieldRow label="Abonnements actifs" description="Activer ou désactiver la page d'abonnement sur le site public.">
                   <div className="flex items-center gap-3">
-                    <button
-                      onClick={() => updateConfig('sub_enabled', config.sub_enabled === 'true' ? 'false' : 'true')}
+                    <button onClick={() => updateConfig('sub_enabled', config.sub_enabled === 'true' ? 'false' : 'true')}
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${config.sub_enabled === 'true' ? 'bg-green-600' : 'bg-gray-300'}`}>
                       <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${config.sub_enabled === 'true' ? 'translate-x-6' : 'translate-x-1'}`} />
                     </button>
@@ -276,14 +364,17 @@ export default function CMSAbonnement() {
                 </FieldRow>
 
                 <FieldRow label="Titre de la page" description="Le titre affiché en grand dans le hero.">
-                  <input type="text" value={config.sub_hero_title || ''} onChange={(e) => updateConfig('sub_hero_title', e.target.value)}
+                  <input type="text" value={config.sub_hero_title || ''}
+                    onChange={(e) => updateConfig('sub_hero_title', e.target.value)}
                     className="w-full max-w-md px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="Abonnements" />
                 </FieldRow>
 
                 <FieldRow label="Sous-titre" description="Texte doré italique sous le titre principal." noBorder>
-                  <textarea value={config.sub_hero_subtitle || ''} onChange={(e) => updateConfig('sub_hero_subtitle', e.target.value)}
-                    rows={3} className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  <textarea value={config.sub_hero_subtitle || ''}
+                    onChange={(e) => updateConfig('sub_hero_subtitle', e.target.value)}
+                    rows={3}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                     placeholder="Rejoignez une communauté de femmes visionnaires..." />
                 </FieldRow>
               </div>
@@ -296,34 +387,49 @@ export default function CMSAbonnement() {
                 <p className="text-sm text-gray-500 mb-6">Configuration du plan d'abonnement mensuel.</p>
 
                 <FieldRow label="Nom du plan" description="Le titre affiché sur la carte.">
-                  <input type="text" value={config.sub_monthly_name || ''} onChange={(e) => updateConfig('sub_monthly_name', e.target.value)}
-                    className="w-full max-w-sm px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Mensuel" />
+                  <input type="text" value={config.sub_monthly_name || ''}
+                    onChange={(e) => updateConfig('sub_monthly_name', e.target.value)}
+                    className="w-full max-w-sm px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Mensuel" />
                 </FieldRow>
 
                 <FieldRow label="Prix" description="Le montant en euros.">
                   <div className="flex items-center gap-2 max-w-xs">
-                    <input type="number" value={config.sub_monthly_price || ''} onChange={(e) => updateConfig('sub_monthly_price', e.target.value)}
-                      className="w-24 px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="15" />
+                    <input type="text" inputMode="decimal"
+                      value={config.sub_monthly_price || ''}
+                      onChange={(e) => updateConfig('sub_monthly_price', e.target.value)}
+                      className="w-24 px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="15" />
                     <span className="text-lg font-medium text-gray-600">€</span>
-                    <span className="text-sm text-gray-400">/ </span>
-                    <input type="text" value={config.sub_monthly_period || ''} onChange={(e) => updateConfig('sub_monthly_period', e.target.value)}
-                      className="w-20 px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="mois" />
+                    <span className="text-sm text-gray-400">/</span>
+                    <input type="text" value={config.sub_monthly_period || ''}
+                      onChange={(e) => updateConfig('sub_monthly_period', e.target.value)}
+                      className="w-20 px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="mois" />
                   </div>
                 </FieldRow>
 
                 <FieldRow label="Description" description="Texte court sous le prix.">
-                  <input type="text" value={config.sub_monthly_description || ''} onChange={(e) => updateConfig('sub_monthly_description', e.target.value)}
+                  <input type="text" value={config.sub_monthly_description || ''}
+                    onChange={(e) => updateConfig('sub_monthly_description', e.target.value)}
                     className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="L'accès complet à l'univers AFRIKHER..." />
                 </FieldRow>
 
                 <FieldRow label="Texte du bouton" description="Le texte affiché sur le bouton CTA.">
-                  <input type="text" value={config.sub_monthly_cta || ''} onChange={(e) => updateConfig('sub_monthly_cta', e.target.value)}
-                    className="w-full max-w-sm px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="S'abonner" />
+                  <input type="text" value={config.sub_monthly_cta || ''}
+                    onChange={(e) => updateConfig('sub_monthly_cta', e.target.value)}
+                    className="w-full max-w-sm px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="S'abonner" />
                 </FieldRow>
 
                 <FieldRow label="Avantages" description="Liste des avantages inclus dans ce plan." noBorder>
-                  <FeatureEditor configKey="sub_monthly_features" />
+                  <FeatureEditor
+                    features={monthlyFeatures}
+                    onUpdate={(i, v) => updateFeature('sub_monthly_features', i, v)}
+                    onRemove={(i) => removeFeature('sub_monthly_features', i)}
+                    onAdd={() => addFeature('sub_monthly_features')}
+                  />
                 </FieldRow>
               </div>
             )}
@@ -345,34 +451,49 @@ export default function CMSAbonnement() {
                 </FieldRow>
 
                 <FieldRow label="Nom du plan" description="Le titre affiché sur la carte.">
-                  <input type="text" value={config.sub_annual_name || ''} onChange={(e) => updateConfig('sub_annual_name', e.target.value)}
-                    className="w-full max-w-sm px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Annuel" />
+                  <input type="text" value={config.sub_annual_name || ''}
+                    onChange={(e) => updateConfig('sub_annual_name', e.target.value)}
+                    className="w-full max-w-sm px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Annuel" />
                 </FieldRow>
 
                 <FieldRow label="Prix" description="Le montant en euros.">
                   <div className="flex items-center gap-2 max-w-xs">
-                    <input type="number" value={config.sub_annual_price || ''} onChange={(e) => updateConfig('sub_annual_price', e.target.value)}
-                      className="w-24 px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="150" />
+                    <input type="text" inputMode="decimal"
+                      value={config.sub_annual_price || ''}
+                      onChange={(e) => updateConfig('sub_annual_price', e.target.value)}
+                      className="w-24 px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="150" />
                     <span className="text-lg font-medium text-gray-600">€</span>
-                    <span className="text-sm text-gray-400">/ </span>
-                    <input type="text" value={config.sub_annual_period || ''} onChange={(e) => updateConfig('sub_annual_period', e.target.value)}
-                      className="w-20 px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="an" />
+                    <span className="text-sm text-gray-400">/</span>
+                    <input type="text" value={config.sub_annual_period || ''}
+                      onChange={(e) => updateConfig('sub_annual_period', e.target.value)}
+                      className="w-20 px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="an" />
                   </div>
                 </FieldRow>
 
                 <FieldRow label="Description" description="Texte court sous le prix.">
-                  <input type="text" value={config.sub_annual_description || ''} onChange={(e) => updateConfig('sub_annual_description', e.target.value)}
+                  <input type="text" value={config.sub_annual_description || ''}
+                    onChange={(e) => updateConfig('sub_annual_description', e.target.value)}
                     className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="Le choix de l'excellence..." />
                 </FieldRow>
 
                 <FieldRow label="Texte du bouton" description="Le texte affiché sur le bouton CTA.">
-                  <input type="text" value={config.sub_annual_cta || ''} onChange={(e) => updateConfig('sub_annual_cta', e.target.value)}
-                    className="w-full max-w-sm px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="S'abonner & Économiser" />
+                  <input type="text" value={config.sub_annual_cta || ''}
+                    onChange={(e) => updateConfig('sub_annual_cta', e.target.value)}
+                    className="w-full max-w-sm px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="S'abonner & Économiser" />
                 </FieldRow>
 
                 <FieldRow label="Avantages" description="Liste des avantages inclus dans ce plan." noBorder>
-                  <FeatureEditor configKey="sub_annual_features" />
+                  <FeatureEditor
+                    features={annualFeatures}
+                    onUpdate={(i, v) => updateFeature('sub_annual_features', i, v)}
+                    onRemove={(i) => removeFeature('sub_annual_features', i)}
+                    onAdd={() => addFeature('sub_annual_features')}
+                  />
                 </FieldRow>
               </div>
             )}
@@ -384,52 +505,34 @@ export default function CMSAbonnement() {
                 <p className="text-sm text-gray-500 mb-6">Les questions/réponses affichées en bas de la page abonnement.</p>
 
                 <FieldRow label="Titre" description="Le titre de la section FAQ.">
-                  <input type="text" value={config.sub_faq_title || ''} onChange={(e) => updateConfig('sub_faq_title', e.target.value)}
-                    className="w-full max-w-md px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Une question ?" />
+                  <input type="text" value={config.sub_faq_title || ''}
+                    onChange={(e) => updateConfig('sub_faq_title', e.target.value)}
+                    className="w-full max-w-md px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Une question ?" />
                 </FieldRow>
 
                 <FieldRow label="Texte d'accompagnement" description="Le paragraphe sous le titre.">
-                  <textarea value={config.sub_faq_text || ''} onChange={(e) => updateConfig('sub_faq_text', e.target.value)}
-                    rows={3} className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  <textarea value={config.sub_faq_text || ''}
+                    onChange={(e) => updateConfig('sub_faq_text', e.target.value)}
+                    rows={3}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                     placeholder="Notre équipe est à votre disposition..." />
                 </FieldRow>
 
                 <FieldRow label="Email de support" description="L'adresse email affichée pour les questions.">
-                  <input type="email" value={config.sub_faq_email || ''} onChange={(e) => updateConfig('sub_faq_email', e.target.value)}
-                    className="w-full max-w-md px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="support@afrikher.com" />
+                  <input type="email" value={config.sub_faq_email || ''}
+                    onChange={(e) => updateConfig('sub_faq_email', e.target.value)}
+                    className="w-full max-w-md px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="support@afrikher.com" />
                 </FieldRow>
 
                 <FieldRow label="Questions / Réponses" description="Ajoutez, modifiez ou supprimez les FAQ." noBorder>
-                  <div className="space-y-4">
-                    {getFaqItems().map((item, i) => (
-                      <div key={i} className="p-4 border border-gray-200 rounded-xl bg-gray-50 space-y-3">
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="flex-1 space-y-3">
-                            <div>
-                              <label className="block text-xs font-medium text-gray-500 mb-1">Question</label>
-                              <input type="text" value={item.question} onChange={(e) => updateFaqItem(i, 'question', e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                                placeholder="Ex: Puis-je annuler à tout moment ?" />
-                            </div>
-                            <div>
-                              <label className="block text-xs font-medium text-gray-500 mb-1">Réponse</label>
-                              <textarea value={item.answer} onChange={(e) => updateFaqItem(i, 'answer', e.target.value)}
-                                rows={2} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none bg-white"
-                                placeholder="La réponse à cette question..." />
-                            </div>
-                          </div>
-                          <button onClick={() => removeFaqItem(i)}
-                            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors mt-5">
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                    <button onClick={addFaqItem}
-                      className="flex items-center gap-2 px-4 py-2.5 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors border border-dashed border-blue-300">
-                      <Plus size={14} /> Ajouter une question
-                    </button>
-                  </div>
+                  <FaqEditor
+                    items={faqItems}
+                    onUpdateItem={updateFaqItem}
+                    onRemoveItem={removeFaqItem}
+                    onAddItem={addFaqItem}
+                  />
                 </FieldRow>
               </div>
             )}
