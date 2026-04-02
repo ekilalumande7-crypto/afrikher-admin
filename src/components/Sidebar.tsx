@@ -32,7 +32,7 @@ import { useNavigate } from 'react-router-dom';
 
 const menuGroups = [
   {
-    title: "Général",
+    title: "G\u00e9n\u00e9ral",
     items: [
       { name: "Tableau de bord", path: "/admin", icon: LayoutDashboard },
     ]
@@ -50,10 +50,10 @@ const menuGroups = [
     ]
   },
   {
-    title: "Éditorial",
+    title: "\u00c9ditorial",
     items: [
       { name: "Contenus", path: "/admin/articles", icon: FileText },
-      { name: "Catégories", path: "/admin/categories", icon: Tags },
+      { name: "Cat\u00e9gories", path: "/admin/categories", icon: Tags },
       { name: "Galerie", path: "/admin/galerie", icon: Image },
     ]
   },
@@ -68,32 +68,26 @@ const menuGroups = [
     title: "Utilisateurs",
     items: [
       { name: "Lecteurs", path: "/admin/utilisateurs/lecteurs", icon: Users },
-      { name: "Partenaires", path: "/admin/utilisateurs/partenaires", icon: Handshake },
-      { name: "Abonnements", path: "/admin/utilisateurs/abonnements", icon: CreditCard },
-    ]
-  },
-  {
-    title: "CMS & Design",
-    items: [
-      { name: "Configuration", path: "/admin/cms/config", icon: Settings },
-      { name: "Design & Thème", path: "/admin/cms/design", icon: Palette },
+      { name: "Gestion Partenaires", path: "/admin/utilisateurs/partenaires", icon: Handshake },
+      { name: "Gestion Abonn\u00e9s", path: "/admin/utilisateurs/abonnements", icon: Users },
     ]
   },
   {
     title: "Marketing",
     items: [
       { name: "Newsletter", path: "/admin/marketing/newsletter", icon: Mail },
-      { name: "Publicités", path: "/admin/marketing/publicites", icon: Megaphone },
+      { name: "Publicit\u00e9s", path: "/admin/marketing/publicites", icon: Megaphone },
     ]
   },
   {
-    title: "Paramètres",
+    title: "Param\u00e8tres",
     items: [
+      { name: "Configuration", path: "/admin/cms/config", icon: Settings },
       { name: "Paiements", path: "/admin/parametres/paiements", icon: CreditCard },
       { name: "Notifications", path: "/admin/parametres/notifications", icon: Bell },
     ]
   }
-];
+]
 
 export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
