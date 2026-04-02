@@ -102,7 +102,7 @@ export default function CMSContact() {
         <div>
           <h1 className="text-3xl font-serif font-bold text-gray-900">Page Contact</h1>
           <p className="text-gray-400 mt-1">
-            G\u00e9rez les informations de contact affich\u00e9es sur le site et dans le footer.
+            Gérez les informations de contact affichées sur le site et dans le footer.
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -119,7 +119,7 @@ export default function CMSContact() {
             className="px-6 py-2.5 bg-gray-900 text-white rounded-xl text-sm font-medium hover:bg-gray-800 transition-colors flex items-center gap-2 disabled:opacity-50"
           >
             {saving ? <RefreshCw size={16} className="animate-spin" /> : saved ? <Check size={16} /> : <Save size={16} />}
-            {saving ? 'Sauvegarde...' : saved ? 'Sauvegard\u00e9 !' : 'Sauvegarder'}
+            {saving ? 'Sauvegarde...' : saved ? 'Sauvegardé !' : 'Sauvegarder'}
           </button>
         </div>
       </div>
@@ -134,7 +134,7 @@ export default function CMSContact() {
       {saved && (
         <div className="flex items-center gap-3 p-4 bg-green-50 border border-green-100 rounded-2xl text-green-600 text-sm">
           <Check size={18} />
-          Modifications sauvegard\u00e9es avec succ\u00e8s ! Les changements sont visibles sur le site.
+          Modifications sauvegardées avec succès ! Les changements sont visibles sur le site.
         </div>
       )}
 
@@ -144,10 +144,10 @@ export default function CMSContact() {
           <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
             <Mail size={20} className="text-blue-500" />
           </div>
-          <h2 className="text-xl font-serif font-bold text-gray-900">Email & T\u00e9l\u00e9phone</h2>
+          <h2 className="text-xl font-serif font-bold text-gray-900">Email & Téléphone</h2>
         </div>
 
-        <FieldRow label="Email de contact" description="Affich\u00e9 sur la page contact et dans le footer.">
+        <FieldRow label="Email de contact" description="Affiché sur la page contact et dans le footer.">
           <input
             type="email"
             value={config.contact_email || ''}
@@ -157,7 +157,7 @@ export default function CMSContact() {
           />
         </FieldRow>
 
-        <FieldRow label="T\u00e9l\u00e9phone" description="Num\u00e9ro affich\u00e9 sur la page contact. Laisser vide pour 'Sur rendez-vous'.">
+        <FieldRow label="Téléphone" description="Numéro affiché sur la page contact. Laisser vide pour 'Sur rendez-vous'.">
           <input
             type="text"
             value={config.contact_phone || ''}
@@ -187,7 +187,7 @@ export default function CMSContact() {
           <h2 className="text-xl font-serif font-bold text-gray-900">Adresses</h2>
         </div>
 
-        <FieldRow label="Adresse 1" description="Premi\u00e8re adresse affich\u00e9e (ex: si\u00e8ge principal).">
+        <FieldRow label="Adresse 1" description="Première adresse affichée (ex: siège principal).">
           <input
             type="text"
             value={config.contact_address_1 || ''}
@@ -197,17 +197,17 @@ export default function CMSContact() {
           />
         </FieldRow>
 
-        <FieldRow label="Adresse 2" description="Deuxi\u00e8me adresse (optionnelle).">
+        <FieldRow label="Adresse 2" description="Deuxième adresse (optionnelle).">
           <input
             type="text"
             value={config.contact_address_2 || ''}
             onChange={(e) => updateConfig('contact_address_2', e.target.value)}
             className="w-full max-w-md px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Abidjan, C\u00f4te d'Ivoire"
+            placeholder="Abidjan, Côte d'Ivoire"
           />
         </FieldRow>
 
-        <FieldRow label="Adresse 3" description="Troisi\u00e8me adresse (optionnelle).">
+        <FieldRow label="Adresse 3" description="Troisième adresse (optionnelle).">
           <input
             type="text"
             value={config.contact_address_3 || ''}
@@ -224,7 +224,7 @@ export default function CMSContact() {
           <div className="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center">
             <Globe size={20} className="text-purple-500" />
           </div>
-          <h2 className="text-xl font-serif font-bold text-gray-900">R\u00e9seaux sociaux</h2>
+          <h2 className="text-xl font-serif font-bold text-gray-900">Réseaux sociaux</h2>
         </div>
 
         <FieldRow label="Instagram" description="URL de la page Instagram.">
@@ -257,7 +257,7 @@ export default function CMSContact() {
           />
         </FieldRow>
 
-        <FieldRow label="Site web" description="URL du site principal (si diff\u00e9rent).">
+        <FieldRow label="Site web" description="URL du site principal (si différent).">
           <input
             type="url"
             value={config.contact_website || ''}
@@ -277,7 +277,7 @@ export default function CMSContact() {
           <h2 className="text-xl font-serif font-bold text-gray-900">Textes de la page Contact</h2>
         </div>
 
-        <FieldRow label="Titre de la page" description="Titre principal affich\u00e9 en haut de la page contact.">
+        <FieldRow label="Titre de la page" description="Titre principal affiché en haut de la page contact.">
           <input
             type="text"
             value={config.contact_page_title || ''}
@@ -293,17 +293,17 @@ export default function CMSContact() {
             value={config.contact_page_subtitle || ''}
             onChange={(e) => updateConfig('contact_page_subtitle', e.target.value)}
             className="w-full max-w-md px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Une question, une collaboration ? Nous sommes \u00e0 votre \u00e9coute."
+            placeholder="Une question, une collaboration ? Nous sommes à votre écoute."
           />
         </FieldRow>
 
-        <FieldRow label="Texte d'introduction" description="Paragraphe de pr\u00e9sentation \u00e0 c\u00f4t\u00e9 du formulaire.">
+        <FieldRow label="Texte d'introduction" description="Paragraphe de présentation à côté du formulaire.">
           <textarea
             value={config.contact_intro_text || ''}
             onChange={(e) => updateConfig('contact_intro_text', e.target.value)}
             rows={4}
             className="w-full max-w-md px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-            placeholder="AFRIKHER est toujours ouvert aux \u00e9changes, collaborations et nouvelles perspectives..."
+            placeholder="AFRIKHER est toujours ouvert aux échanges, collaborations et nouvelles perspectives..."
           />
         </FieldRow>
       </div>
