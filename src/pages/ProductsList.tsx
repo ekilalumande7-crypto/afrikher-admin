@@ -297,6 +297,7 @@ export default function ProductsList() {
       setFormImages([]);
     }
     setSaveMsg('');
+    window.scrollTo(0, 0);
     setTab('editor');
   };
 
@@ -436,6 +437,8 @@ export default function ProductsList() {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
+      {tab !== 'editor' && (
+      <>
       {/* Header */}
       <div className="flex items-end justify-between">
         <div>
@@ -490,6 +493,8 @@ export default function ProductsList() {
         ))}
       </div>
 
+      </>
+      )}
       {/* ══════════════════════════════════════════════ */}
       {/* TAB: CATALOGUE */}
       {/* ══════════════════════════════════════════════ */}
