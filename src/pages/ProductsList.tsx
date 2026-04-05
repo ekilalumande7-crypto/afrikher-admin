@@ -14,7 +14,8 @@ interface Product {
   id: string;
   name: string;
   description: string;
-  price: number;
+  price: number | null;
+  external_url: string | null;
   images: string[];
   type: string;
   stock: number;
@@ -105,7 +106,7 @@ export default function ProductsList() {
   // Editor form
   const [formName, setFormName] = useState('');
   const [formDesc, setFormDesc] = useState('');
-  const [formPrice, setFormPrice] = useState('');
+  const [formExternalUrl, setFormExternalUrl] = useState('');
   const [formStock, setFormStock] = useState('');
   const [formUnlimited, setFormUnlimited] = useState(false);
   const [formType, setFormType] = useState('book');
@@ -278,7 +279,7 @@ export default function ProductsList() {
       setIsNew(false);
       setFormName(product.name);
       setFormDesc(product.description || '');
-      setFormPrice(product.price.toString());
+      setFormExternalUrl(product.external_url || '');
       setFormStock(product.stock.toString());
       setFormUnlimited(product.unlimited || false);
       setFormType(product.type || 'other');
@@ -289,7 +290,7 @@ export default function ProductsList() {
       setIsNew(true);
       setFormName('');
       setFormDesc('');
-      setFormPrice('');
+      setFormExternalUrl('');
       setFormStock('0');
       setFormUnlimited(false);
       setFormType('book');
@@ -302,8 +303,8 @@ export default function ProductsList() {
   };
 
   const saveProduct = async () => {
-    if (!formName.trim() || !formPrice) {
-      setSaveMsg('Le nom et le prix sont obligatoires');
+    if (!formName.trim() || !formExternalUrl.trim()) {
+      setSaveMsg('Le nom et le lien partenaire sont obligatoires');
       return;
     }
 
@@ -311,12 +312,13 @@ export default function ProductsList() {
     setSaveMsg('');
 
     try {
-      const payload = {
+      const payload: any = {
         name: formName.trim(),
         description: formDesc.trim(),
-        price: parseFloat(formPrice),
-        stock: parseInt(formStock) || 0,
-        unlimited: formUnlimited,
+        external_url: formExternalUrl.trim(),
+        price: 0,
+        stock: 0,
+        unlimited: true,
         type: formType,
         status: formStatus,
         images: formImages,
@@ -554,7 +556,7 @@ export default function ProductsList() {
                   <tr>
                     <th className="px-8 py-5">Produit</th>
                     <th className="px-6 py-5">Type</th>
-                    <th className="px-6 py-5">Prix</th>
+                    <th className="px-6 py-5">Lien</th>
                     <th className="px-6 py-5">Stock</th>
                     <th className="px-6 py-5">Partenaire</th>
                     <th className="px-6 py-5">Statut</th>
@@ -587,7 +589,13 @@ export default function ProductsList() {
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="text-sm font-bold text-slate-900">{product.price.toFixed(2)} €</span>
+                        {product.external_url ? (
+                          <a href={product.external_url} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-green-600 hover:underline truncate max-w-[160px] inline-block">
+                            Voir le lien ↗
+                          </a>
+                        ) : (
+                          <span className="text-xs text-gray-300">—</span>
+                        )}
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center space-x-2">
@@ -870,37 +878,22 @@ export default function ProductsList() {
                 </div>
               </div>
 
-              {/* Price & Stock */}
+              {/* Lien partenaire */}
               <div className="bg-white p-8 rounded-[32px] border border-gray-50 shadow-sm space-y-5">
-                <h3 className="text-lg font-sans font-bold text-slate-900 border-b border-gray-50 pb-3">Prix & Stock</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">Prix (€) *</label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={formPrice}
-                      onChange={e => setFormPrice(e.target.value)}
-                      placeholder="0.00"
-                      className="w-full p-4 bg-gray-50 border-none rounded-2xl text-sm focus:bg-white focus:ring-2 focus:ring-green-500/20 outline-none transition-all"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">Stock</label>
-                    <input
-                      type="number"
-                      value={formStock}
-                      onChange={e => setFormStock(e.target.value)}
-                      placeholder="0"
-                      disabled={formUnlimited}
-                      className="w-full p-4 bg-gray-50 border-none rounded-2xl text-sm focus:bg-white focus:ring-2 focus:ring-green-500/20 outline-none transition-all disabled:opacity-50"
-                    />
-                  </div>
+                <h3 className="text-lg font-sans font-bold text-slate-900 border-b border-gray-50 pb-3">Lien partenaire</h3>
+                <div>
+                  <label className="block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">URL externe du produit *</label>
+                  <input
+                    type="url"
+                    value={formExternalUrl}
+                    onChange={e => setFormExternalUrl(e.target.value)}
+                    placeholder="https://site-du-partenaire.com/produit"
+                    className="w-full p-4 bg-gray-50 border-none rounded-2xl text-sm focus:bg-white focus:ring-2 focus:ring-green-500/20 outline-none transition-all"
+                  />
+                  <p className="text-[11px] text-gray-400 mt-2 leading-relaxed">
+                    Le bouton &laquo; Acheter &raquo; redirigera les visiteurs vers ce lien. Le client ach&egrave;te directement chez le partenaire.
+                  </p>
                 </div>
-                <label className="flex items-center space-x-3 cursor-pointer">
-                  <input type="checkbox" checked={formUnlimited} onChange={e => setFormUnlimited(e.target.checked)} className="rounded border-gray-300 text-green-600 focus:ring-gold" />
-                  <span className="text-sm text-gray-500">Stock illimité (produit digital ou service)</span>
-                </label>
               </div>
             </div>
 
