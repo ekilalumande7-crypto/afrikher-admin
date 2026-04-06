@@ -29,7 +29,7 @@ interface VideoItem {
   description: string;
 }
 
-type ActiveTab = 'presentation' | 'fondatrice' | 'valeurs' | 'galerie' | 'videos';
+type ActiveTab = 'presentation' | 'fondatrice' | 'valeurs' | 'galerie' | 'videos' | 'sections';
 
 // ── Image conversion utility ──
 async function convertImageToJpeg(file: File): Promise<File> {
@@ -87,6 +87,8 @@ export default function CMSQuiSommesNous() {
   const [aboutTexte2, setAboutTexte2] = useState("Notre mission : mettre en lumière les femmes qui bâtissent l'Afrique de demain, à travers des portraits, des interviews, des analyses sectorielles et un magazine premium qui conjugue intelligence économique et art de vivre.");
   const [aboutImage, setAboutImage] = useState('');
   const [aboutCitation, setAboutCitation] = useState("L'élégance hors du commun. Le Business au féminin.");
+  const [aboutHeroLabel, setAboutHeroLabel] = useState('Maison éditoriale');
+  const [aboutHeroSubtitle, setAboutHeroSubtitle] = useState("L'histoire d'AFRIKHER, entre élégance, influence et vision.");
 
   // ── Fondatrice ──
   const [fondNom, setFondNom] = useState('Hadassa Hélène EKILA-LUMANDE');
@@ -95,6 +97,8 @@ export default function CMSQuiSommesNous() {
   const [fondBio2, setFondBio2] = useState("Basée à Waterloo en Belgique, elle porte la vision d'un magazine qui transcende les frontières — un pont entre l'Afrique et sa diaspora, entre tradition et modernité, entre business et style.");
   const [fondPhoto, setFondPhoto] = useState('');
   const [fondCitation, setFondCitation] = useState("Je crois en une Afrique où chaque femme entrepreneure peut écrire sa propre histoire de réussite.");
+  const [fondSectionLabel, setFondSectionLabel] = useState('Portrait');
+  const [fondSectionTitle, setFondSectionTitle] = useState('La Fondatrice');
 
   // ── Valeurs ──
   const [valeurs, setValeurs] = useState<Valeur[]>([
@@ -103,12 +107,21 @@ export default function CMSQuiSommesNous() {
     { id: 'v3', icone: '◆', titre: 'Empowerment', description: "Nous croyons au pouvoir des femmes africaines de transformer le continent." },
     { id: 'v4', icone: '∞', titre: 'Communauté', description: "AFRIKHER est plus qu'un magazine — c'est un réseau, une famille, un mouvement." },
   ]);
+  const [valuesSectionLabel, setValuesSectionLabel] = useState('Nos valeurs');
+  const [valuesSectionTitle, setValuesSectionTitle] = useState('Ce qui nous guide');
+  const [valuesSectionIntro, setValuesSectionIntro] = useState("Une vision éditoriale claire, pensée pour construire une plateforme à la fois exigeante, sensible et durable.");
 
   // ── Galerie ──
   const [photos, setPhotos] = useState<GalleryPhoto[]>([]);
 
   // ── Vidéos ──
   const [videos, setVideos] = useState<VideoItem[]>([]);
+  const [mediaSectionLabel, setMediaSectionLabel] = useState('Regards & archives');
+  const [mediaSectionTitle, setMediaSectionTitle] = useState("L'univers AFRIKHER");
+  const [mediaSectionIntro, setMediaSectionIntro] = useState("Images, vidéos et fragments de vie qui prolongent la voix éditoriale d’AFRIKHER au-delà des mots.");
+  const [closingText, setClosingText] = useState("Chaque écran de cette page prolonge une même intention : raconter une présence, une ligne éditoriale et une ambition féminine sans compromis.");
+  const [closingCtaLabel, setClosingCtaLabel] = useState('Découvrir le magazine');
+  const [closingCtaLink, setClosingCtaLink] = useState('/magazine');
 
   // ══════════════════════════════════════════════
   // DATA LOADING
@@ -138,6 +151,8 @@ export default function CMSQuiSommesNous() {
       if (config['about_texte2']) setAboutTexte2(config['about_texte2']);
       if (config['about_image']) setAboutImage(config['about_image']);
       if (config['about_citation']) setAboutCitation(config['about_citation']);
+      if (config['about_hero_label']) setAboutHeroLabel(config['about_hero_label']);
+      if (config['about_hero_subtitle']) setAboutHeroSubtitle(config['about_hero_subtitle']);
 
       // Fondatrice
       if (config['about_fond_nom']) setFondNom(config['about_fond_nom']);
@@ -146,8 +161,13 @@ export default function CMSQuiSommesNous() {
       if (config['about_fond_bio2']) setFondBio2(config['about_fond_bio2']);
       if (config['about_fond_photo']) setFondPhoto(config['about_fond_photo']);
       if (config['about_fond_citation']) setFondCitation(config['about_fond_citation']);
+      if (config['about_founder_label']) setFondSectionLabel(config['about_founder_label']);
+      if (config['about_founder_title']) setFondSectionTitle(config['about_founder_title']);
 
       // Valeurs
+      if (config['about_values_label']) setValuesSectionLabel(config['about_values_label']);
+      if (config['about_values_title']) setValuesSectionTitle(config['about_values_title']);
+      if (config['about_values_intro']) setValuesSectionIntro(config['about_values_intro']);
       try {
         const parsed = config['about_valeurs'] ? JSON.parse(config['about_valeurs']) : null;
         if (parsed && Array.isArray(parsed) && parsed.length > 0) setValeurs(parsed);
@@ -164,6 +184,12 @@ export default function CMSQuiSommesNous() {
         const parsed = config['about_videos'] ? JSON.parse(config['about_videos']) : [];
         if (Array.isArray(parsed)) setVideos(parsed);
       } catch { /* keep empty */ }
+      if (config['about_media_label']) setMediaSectionLabel(config['about_media_label']);
+      if (config['about_media_title']) setMediaSectionTitle(config['about_media_title']);
+      if (config['about_media_intro']) setMediaSectionIntro(config['about_media_intro']);
+      if (config['about_closing_text']) setClosingText(config['about_closing_text']);
+      if (config['about_closing_cta_label']) setClosingCtaLabel(config['about_closing_cta_label']);
+      if (config['about_closing_cta_link']) setClosingCtaLink(config['about_closing_cta_link']);
 
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Erreur inconnue';
@@ -192,15 +218,28 @@ export default function CMSQuiSommesNous() {
         { key: 'about_texte2', value: aboutTexte2 },
         { key: 'about_image', value: aboutImage },
         { key: 'about_citation', value: aboutCitation },
+        { key: 'about_hero_label', value: aboutHeroLabel },
+        { key: 'about_hero_subtitle', value: aboutHeroSubtitle },
         { key: 'about_fond_nom', value: fondNom },
         { key: 'about_fond_titre', value: fondTitre },
         { key: 'about_fond_bio', value: fondBio },
         { key: 'about_fond_bio2', value: fondBio2 },
         { key: 'about_fond_photo', value: fondPhoto },
         { key: 'about_fond_citation', value: fondCitation },
+        { key: 'about_founder_label', value: fondSectionLabel },
+        { key: 'about_founder_title', value: fondSectionTitle },
+        { key: 'about_values_label', value: valuesSectionLabel },
+        { key: 'about_values_title', value: valuesSectionTitle },
+        { key: 'about_values_intro', value: valuesSectionIntro },
         { key: 'about_valeurs', value: JSON.stringify(valeurs) },
         { key: 'about_galerie', value: JSON.stringify(photos) },
         { key: 'about_videos', value: JSON.stringify(videos) },
+        { key: 'about_media_label', value: mediaSectionLabel },
+        { key: 'about_media_title', value: mediaSectionTitle },
+        { key: 'about_media_intro', value: mediaSectionIntro },
+        { key: 'about_closing_text', value: closingText },
+        { key: 'about_closing_cta_label', value: closingCtaLabel },
+        { key: 'about_closing_cta_link', value: closingCtaLink },
       ];
 
       for (const item of updates) {
@@ -298,6 +337,7 @@ export default function CMSQuiSommesNous() {
     { key: 'valeurs', label: 'Nos Valeurs', icon: Target, count: valeurs.length },
     { key: 'galerie', label: 'Galerie', icon: ImageIcon, count: photos.length },
     { key: 'videos', label: 'Vidéos', icon: Video, count: videos.length },
+    { key: 'sections', label: 'Paramètres de section', icon: Quote },
   ];
 
   return (
@@ -372,6 +412,12 @@ export default function CMSQuiSommesNous() {
             <p className="text-sm text-gray-500 mt-1">Le texte principal de la page "Qui sommes-nous"</p>
           </div>
           <div className="px-8 pb-8">
+            <FieldRow label="Label de section" description="Petit label premium au-dessus du hero">
+              <input type="text" value={aboutHeroLabel} onChange={e => setAboutHeroLabel(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all"
+                placeholder="Maison éditoriale" />
+            </FieldRow>
+
             <FieldRow label="Titre" description="Titre principal de la page">
               <input type="text" value={aboutTitre} onChange={e => setAboutTitre(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all"
@@ -382,6 +428,12 @@ export default function CMSQuiSommesNous() {
               <input type="text" value={aboutSousTitre} onChange={e => setAboutSousTitre(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all"
                 placeholder="Plus qu'un magazine" />
+            </FieldRow>
+
+            <FieldRow label="Accroche hero" description="Sous-texte introductif juste sous le titre principal">
+              <input type="text" value={aboutHeroSubtitle} onChange={e => setAboutHeroSubtitle(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all"
+                placeholder="L'histoire d'AFRIKHER, entre élégance, influence et vision." />
             </FieldRow>
 
             <FieldRow label="Image principale" description="Photo illustrant AFRIKHER (équipe, événement, etc.)">
@@ -447,6 +499,16 @@ export default function CMSQuiSommesNous() {
             <p className="text-sm text-gray-500 mt-1">Informations sur Hadassa Hélène EKILA-LUMANDE</p>
           </div>
           <div className="px-8 pb-8">
+            <FieldRow label="Label de section" description="Petit label premium au-dessus du portrait">
+              <input type="text" value={fondSectionLabel} onChange={e => setFondSectionLabel(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all" />
+            </FieldRow>
+
+            <FieldRow label="Titre de section" description="Titre affiché pour le bloc fondatrice">
+              <input type="text" value={fondSectionTitle} onChange={e => setFondSectionTitle(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all" />
+            </FieldRow>
+
             <FieldRow label="Photo" description="Portrait officiel de la fondatrice">
               <div className="flex items-center gap-6">
                 {fondPhoto ? (
@@ -512,6 +574,29 @@ export default function CMSQuiSommesNous() {
       {/* ══════════════════════════════════════════════ */}
       {activeTab === 'valeurs' && (
         <div className="space-y-6">
+          <div className="bg-white rounded-[28px] border border-gray-50 shadow-sm overflow-hidden">
+            <div className="px-8 py-6 border-b border-gray-100 bg-gradient-to-r from-cream/30 to-transparent">
+              <h2 className="text-xl font-sans font-bold text-slate-900 flex items-center gap-3">
+                <Target size={22} className="text-green-600" />
+                Paramètres de la section valeurs
+              </h2>
+            </div>
+            <div className="px-8 pb-8">
+              <FieldRow label="Label de section">
+                <input type="text" value={valuesSectionLabel} onChange={e => setValuesSectionLabel(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all" />
+              </FieldRow>
+              <FieldRow label="Titre de section">
+                <input type="text" value={valuesSectionTitle} onChange={e => setValuesSectionTitle(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all" />
+              </FieldRow>
+              <FieldRow label="Texte d'introduction" noBorder>
+                <textarea value={valuesSectionIntro} onChange={e => setValuesSectionIntro(e.target.value)} rows={3}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all resize-none" />
+              </FieldRow>
+            </div>
+          </div>
+
           <div className="flex justify-end">
             <button onClick={addValeur}
               className="flex items-center gap-2 px-5 py-2.5 bg-green-600 text-slate-900 rounded-2xl font-semibold text-sm hover:bg-green-600/90 transition-all shadow-lg shadow-gold/20">
@@ -656,6 +741,45 @@ export default function CMSQuiSommesNous() {
                 ))}
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'sections' && (
+        <div className="bg-white rounded-[28px] border border-gray-50 shadow-sm overflow-hidden">
+          <div className="px-8 py-6 border-b border-gray-100 bg-gradient-to-r from-cream/30 to-transparent">
+            <h2 className="text-xl font-sans font-bold text-slate-900 flex items-center gap-3">
+              <Quote size={22} className="text-green-600" />
+              Paramètres de section
+            </h2>
+            <p className="text-sm text-gray-500 mt-1">Labels, intros et fermeture du dernier écran</p>
+          </div>
+          <div className="px-8 pb-8">
+            <FieldRow label="Label médias">
+              <input type="text" value={mediaSectionLabel} onChange={e => setMediaSectionLabel(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all" />
+            </FieldRow>
+            <FieldRow label="Titre médias">
+              <input type="text" value={mediaSectionTitle} onChange={e => setMediaSectionTitle(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all" />
+            </FieldRow>
+            <FieldRow label="Introduction médias">
+              <textarea value={mediaSectionIntro} onChange={e => setMediaSectionIntro(e.target.value)} rows={3}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all resize-none" />
+            </FieldRow>
+            <FieldRow label="Texte de clôture">
+              <textarea value={closingText} onChange={e => setClosingText(e.target.value)} rows={3}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all resize-none" />
+            </FieldRow>
+            <FieldRow label="CTA de clôture">
+              <input type="text" value={closingCtaLabel} onChange={e => setClosingCtaLabel(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all" />
+            </FieldRow>
+            <FieldRow label="Lien du CTA" noBorder>
+              <input type="text" value={closingCtaLink} onChange={e => setClosingCtaLink(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all"
+                placeholder="/magazine" />
+            </FieldRow>
           </div>
         </div>
       )}
