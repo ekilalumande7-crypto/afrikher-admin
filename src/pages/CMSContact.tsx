@@ -287,6 +287,16 @@ export default function CMSContact() {
           />
         </FieldRow>
 
+        <FieldRow label="Label hero" description="Petit label premium au-dessus du titre principal.">
+          <input
+            type="text"
+            value={config.contact_hero_label || ''}
+            onChange={(e) => updateConfig('contact_hero_label', e.target.value)}
+            className="w-full max-w-md px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="PRENDRE CONTACT"
+          />
+        </FieldRow>
+
         <FieldRow label="Sous-titre" description="Texte en italique sous le titre.">
           <input
             type="text"
@@ -297,6 +307,26 @@ export default function CMSContact() {
           />
         </FieldRow>
 
+        <FieldRow label="Label intro" description="Petit label gold au-dessus du bloc éditorial de gauche.">
+          <input
+            type="text"
+            value={config.contact_intro_label || ''}
+            onChange={(e) => updateConfig('contact_intro_label', e.target.value)}
+            className="w-full max-w-md px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="RESTONS EN CONTACT"
+          />
+        </FieldRow>
+
+        <FieldRow label="Titre intro" description="Titre éditorial principal dans la colonne gauche.">
+          <input
+            type="text"
+            value={config.contact_intro_title || ''}
+            onChange={(e) => updateConfig('contact_intro_title', e.target.value)}
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Parlons de votre projet, de votre message ou d'une collaboration."
+          />
+        </FieldRow>
+
         <FieldRow label="Texte d'introduction" description="Paragraphe de présentation à côté du formulaire.">
           <textarea
             value={config.contact_intro_text || ''}
@@ -304,6 +334,46 @@ export default function CMSContact() {
             rows={4}
             className="w-full max-w-md px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
             placeholder="AFRIKHER est toujours ouvert aux échanges, collaborations et nouvelles perspectives..."
+          />
+        </FieldRow>
+
+        <FieldRow label="Titre bloc de conclusion" description="Titre affiché dans la bande de conclusion avant le footer.">
+          <input
+            type="text"
+            value={config.contact_help_title || ''}
+            onChange={(e) => updateConfig('contact_help_title', e.target.value)}
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Nous vous répondons avec attention."
+          />
+        </FieldRow>
+
+        <FieldRow label="Texte bloc de conclusion" description="Texte d'accompagnement de la bande de conclusion.">
+          <textarea
+            value={config.contact_help_text || ''}
+            onChange={(e) => updateConfig('contact_help_text', e.target.value)}
+            rows={3}
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+            placeholder="Chaque message est lu avec soin..."
+          />
+        </FieldRow>
+
+        <FieldRow label="Label CTA final" description="Texte du bouton dans la bande de conclusion.">
+          <input
+            type="text"
+            value={config.contact_cta_label || ''}
+            onChange={(e) => updateConfig('contact_cta_label', e.target.value)}
+            className="w-full max-w-md px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Écrire à l'équipe"
+          />
+        </FieldRow>
+
+        <FieldRow label="Lien CTA final" description="Lien du bouton de conclusion (mailto:, /rubriques, URL externe, etc.).">
+          <input
+            type="text"
+            value={config.contact_cta_link || ''}
+            onChange={(e) => updateConfig('contact_cta_link', e.target.value)}
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="mailto:contact@afrikher.com"
           />
         </FieldRow>
       </div>
