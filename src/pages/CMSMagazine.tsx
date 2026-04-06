@@ -390,26 +390,29 @@ export default function CMSMagazine() {
     return (
       <div className="max-w-5xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="mb-8 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div className="flex items-center gap-4">
             <button
               onClick={() => { setViewMode('list'); setEditingMagazine(null); }}
-              className="flex items-center px-3 py-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+              className="flex items-center border border-black/10 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500 transition-colors hover:border-gold/30 hover:text-gold"
             >
               ← Retour
             </button>
-            <h1 className="text-2xl font-bold text-gray-900">
-              {editingMagazine.id ? 'Modifier le magazine' : 'Nouveau magazine'}
-            </h1>
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold">Edition magazine</p>
+              <h1 className="font-serif text-4xl font-semibold text-dark">
+                {editingMagazine.id ? 'Modifier le magazine' : 'Nouveau magazine'}
+              </h1>
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <button
               onClick={handleSave}
               disabled={saving}
-              className={`flex items-center px-5 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`flex items-center px-6 py-3 rounded-2xl text-xs font-semibold uppercase tracking-[0.24em] transition-colors ${
                 saved
-                  ? 'bg-green-600 text-slate-900'
-                  : 'bg-gray-900 text-slate-900 hover:bg-gray-800'
+                  ? 'bg-green-600 text-white'
+                  : 'bg-dark text-cream hover:bg-charcoal'
               }`}
             >
               {saving ? <><RefreshCw size={14} className="mr-2 animate-spin" /> Enregistrement...</>
@@ -428,7 +431,7 @@ export default function CMSMagazine() {
           </div>
         )}
 
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <div className="overflow-hidden rounded-[32px] border border-black/5 bg-white shadow-sm">
           <div className="px-10 py-6">
             {/* Title */}
             <FieldRow label="Titre" description="Le titre complet du magazine.">
@@ -619,26 +622,32 @@ export default function CMSMagazine() {
   // LIST VIEW
   // ══════════════════════════════════════
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="max-w-6xl mx-auto space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Magazines</h1>
-          <p className="text-sm text-gray-500 mt-1">Gérez vos numéros de magazine digital</p>
+          <span className="inline-flex items-center gap-2 border border-gold/20 bg-gold/5 px-4 py-2 text-[11px] uppercase tracking-[0.28em] text-gold">
+            <BookOpen size={14} />
+            CMS Magazine
+          </span>
+          <h1 className="mt-4 font-serif text-5xl font-semibold text-dark">Direction magazine</h1>
+          <p className="mt-2 max-w-3xl text-sm leading-7 text-gray-500">
+            Pilotez la couverture, le hero et la collection de numéros depuis une interface plus éditoriale et plus premium.
+          </p>
         </div>
         <div className="flex items-center gap-3">
           <a
             href="https://afrikher-client.vercel.app/magazine"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+            className="flex items-center px-5 py-3 border border-black/10 rounded-2xl text-xs font-semibold uppercase tracking-[0.2em] text-gray-700 bg-white hover:border-gold/30 hover:text-gold transition-colors"
           >
             <ExternalLink size={16} className="mr-2" />
             Voir le site
           </a>
           <button
             onClick={startNewMagazine}
-            className="flex items-center px-5 py-2 rounded-lg text-sm font-medium bg-gray-900 text-slate-900 hover:bg-gray-800 transition-colors"
+            className="flex items-center px-6 py-3 rounded-2xl text-xs font-semibold uppercase tracking-[0.2em] bg-dark text-cream hover:bg-charcoal transition-colors"
           >
             <Plus size={14} className="mr-2" />
             Nouveau magazine
@@ -664,24 +673,25 @@ export default function CMSMagazine() {
       )}
 
       {/* ══════ HERO CONFIGURATION ══════ */}
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden mb-8">
-        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+      <div className="overflow-hidden rounded-[32px] border border-black/5 bg-[#0A0A0A] text-cream shadow-[0_24px_80px_rgba(10,10,10,0.08)]">
+        <div className="flex items-center justify-between border-b border-white/10 px-8 py-6">
           <div>
-            <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
-              <ImageIcon size={18} className="text-amber-500" />
-              Banniere de la page Magazine
+            <p className="text-[11px] uppercase tracking-[0.3em] text-gold">Preview hero</p>
+            <h2 className="mt-2 flex items-center gap-2 font-serif text-3xl text-cream">
+              <ImageIcon size={18} className="text-gold" />
+              Bannière de la page Magazine
             </h2>
-            <p className="text-xs text-gray-500 mt-0.5">
-              Image et texte affiches en haut de la page Magazine du site public
+            <p className="mt-1 text-xs text-cream/55">
+              Image et texte affichés en haut de la page Magazine du site public.
             </p>
           </div>
           <button
             onClick={saveHeroConfig}
             disabled={heroSaving}
-            className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`flex items-center px-5 py-3 rounded-2xl text-xs font-semibold uppercase tracking-[0.24em] transition-colors ${
               heroSaved
-                ? 'bg-green-600 text-slate-900'
-                : 'bg-gray-900 text-slate-900 hover:bg-gray-800'
+                ? 'bg-green-600 text-white'
+                : 'bg-gold text-dark hover:bg-[#E8C97A]'
             }`}
           >
             {heroSaving ? <><RefreshCw size={14} className="mr-2 animate-spin" /> Enregistrement...</>
@@ -689,14 +699,14 @@ export default function CMSMagazine() {
               : <><Save size={14} className="mr-2" /> Enregistrer</>}
           </button>
         </div>
-        <div className="p-6">
+        <div className="p-8">
           {/* Hero image preview + upload */}
-          <div className="flex gap-6 mb-6">
-            <div className="w-80 h-48 bg-gray-100 rounded-lg overflow-hidden border border-gray-200 shrink-0 relative">
+          <div className="mb-8 flex gap-6">
+            <div className="relative h-48 w-80 shrink-0 overflow-hidden border border-white/10 bg-white/5">
               {heroImage ? (
                 <img src={heroImage} alt="Hero Magazine" className="w-full h-full object-cover" />
               ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
+                <div className="flex h-full w-full flex-col items-center justify-center text-cream/35">
                   <ImageIcon size={32} className="mb-2" />
                   <span className="text-xs">Aucune image</span>
                 </div>
@@ -706,11 +716,11 @@ export default function CMSMagazine() {
               )}
             </div>
             <div className="flex flex-col gap-3 flex-1">
-              <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider">Image de banniere</label>
-              <p className="text-xs text-gray-500">
-                Cette image s'affiche en grand en haut de la page Magazine. Format recommande : 1920x800px minimum, paysage.
+              <label className="text-[11px] font-semibold uppercase tracking-[0.28em] text-gold">Image de bannière</label>
+              <p className="text-xs leading-6 text-cream/55">
+                Cette image s'affiche en grand en haut de la page Magazine. Format recommandé : 1920x800px minimum, paysage.
               </p>
-              <label className={`inline-flex items-center w-fit px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer transition-colors ${heroUploading ? 'opacity-50 cursor-wait' : ''}`}>
+              <label className={`inline-flex items-center w-fit px-5 py-3 border border-white/15 rounded-2xl text-xs font-semibold uppercase tracking-[0.2em] text-cream bg-white/[0.03] hover:border-gold/30 hover:text-gold cursor-pointer transition-colors ${heroUploading ? 'opacity-50 cursor-wait' : ''}`}>
                 {heroUploading ? (
                   <><RefreshCw size={14} className="mr-2 animate-spin" /> Upload...</>
                 ) : (
@@ -729,7 +739,7 @@ export default function CMSMagazine() {
                   type="text"
                   value={heroImage}
                   onChange={(e) => setHeroImage(e.target.value)}
-                  className="px-3 py-2 border border-gray-200 rounded-lg text-xs text-gray-500 font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-xs text-cream/70 font-mono focus:outline-none focus:ring-2 focus:ring-gold/30"
                   placeholder="Ou collez une URL d'image"
                 />
               )}
@@ -738,28 +748,28 @@ export default function CMSMagazine() {
 
           {/* Hero title */}
           <div className="mb-4">
-            <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider block mb-2">
+            <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.28em] text-gold">
               Titre principal
             </label>
             <input
               type="text"
               value={heroTitle}
               onChange={(e) => setHeroTitle(e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-sm text-cream focus:outline-none focus:ring-2 focus:ring-gold/30"
               placeholder="Le magazine qui celebre la femme africaine entrepreneure"
             />
           </div>
 
           {/* Hero subtitle */}
           <div>
-            <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider block mb-2">
+            <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.28em] text-gold">
               Sous-titre
             </label>
             <textarea
               value={heroSubtitle}
               onChange={(e) => setHeroSubtitle(e.target.value)}
               rows={2}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              className="w-full resize-none rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-sm text-cream focus:outline-none focus:ring-2 focus:ring-gold/30"
               placeholder="Portraits, interviews exclusives et analyses pour celles qui batissent l'Afrique de demain."
             />
           </div>
@@ -768,7 +778,7 @@ export default function CMSMagazine() {
 
       {/* Empty state */}
       {magazines.length === 0 && (
-        <div className="bg-white border border-gray-200 rounded-xl p-20 text-center">
+        <div className="rounded-[32px] border border-black/5 bg-white p-20 text-center shadow-sm">
           <BookOpen size={48} className="text-gray-300 mx-auto mb-4" />
           <h2 className="text-xl font-bold text-gray-900 mb-2">Aucun magazine</h2>
           <p className="text-sm text-gray-500 mb-6 max-w-sm mx-auto">
@@ -776,7 +786,7 @@ export default function CMSMagazine() {
           </p>
           <button
             onClick={startNewMagazine}
-            className="inline-flex items-center px-6 py-3 bg-gray-900 text-slate-900 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors"
+            className="inline-flex items-center rounded-2xl bg-dark px-6 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-cream transition-colors hover:bg-charcoal"
           >
             <Plus size={14} className="mr-2" />
             Créer un magazine
@@ -786,12 +796,12 @@ export default function CMSMagazine() {
 
       {/* Magazines list */}
       {magazines.length > 0 && (
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <div className="overflow-hidden rounded-[32px] border border-black/5 bg-white shadow-sm">
           <div className="divide-y divide-gray-100">
             {magazines.map((mag) => (
-              <div key={mag.id} className="flex items-center gap-6 p-5 hover:bg-gray-50/50 transition-colors">
+              <div key={mag.id} className="flex items-center gap-6 p-6 transition-colors hover:bg-[#F9F7F2]">
                 {/* Cover thumbnail */}
-                <div className="w-16 h-22 bg-gray-100 rounded overflow-hidden shrink-0 border border-gray-200">
+                <div className="h-24 w-16 shrink-0 overflow-hidden border border-black/8 bg-gray-100">
                   {mag.cover_image ? (
                     <img src={mag.cover_image} alt={mag.title} className="w-full h-full object-cover" />
                   ) : (
@@ -804,8 +814,8 @@ export default function CMSMagazine() {
                 {/* Info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-3 mb-1">
-                    <h3 className="text-sm font-bold text-gray-900 truncate">{mag.title}</h3>
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                    <h3 className="truncate font-serif text-2xl text-dark">{mag.title}</h3>
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
                       mag.status === 'published'
                         ? 'bg-green-100 text-green-700'
                         : mag.status === 'archived'
@@ -815,8 +825,8 @@ export default function CMSMagazine() {
                       {mag.status === 'published' ? 'Publié' : mag.status === 'archived' ? 'Archivé' : 'Brouillon'}
                     </span>
                   </div>
-                  <p className="text-xs text-gray-500 truncate">{mag.description || 'Pas de description'}</p>
-                  <div className="flex items-center gap-4 mt-2 text-xs text-gray-400">
+                  <p className="truncate text-sm text-gray-500">{mag.description || 'Pas de description'}</p>
+                  <div className="mt-3 flex items-center gap-4 text-[11px] uppercase tracking-[0.18em] text-gray-400">
                     <span>{mag.page_count} pages</span>
                     <span>{mag.price?.toFixed(2)} €</span>
                     <span>/{mag.slug}</span>
@@ -827,7 +837,7 @@ export default function CMSMagazine() {
                 <div className="flex items-center gap-2 shrink-0">
                   <button
                     onClick={() => togglePublish(mag)}
-                    className={`flex items-center px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                    className={`flex items-center px-4 py-2 rounded-2xl text-[11px] font-semibold uppercase tracking-[0.16em] border transition-colors ${
                       mag.status === 'published'
                         ? 'border-amber-300 text-amber-700 hover:bg-amber-50'
                         : 'border-green-300 text-green-700 hover:bg-green-50'
@@ -837,7 +847,7 @@ export default function CMSMagazine() {
                   </button>
                   <button
                     onClick={() => startEditMagazine(mag)}
-                    className="flex items-center px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
+                    className="flex items-center px-4 py-2 rounded-2xl text-[11px] font-semibold uppercase tracking-[0.16em] border border-black/10 text-gray-700 hover:border-gold/30 hover:text-gold transition-colors"
                   >
                     Modifier
                   </button>
