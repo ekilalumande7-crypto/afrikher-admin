@@ -16,6 +16,7 @@ interface Product {
   description: string;
   price: number | null;
   external_url: string | null;
+  cta_text: string | null;
   images: string[];
   type: string;
   stock: number;
@@ -107,6 +108,7 @@ export default function ProductsList() {
   const [formName, setFormName] = useState('');
   const [formDesc, setFormDesc] = useState('');
   const [formExternalUrl, setFormExternalUrl] = useState('');
+  const [formCtaText, setFormCtaText] = useState('');
   const [formStock, setFormStock] = useState('');
   const [formUnlimited, setFormUnlimited] = useState(false);
   const [formType, setFormType] = useState('book');
@@ -280,6 +282,7 @@ export default function ProductsList() {
       setFormName(product.name);
       setFormDesc(product.description || '');
       setFormExternalUrl(product.external_url || '');
+      setFormCtaText(product.cta_text || '');
       setFormStock(product.stock.toString());
       setFormUnlimited(product.unlimited || false);
       setFormType(product.type || 'other');
@@ -291,6 +294,7 @@ export default function ProductsList() {
       setFormName('');
       setFormDesc('');
       setFormExternalUrl('');
+      setFormCtaText('');
       setFormStock('0');
       setFormUnlimited(false);
       setFormType('book');
@@ -316,6 +320,7 @@ export default function ProductsList() {
         name: formName.trim(),
         description: formDesc.trim(),
         external_url: formExternalUrl.trim(),
+        cta_text: formCtaText.trim() || null,
         price: 0,
         stock: 0,
         unlimited: true,
@@ -891,7 +896,20 @@ export default function ProductsList() {
                     className="w-full p-4 bg-gray-50 border-none rounded-2xl text-sm focus:bg-white focus:ring-2 focus:ring-green-500/20 outline-none transition-all"
                   />
                   <p className="text-[11px] text-gray-400 mt-2 leading-relaxed">
-                    Le bouton &laquo; Acheter &raquo; redirigera les visiteurs vers ce lien. Le client ach&egrave;te directement chez le partenaire.
+                    Le bouton redirigera les visiteurs vers ce lien. Le client contacte directement le partenaire.
+                  </p>
+                </div>
+                <div>
+                  <label className="block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">Texte du bouton (optionnel)</label>
+                  <input
+                    type="text"
+                    value={formCtaText}
+                    onChange={e => setFormCtaText(e.target.value)}
+                    placeholder="Ex: Découvrir l'article, Contacter la vendeuse..."
+                    className="w-full p-4 bg-gray-50 border-none rounded-2xl text-sm focus:bg-white focus:ring-2 focus:ring-green-500/20 outline-none transition-all"
+                  />
+                  <p className="text-[11px] text-gray-400 mt-2 leading-relaxed">
+                    Si vide, le texte par défaut sera «&nbsp;Découvrir l'article&nbsp;».
                   </p>
                 </div>
               </div>
