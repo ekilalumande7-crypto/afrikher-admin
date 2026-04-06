@@ -370,12 +370,48 @@ export default function CMSAbonnement() {
                     placeholder="Abonnements" />
                 </FieldRow>
 
+                <FieldRow label="Label hero" description="Petit label premium au-dessus du titre principal.">
+                  <input type="text" value={config.sub_hero_label || ''}
+                    onChange={(e) => updateConfig('sub_hero_label', e.target.value)}
+                    className="w-full max-w-md px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="ACCÈS PRIVILÉGIÉ" />
+                </FieldRow>
+
                 <FieldRow label="Sous-titre" description="Texte doré italique sous le titre principal." noBorder>
                   <textarea value={config.sub_hero_subtitle || ''}
                     onChange={(e) => updateConfig('sub_hero_subtitle', e.target.value)}
                     rows={3}
                     className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                     placeholder="Rejoignez une communauté de femmes visionnaires..." />
+                </FieldRow>
+
+                <FieldRow label="Label section offres" description="Petit label au-dessus du bloc des formules.">
+                  <input type="text" value={config.sub_section_label || ''}
+                    onChange={(e) => updateConfig('sub_section_label', e.target.value)}
+                    className="w-full max-w-md px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Les formules" />
+                </FieldRow>
+
+                <FieldRow label="Titre section offres" description="Titre principal du bloc des abonnements.">
+                  <input type="text" value={config.sub_section_title || ''}
+                    onChange={(e) => updateConfig('sub_section_title', e.target.value)}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Deux accès pensés comme une expérience éditoriale" />
+                </FieldRow>
+
+                <FieldRow label="Texte d'introduction offres" description="Court texte sous le titre de section." >
+                  <textarea value={config.sub_section_intro || ''}
+                    onChange={(e) => updateConfig('sub_section_intro', e.target.value)}
+                    rows={3}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                    placeholder="Choisissez la formule qui accompagne votre lecture..." />
+                </FieldRow>
+
+                <FieldRow label="Label section aide" description="Petit label affiché au-dessus du bloc FAQ / aide." noBorder>
+                  <input type="text" value={config.sub_help_label || ''}
+                    onChange={(e) => updateConfig('sub_help_label', e.target.value)}
+                    className="w-full max-w-md px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Réassurance" />
                 </FieldRow>
               </div>
             )}
@@ -432,6 +468,13 @@ export default function CMSAbonnement() {
                     onChange={(e) => updateConfig('sub_monthly_description', e.target.value)}
                     className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="L'accès complet à l'univers AFRIKHER..." />
+                </FieldRow>
+
+                <FieldRow label="Note complémentaire" description="Petite phrase courte près du prix ou sous le plan.">
+                  <input type="text" value={config.sub_monthly_note || ''}
+                    onChange={(e) => updateConfig('sub_monthly_note', e.target.value)}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Lecture immédiate, sans engagement." />
                 </FieldRow>
 
                 <FieldRow label="Texte du bouton" description="Le texte affiché sur le bouton CTA.">
@@ -514,6 +557,20 @@ export default function CMSAbonnement() {
                     onChange={(e) => updateConfig('sub_annual_description', e.target.value)}
                     className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="Le choix de l'excellence..." />
+                </FieldRow>
+
+                <FieldRow label="Note complémentaire" description="Petite phrase courte près du prix ou sous le plan.">
+                  <input type="text" value={config.sub_annual_note || ''}
+                    onChange={(e) => updateConfig('sub_annual_note', e.target.value)}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Accès annuel + privilèges AFRIKHER." />
+                </FieldRow>
+
+                <FieldRow label="Badge premium" description="Remplace le badge codé en dur sur la carte annuelle.">
+                  <input type="text" value={config.sub_annual_badge || ''}
+                    onChange={(e) => updateConfig('sub_annual_badge', e.target.value)}
+                    className="w-full max-w-sm px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Le plus populaire" />
                 </FieldRow>
 
                 <FieldRow label="Texte du bouton" description="Le texte affiché sur le bouton CTA.">
