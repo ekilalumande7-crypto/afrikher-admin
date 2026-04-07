@@ -5,6 +5,17 @@ import {
   Users, Percent, AlertCircle, RefreshCw, ShoppingBag
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import {
+  AdminAlert,
+  AdminIconBadge,
+  AdminSectionHeader,
+  AdminSectionShell,
+  adminGhostButtonClass,
+  adminInputClass,
+  adminPrimaryButtonClass,
+  adminSecondaryButtonClass,
+  adminTextareaClass,
+} from '../components/AdminPrimitives';
 
 // ══════════════════════════════════════════════
 // TYPES
@@ -447,42 +458,40 @@ export default function ProductsList() {
       {tab !== 'editor' && (
       <>
       {/* Header */}
-      <div className="flex items-end justify-between">
+      <div className="flex items-end justify-between gap-6">
         <div>
-          <h1 className="text-4xl font-sans font-bold text-slate-900">Boutique</h1>
-          <p className="text-gray-400 text-sm mt-1">Gérez votre catalogue de produits, stocks et produits partenaires.</p>
+          <p className="text-[10px] uppercase tracking-[0.32em] text-[#9A9A8A]">Boutique & sélection</p>
+          <h1 className="mt-3 font-display text-5xl font-semibold text-[#0A0A0A]">Boutique</h1>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[#6F675B]">Pilotez le catalogue AFRIKHER, les produits partenaires et la qualité de présentation commerciale sans retomber dans un outil e-commerce générique.</p>
         </div>
         <button
           onClick={() => openEditor()}
-          className="flex items-center px-8 py-3.5 bg-white text-slate-900 rounded-2xl hover:bg-slate-100 transition-all font-bold tracking-wide shadow-lg shadow-slate-200"
+          className={adminPrimaryButtonClass}
         >
-          <Plus size={20} className="mr-2 text-green-600" />
+          <Plus size={18} className="mr-2" />
           Nouveau produit
         </button>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
         {[
-          { title: 'Total Produits', value: stats.total, icon: Package, color: 'text-blue-600', bg: 'bg-blue-50' },
-          { title: 'Actifs', value: stats.active, icon: CheckCircle, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-          { title: 'Rupture', value: stats.outOfStock, icon: XCircle, color: 'text-red-600', bg: 'bg-red-50' },
-          { title: 'En attente partenaires', value: stats.pending, icon: Users, color: 'text-green-600', bg: 'bg-green-50' },
+          { title: 'Total Produits', value: stats.total },
+          { title: 'Actifs', value: stats.active },
+          { title: 'Rupture', value: stats.outOfStock },
+          { title: 'En attente partenaires', value: stats.pending },
         ].map((stat, i) => (
-          <div key={i} className="bg-white p-6 rounded-[32px] border border-gray-50 shadow-sm flex items-center space-x-4">
-            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${stat.bg} ${stat.color}`}>
-              <stat.icon size={24} />
-            </div>
+          <div key={i} className="rounded-[2rem] border border-[#E9E2D6] bg-white p-6 shadow-sm">
             <div>
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">{stat.title}</p>
-              <p className="text-2xl font-sans font-bold text-slate-900">{stat.value}</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.26em] text-[#9A9A8A]">{stat.title}</p>
+              <p className="mt-3 font-display text-4xl font-semibold text-[#0A0A0A]">{stat.value}</p>
             </div>
           </div>
         ))}
       </div>
 
       {/* Tabs */}
-      <div className="flex space-x-1 bg-gray-100 p-1 rounded-2xl w-fit">
+      <div className="flex w-fit space-x-2 rounded-[1.75rem] border border-[#E5E0D8] bg-[#F8F6F2] p-2">
         {[
           { id: 'catalogue' as Tab, label: 'Catalogue', icon: ShoppingBag },
           { id: 'partenaires' as Tab, label: `Produits partenaires${stats.pending > 0 ? ` (${stats.pending})` : ''}`, icon: Users },
@@ -490,8 +499,8 @@ export default function ProductsList() {
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            className={`flex items-center px-6 py-3 rounded-xl text-sm font-bold transition-all ${
-              tab === t.id ? 'bg-white text-slate-900 shadow-sm' : 'text-gray-400 hover:text-slate-900'
+            className={`flex items-center rounded-2xl px-6 py-3 text-xs font-semibold uppercase tracking-[0.22em] transition-all ${
+              tab === t.id ? 'bg-[#0A0A0A] text-[#F5F0E8] shadow-sm' : 'text-[#6F675B] hover:text-[#0A0A0A]'
             }`}
           >
             <t.icon size={16} className="mr-2" />
@@ -508,21 +517,21 @@ export default function ProductsList() {
       {tab === 'catalogue' && (
         <>
           {/* Search & Filters */}
-          <div className="bg-white p-6 rounded-[32px] border border-gray-50 shadow-sm flex flex-wrap items-center gap-4">
+          <div className="flex flex-wrap items-center gap-4 rounded-[2rem] border border-[#E9E2D6] bg-white p-6 shadow-sm">
             <div className="relative flex-1 min-w-[200px]">
-              <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" />
+              <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9A9A8A]" />
               <input
                 type="text"
                 placeholder="Rechercher un produit..."
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-green-500/20 outline-none transition-all"
+                className={`${adminInputClass} rounded-2xl pl-12`}
               />
             </div>
             <select
               value={filterType}
               onChange={e => setFilterType(e.target.value)}
-              className="px-4 py-3 bg-gray-50 border-none rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-green-500/20"
+              className={`${adminInputClass} w-auto rounded-2xl font-semibold`}
             >
               <option value="all">Tous les types</option>
               {PRODUCT_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
@@ -530,34 +539,34 @@ export default function ProductsList() {
             <select
               value={filterStatus}
               onChange={e => setFilterStatus(e.target.value)}
-              className="px-4 py-3 bg-gray-50 border-none rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-green-500/20"
+              className={`${adminInputClass} w-auto rounded-2xl font-semibold`}
             >
               <option value="all">Tous les statuts</option>
               <option value="active">Actif</option>
               <option value="inactive">Inactif</option>
               <option value="out_of_stock">Rupture</option>
             </select>
-            <button onClick={() => { fetchProducts(); }} className="p-3 bg-gray-50 hover:bg-cream rounded-xl transition-all text-gray-400 hover:text-green-600">
+            <button onClick={() => { fetchProducts(); }} className={`${adminGhostButtonClass} p-3`}>
               <RefreshCw size={18} />
             </button>
           </div>
 
           {/* Products Table */}
-          <div className="bg-white rounded-[32px] border border-gray-50 shadow-sm overflow-hidden">
+          <div className="overflow-hidden rounded-[2rem] border border-[#E9E2D6] bg-white shadow-sm">
             {loading ? (
               <div className="p-20 text-center">
                 <div className="w-10 h-10 border-2 border-gold border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-                <p className="text-gray-400 text-sm">Chargement des produits...</p>
+                <p className="text-sm text-[#6F675B]">Chargement des produits...</p>
               </div>
             ) : filteredProducts.length === 0 ? (
               <div className="p-20 text-center">
-                <Package size={48} className="mx-auto text-gray-200 mb-4" />
-                <p className="text-gray-400 font-bold">Aucun produit trouvé</p>
-                <p className="text-gray-300 text-sm mt-1">Créez votre premier produit pour commencer</p>
+                <Package size={48} className="mx-auto mb-4 text-[#C9A84C]" />
+                <p className="font-display text-3xl font-semibold text-[#0A0A0A]">Aucun produit trouvé</p>
+                <p className="mt-2 text-sm text-[#6F675B]">Créez votre premier produit pour commencer</p>
               </div>
             ) : (
               <table className="w-full text-left">
-                <thead className="bg-gray-50/50 text-[10px] uppercase tracking-widest font-bold text-gray-400">
+                <thead className="bg-[#FBF8F2] text-[10px] font-semibold uppercase tracking-[0.24em] text-[#9A9A8A]">
                   <tr>
                     <th className="px-8 py-5">Produit</th>
                     <th className="px-6 py-5">Type</th>
@@ -568,51 +577,51 @@ export default function ProductsList() {
                     <th className="px-6 py-5 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50">
+                <tbody className="divide-y divide-[#F1ECE4]">
                   {filteredProducts.map((product) => (
-                    <tr key={product.id} className="hover:bg-gray-50/50 transition-colors group">
+                    <tr key={product.id} className="group transition-colors hover:bg-[#FBF8F2]">
                       <td className="px-8 py-4">
                         <div className="flex items-center space-x-4">
-                          <div className="w-14 h-14 rounded-xl bg-cream overflow-hidden shrink-0 shadow-sm">
+                          <div className="h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-[#E5E0D8] bg-[#F8F6F2] shadow-sm">
                             {product.images?.[0] ? (
                               <img src={product.images[0]} alt="" className="w-full h-full object-cover" />
                             ) : (
-                              <div className="w-full h-full flex items-center justify-center text-gray-300">
+                              <div className="flex h-full w-full items-center justify-center text-[#9A9A8A]">
                                 <ImageIcon size={20} />
                               </div>
                             )}
                           </div>
                           <div>
-                            <p className="text-sm font-bold text-slate-900 group-hover:text-green-600 transition-colors">{product.name}</p>
-                            <p className="text-[10px] text-gray-400 mt-0.5 line-clamp-1 max-w-[200px]">{product.description}</p>
+                            <p className="font-display text-xl font-semibold text-[#0A0A0A]">{product.name}</p>
+                            <p className="mt-0.5 line-clamp-1 max-w-[220px] text-[11px] text-[#9A9A8A]">{product.description}</p>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="text-xs font-bold text-gray-500 bg-gray-100 px-3 py-1.5 rounded-lg">
+                        <span className="rounded-full border border-[#E5E0D8] bg-[#F8F6F2] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#6F675B]">
                           {typeLabel(product.type)}
                         </span>
                       </td>
                       <td className="px-6 py-4">
                         {product.external_url ? (
-                          <a href={product.external_url} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-green-600 hover:underline truncate max-w-[160px] inline-block">
+                          <a href={product.external_url} target="_blank" rel="noopener noreferrer" className="inline-block max-w-[160px] truncate text-xs font-semibold text-[#C9A84C] hover:underline">
                             Voir le lien ↗
                           </a>
                         ) : (
-                          <span className="text-xs text-gray-300">—</span>
+                          <span className="text-xs text-[#B8AF9F]">—</span>
                         )}
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center space-x-2">
                           {product.unlimited ? (
-                            <span className="text-xs font-bold text-blue-600">Illimité</span>
+                            <span className="text-xs font-semibold text-[#6D5622]">Illimité</span>
                           ) : (
                             <>
                               <div className={`w-2 h-2 rounded-full ${
-                                product.stock > 10 ? 'bg-emerald-500' : product.stock > 0 ? 'bg-orange-500' : 'bg-red-500'
+                                product.stock > 10 ? 'bg-[#0A0A0A]' : product.stock > 0 ? 'bg-[#C9A84C]' : 'bg-[#7C2D2D]'
                               }`} />
-                              <span className={`text-xs font-bold ${
-                                product.stock > 10 ? 'text-emerald-600' : product.stock > 0 ? 'text-orange-600' : 'text-red-600'
+                              <span className={`text-xs font-semibold ${
+                                product.stock > 10 ? 'text-[#0A0A0A]' : product.stock > 0 ? 'text-[#6D5622]' : 'text-[#7C2D2D]'
                               }`}>
                                 {product.stock}
                               </span>
@@ -623,18 +632,18 @@ export default function ProductsList() {
                       <td className="px-6 py-4">
                         {product.partner_id ? (
                           <div>
-                            <p className="text-xs font-bold text-slate-900">{product.partner_company || product.partner_name}</p>
-                            <p className="text-[10px] text-green-600">{((product.commission_rate || 0.15) * 100).toFixed(0)}% commission</p>
+                            <p className="text-xs font-semibold text-[#0A0A0A]">{product.partner_company || product.partner_name}</p>
+                            <p className="text-[10px] text-[#C9A84C]">{((product.commission_rate || 0.15) * 100).toFixed(0)}% commission</p>
                           </div>
                         ) : (
-                          <span className="text-[10px] text-gray-300 uppercase tracking-wider">AFRIKHER</span>
+                          <span className="text-[10px] uppercase tracking-[0.22em] text-[#9A9A8A]">AFRIKHER</span>
                         )}
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`text-[10px] px-3 py-1.5 rounded-lg font-bold uppercase tracking-wider ${
-                          product.status === 'active' ? 'bg-green-50 text-green-600' :
-                          product.status === 'out_of_stock' ? 'bg-red-50 text-red-600' :
-                          'bg-gray-100 text-gray-500'
+                        <span className={`rounded-full border px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] ${
+                          product.status === 'active' ? 'border-[#C9A84C]/30 bg-[#FBF7ED] text-[#6D5622]' :
+                          product.status === 'out_of_stock' ? 'border-[#7C2D2D]/18 bg-[#FBF1F0] text-[#7C2D2D]' :
+                          'border-[#E5E0D8] bg-[#F8F6F2] text-[#6F675B]'
                         }`}>
                           {product.status === 'active' ? 'Actif' :
                            product.status === 'out_of_stock' ? 'Rupture' :
@@ -642,17 +651,17 @@ export default function ProductsList() {
                         </span>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex items-center justify-end space-x-2 opacity-0 transition-opacity group-hover:opacity-100">
                           <button
                             onClick={() => openEditor(product)}
-                            className="p-2.5 bg-white text-gray-400 hover:text-green-600 rounded-xl shadow-sm transition-all"
+                            className="rounded-2xl border border-[#E5E0D8] bg-white p-2.5 text-[#6F675B] shadow-sm transition-all hover:border-[#C9A84C]/35 hover:text-[#C9A84C]"
                             title="Modifier"
                           >
                             <Edit2 size={16} />
                           </button>
                           <button
                             onClick={() => deleteProduct(product.id)}
-                            className="p-2.5 bg-white text-gray-400 hover:text-red-500 rounded-xl shadow-sm transition-all"
+                            className="rounded-2xl border border-[#E5E0D8] bg-white p-2.5 text-[#6F675B] shadow-sm transition-all hover:border-[#7C2D2D]/20 hover:text-[#7C2D2D]"
                             title="Supprimer"
                           >
                             <Trash2 size={16} />
@@ -675,39 +684,39 @@ export default function ProductsList() {
         <div className="space-y-6">
           {/* Pending */}
           {pendingPartner.length > 0 && (
-            <div className="bg-green-50 border border-gold/20 p-6 rounded-[32px]">
-              <h3 className="font-sans font-bold text-slate-900 text-lg mb-4 flex items-center">
-                <AlertCircle size={20} className="text-green-600 mr-2" />
+            <div className="rounded-[2rem] border border-[#C9A84C]/20 bg-[#FBF7ED] p-6">
+              <h3 className="mb-4 flex items-center font-display text-2xl font-semibold text-[#0A0A0A]">
+                <AlertCircle size={20} className="mr-2 text-[#C9A84C]" />
                 En attente d'approbation ({pendingPartner.length})
               </h3>
               <div className="space-y-4">
                 {pendingPartner.map(pp => (
-                  <div key={pp.id} className="bg-white p-5 rounded-2xl border border-gray-50 flex items-center justify-between">
+                  <div key={pp.id} className="flex items-center justify-between rounded-2xl border border-[#E5E0D8] bg-white p-5">
                     <div className="flex items-center space-x-4">
-                      <div className="w-16 h-16 rounded-xl bg-cream overflow-hidden shrink-0">
+                      <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-[#E5E0D8] bg-[#F8F6F2]">
                         {pp.images?.[0] ? (
                           <img src={pp.images[0]} alt="" className="w-full h-full object-cover" />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-300"><ImageIcon size={20} /></div>
+                          <div className="flex h-full w-full items-center justify-center text-[#9A9A8A]"><ImageIcon size={20} /></div>
                         )}
                       </div>
                       <div>
-                        <p className="font-bold text-slate-900 text-sm">{pp.name}</p>
-                        <p className="text-xs text-gray-400">{typeLabel(pp.type)} — {pp.price.toFixed(2)} €</p>
-                        <p className="text-[10px] text-green-600 mt-1">Par: {pp.partner_company || pp.partner_name || 'Partenaire'}</p>
+                        <p className="font-display text-xl font-semibold text-[#0A0A0A]">{pp.name}</p>
+                        <p className="text-xs text-[#9A9A8A]">{typeLabel(pp.type)} — {pp.price.toFixed(2)} €</p>
+                        <p className="mt-1 text-[10px] uppercase tracking-[0.18em] text-[#C9A84C]">Par: {pp.partner_company || pp.partner_name || 'Partenaire'}</p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-3">
                       <button
                         onClick={() => approvePartnerProduct(pp)}
-                        className="flex items-center px-5 py-2.5 bg-emerald-50 text-emerald-600 rounded-xl font-bold text-xs hover:bg-emerald-100 transition-all"
+                        className={adminPrimaryButtonClass}
                       >
                         <CheckCircle size={16} className="mr-1.5" />
                         Approuver
                       </button>
                       <button
                         onClick={() => { setRejectingId(pp.id); setRejectReason(''); }}
-                        className="flex items-center px-5 py-2.5 bg-red-50 text-red-600 rounded-xl font-bold text-xs hover:bg-red-100 transition-all"
+                        className="inline-flex items-center rounded-2xl border border-[#7C2D2D]/18 bg-[#FBF1F0] px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-[#7C2D2D] transition-all hover:bg-[#F7E6E4]"
                       >
                         <XCircle size={16} className="mr-1.5" />
                         Refuser
@@ -720,18 +729,18 @@ export default function ProductsList() {
           )}
 
           {/* All partner products */}
-          <div className="bg-white rounded-[32px] border border-gray-50 shadow-sm overflow-hidden">
-            <div className="p-6 border-b border-gray-50">
-              <h3 className="font-sans font-bold text-slate-900 text-lg">Tous les produits partenaires</h3>
+          <div className="overflow-hidden rounded-[2rem] border border-[#E9E2D6] bg-white shadow-sm">
+            <div className="border-b border-[#F1ECE4] p-6">
+              <h3 className="font-display text-2xl font-semibold text-[#0A0A0A]">Tous les produits partenaires</h3>
             </div>
             {partnerProducts.length === 0 ? (
               <div className="p-16 text-center">
-                <Users size={48} className="mx-auto text-gray-200 mb-4" />
-                <p className="text-gray-400 font-bold">Aucun produit partenaire</p>
+                <Users size={48} className="mx-auto mb-4 text-[#C9A84C]" />
+                <p className="font-display text-3xl font-semibold text-[#0A0A0A]">Aucun produit partenaire</p>
               </div>
             ) : (
               <table className="w-full text-left">
-                <thead className="bg-gray-50/50 text-[10px] uppercase tracking-widest font-bold text-gray-400">
+                <thead className="bg-[#FBF8F2] text-[10px] font-semibold uppercase tracking-[0.24em] text-[#9A9A8A]">
                   <tr>
                     <th className="px-8 py-5">Produit</th>
                     <th className="px-6 py-5">Partenaire</th>
@@ -741,21 +750,21 @@ export default function ProductsList() {
                     <th className="px-6 py-5 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50">
+                <tbody className="divide-y divide-[#F1ECE4]">
                   {partnerProducts.map(pp => (
-                    <tr key={pp.id} className="hover:bg-gray-50/50 transition-colors group">
+                    <tr key={pp.id} className="group transition-colors hover:bg-[#FBF8F2]">
                       <td className="px-8 py-4">
                         <div className="flex items-center space-x-4">
-                          <div className="w-12 h-12 rounded-xl bg-cream overflow-hidden shrink-0">
+                          <div className="h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-[#E5E0D8] bg-[#F8F6F2]">
                             {pp.images?.[0] ? (
                               <img src={pp.images[0]} alt="" className="w-full h-full object-cover" />
                             ) : (
-                              <div className="w-full h-full flex items-center justify-center text-gray-300"><ImageIcon size={16} /></div>
+                              <div className="flex h-full w-full items-center justify-center text-[#9A9A8A]"><ImageIcon size={16} /></div>
                             )}
                           </div>
                           <div>
-                            <p className="text-sm font-bold text-slate-900">{pp.name}</p>
-                            <p className="text-[10px] text-gray-400">{typeLabel(pp.type)}</p>
+                            <p className="font-display text-xl font-semibold text-[#0A0A0A]">{pp.name}</p>
+                            <p className="text-[10px] uppercase tracking-[0.18em] text-[#9A9A8A]">{typeLabel(pp.type)}</p>
                           </div>
                         </div>
                       </td>
@@ -763,15 +772,15 @@ export default function ProductsList() {
                         <p className="text-xs font-bold text-slate-900">{pp.partner_company || pp.partner_name}</p>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="text-sm font-bold text-slate-900">{pp.price.toFixed(2)} €</span>
+                        <span className="text-sm font-semibold text-[#0A0A0A]">{pp.price.toFixed(2)} €</span>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center space-x-2">
-                          <Percent size={14} className="text-green-600" />
+                          <Percent size={14} className="text-[#C9A84C]" />
                           <select
                             defaultValue="15"
                             onChange={e => setCommissionRate(pp.partner_id, parseInt(e.target.value) / 100)}
-                            className="text-xs font-bold bg-gray-50 border-none rounded-lg px-2 py-1 outline-none focus:ring-1 focus:ring-green-500/20"
+                            className={`${adminInputClass} rounded-xl px-2 py-1 text-xs font-semibold`}
                           >
                             <option value="10">10%</option>
                             <option value="15">15%</option>
@@ -782,11 +791,11 @@ export default function ProductsList() {
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`text-[10px] px-3 py-1.5 rounded-lg font-bold uppercase tracking-wider ${
-                          pp.status === 'approved' || pp.status === 'active' ? 'bg-green-50 text-green-600' :
-                          pp.status === 'pending_approval' ? 'bg-green-50 text-green-600' :
-                          pp.status === 'rejected' ? 'bg-red-50 text-red-600' :
-                          'bg-gray-100 text-gray-500'
+                        <span className={`rounded-full border px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] ${
+                          pp.status === 'approved' || pp.status === 'active' ? 'border-[#C9A84C]/30 bg-[#FBF7ED] text-[#6D5622]' :
+                          pp.status === 'pending_approval' ? 'border-[#C9A84C]/30 bg-[#FBF7ED] text-[#6D5622]' :
+                          pp.status === 'rejected' ? 'border-[#7C2D2D]/18 bg-[#FBF1F0] text-[#7C2D2D]' :
+                          'border-[#E5E0D8] bg-[#F8F6F2] text-[#6F675B]'
                         }`}>
                           {pp.status === 'approved' || pp.status === 'active' ? 'Approuvé' :
                            pp.status === 'pending_approval' ? 'En attente' :
@@ -796,10 +805,10 @@ export default function ProductsList() {
                       <td className="px-6 py-4 text-right">
                         {pp.status === 'pending_approval' && (
                           <div className="flex items-center justify-end space-x-2">
-                            <button onClick={() => approvePartnerProduct(pp)} className="p-2 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 transition-all" title="Approuver">
+                            <button onClick={() => approvePartnerProduct(pp)} className="rounded-2xl border border-[#C9A84C]/30 bg-[#FBF7ED] p-2 text-[#6D5622] transition-all hover:bg-[#F7EED9]" title="Approuver">
                               <CheckCircle size={16} />
                             </button>
-                            <button onClick={() => { setRejectingId(pp.id); setRejectReason(''); }} className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-all" title="Refuser">
+                            <button onClick={() => { setRejectingId(pp.id); setRejectReason(''); }} className="rounded-2xl border border-[#7C2D2D]/18 bg-[#FBF1F0] p-2 text-[#7C2D2D] transition-all hover:bg-[#F7E6E4]" title="Refuser">
                               <XCircle size={16} />
                             </button>
                           </div>
@@ -820,56 +829,61 @@ export default function ProductsList() {
       {tab === 'editor' && (
         <div className="space-y-8">
           <div className="flex items-center space-x-4">
-            <button onClick={() => setTab('catalogue')} className="p-2 hover:bg-white rounded-full transition-colors text-gray-400 hover:text-slate-900">
+            <button onClick={() => setTab('catalogue')} className={`${adminGhostButtonClass} rounded-2xl px-3 py-2 text-[11px]`}>
               <ChevronLeft size={24} />
             </button>
-            <h2 className="text-2xl font-sans font-bold text-slate-900">
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.3em] text-[#9A9A8A]">Edition boutique</p>
+              <h2 className="mt-2 font-display text-4xl font-semibold text-[#0A0A0A]">
               {isNew ? 'Nouveau produit' : `Modifier : ${editingProduct?.name}`}
-            </h2>
+              </h2>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main form */}
             <div className="lg:col-span-2 space-y-6">
               {/* Info */}
-              <div className="bg-white p-8 rounded-[32px] border border-gray-50 shadow-sm space-y-5">
-                <h3 className="text-lg font-sans font-bold text-slate-900 border-b border-gray-50 pb-3">Informations</h3>
+              <AdminSectionShell>
+                <AdminSectionHeader eyebrow="Informations" title="Presence produit" description="Affinez le ton, la promesse et la lecture du produit dans un registre plus marque que catalogue." />
+                <div className="space-y-5 p-8">
                 <div>
-                  <label className="block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">Nom du produit *</label>
+                  <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.24em] text-[#9A9A8A]">Nom du produit *</label>
                   <input
                     type="text"
                     value={formName}
                     onChange={e => setFormName(e.target.value)}
                     placeholder="Ex: Bouquet Souveraine"
-                    className="w-full p-4 bg-gray-50 border-none rounded-2xl text-sm focus:bg-white focus:ring-2 focus:ring-green-500/20 outline-none transition-all"
+                    className={`${adminInputClass} rounded-2xl`}
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">Description</label>
+                  <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.24em] text-[#9A9A8A]">Description</label>
                   <textarea
                     value={formDesc}
                     onChange={e => setFormDesc(e.target.value)}
                     placeholder="Description détaillée du produit..."
-                    className="w-full h-40 p-4 bg-gray-50 border-none rounded-2xl text-sm focus:bg-white focus:ring-2 focus:ring-green-500/20 outline-none transition-all resize-none"
+                    className={`${adminTextareaClass} h-40 rounded-2xl`}
                   />
                 </div>
-              </div>
+                </div>
+              </AdminSectionShell>
 
               {/* Images */}
-              <div className="bg-white p-8 rounded-[32px] border border-gray-50 shadow-sm space-y-5">
-                <h3 className="text-lg font-sans font-bold text-slate-900 border-b border-gray-50 pb-3">Images</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <AdminSectionShell>
+                <AdminSectionHeader eyebrow="Visuels" title="Galerie produit" description="Travaillez la premiere impression avec une mise en scene plus editorialisee des images." />
+                <div className="grid grid-cols-2 gap-4 p-8 md:grid-cols-4">
                   {formImages.map((img, i) => (
-                    <div key={i} className="aspect-square rounded-xl overflow-hidden relative group border border-gray-100">
+                    <div key={i} className="group relative aspect-square overflow-hidden rounded-xl border border-[#E5E0D8] bg-[#F8F6F2]">
                       <img src={img} alt="" className="w-full h-full object-cover" />
                       <div className="absolute inset-0 bg-white/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <button onClick={() => setFormImages(formImages.filter((_, j) => j !== i))} className="p-2 bg-white rounded-full text-red-500 shadow-lg">
+                        <button onClick={() => setFormImages(formImages.filter((_, j) => j !== i))} className="rounded-full bg-white p-2 text-[#7C2D2D] shadow-lg">
                           <Trash2 size={16} />
                         </button>
                       </div>
                     </div>
                   ))}
-                  <label className="aspect-square rounded-xl border-2 border-dashed border-gray-200 hover:border-gold/30 hover:bg-green-50 transition-all flex flex-col items-center justify-center text-gray-400 hover:text-green-600 cursor-pointer">
+                  <label className="flex aspect-square cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-[#C9A84C]/35 bg-[#FBF8F2] text-[#6F675B] transition-all hover:border-[#C9A84C] hover:bg-white hover:text-[#0A0A0A]">
                     {uploading ? (
                       <div className="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin" />
                     ) : (
@@ -881,51 +895,54 @@ export default function ProductsList() {
                     <input type="file" accept="image/*" multiple className="hidden" onChange={handleImageUpload} disabled={uploading} />
                   </label>
                 </div>
-              </div>
+              </AdminSectionShell>
 
               {/* Lien partenaire */}
-              <div className="bg-white p-8 rounded-[32px] border border-gray-50 shadow-sm space-y-5">
-                <h3 className="text-lg font-sans font-bold text-slate-900 border-b border-gray-50 pb-3">Lien partenaire</h3>
+              <AdminSectionShell>
+                <AdminSectionHeader eyebrow="Redirection" title="Lien partenaire" description="Ce module controle la sortie vers l'univers de vente du partenaire en gardant un cadre clair pour l'utilisatrice." />
+                <div className="space-y-5 p-8">
                 <div>
-                  <label className="block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">URL externe du produit *</label>
+                  <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.24em] text-[#9A9A8A]">URL externe du produit *</label>
                   <input
                     type="url"
                     value={formExternalUrl}
                     onChange={e => setFormExternalUrl(e.target.value)}
                     placeholder="https://site-du-partenaire.com/produit"
-                    className="w-full p-4 bg-gray-50 border-none rounded-2xl text-sm focus:bg-white focus:ring-2 focus:ring-green-500/20 outline-none transition-all"
+                    className={`${adminInputClass} rounded-2xl`}
                   />
-                  <p className="text-[11px] text-gray-400 mt-2 leading-relaxed">
+                  <p className="mt-2 text-[11px] leading-relaxed text-[#9A9A8A]">
                     Le bouton redirigera les visiteurs vers ce lien. Le client contacte directement le partenaire.
                   </p>
                 </div>
                 <div>
-                  <label className="block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">Texte du bouton (optionnel)</label>
+                  <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.24em] text-[#9A9A8A]">Texte du bouton (optionnel)</label>
                   <input
                     type="text"
                     value={formCtaText}
                     onChange={e => setFormCtaText(e.target.value)}
                     placeholder="Ex: Découvrir l'article, Contacter la vendeuse..."
-                    className="w-full p-4 bg-gray-50 border-none rounded-2xl text-sm focus:bg-white focus:ring-2 focus:ring-green-500/20 outline-none transition-all"
+                    className={`${adminInputClass} rounded-2xl`}
                   />
-                  <p className="text-[11px] text-gray-400 mt-2 leading-relaxed">
+                  <p className="mt-2 text-[11px] leading-relaxed text-[#9A9A8A]">
                     Si vide, le texte par défaut sera «&nbsp;Découvrir l'article&nbsp;».
                   </p>
                 </div>
-              </div>
+                </div>
+              </AdminSectionShell>
             </div>
 
             {/* Sidebar */}
             <div className="space-y-6">
               {/* Type & Status */}
-              <div className="bg-white p-8 rounded-[32px] border border-gray-50 shadow-sm space-y-5">
-                <h3 className="text-lg font-sans font-bold text-slate-900 border-b border-gray-50 pb-3">Organisation</h3>
+              <AdminSectionShell>
+                <AdminSectionHeader eyebrow="Organisation" title="Cadre de diffusion" description="Positionnez le produit dans le bon registre et choisissez son niveau de visibilite." />
+                <div className="space-y-5 p-8">
                 <div>
-                  <label className="block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">Type de produit</label>
+                  <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.24em] text-[#9A9A8A]">Type de produit</label>
                   <select
                     value={formType}
                     onChange={e => setFormType(e.target.value)}
-                    className="w-full p-4 bg-gray-50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-green-500/20"
+                    className={`${adminInputClass} rounded-2xl font-semibold`}
                   >
                     {PRODUCT_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
                   </select>
@@ -941,43 +958,42 @@ export default function ProductsList() {
                       <button
                         key={s.id}
                         onClick={() => setFormStatus(s.id)}
-                        className={`w-full p-3 rounded-xl border text-left transition-all flex items-center justify-between ${
-                          formStatus === s.id ? 'border-gold bg-green-50' : 'border-gray-50 hover:border-gray-200'
+                        className={`flex w-full items-center justify-between rounded-2xl border p-4 text-left transition-all ${
+                          formStatus === s.id ? 'border-[#C9A84C]/35 bg-[#FBF7ED]' : 'border-[#E5E0D8] bg-[#F8F6F2] hover:border-[#D6CCBC]'
                         }`}
                       >
                         <div>
-                          <p className="text-sm font-bold text-slate-900">{s.label}</p>
-                          <p className="text-[10px] text-gray-400">{s.desc}</p>
+                          <p className="text-sm font-bold text-[#0A0A0A]">{s.label}</p>
+                          <p className="text-[10px] text-[#9A9A8A]">{s.desc}</p>
                         </div>
-                        {formStatus === s.id && <CheckCircle size={16} className="text-green-600" />}
+                        {formStatus === s.id && <CheckCircle size={16} className="text-[#C9A84C]" />}
                       </button>
                     ))}
                   </div>
                 </div>
-              </div>
+                </div>
+              </AdminSectionShell>
 
               {/* Save button */}
               <button
                 onClick={saveProduct}
                 disabled={saving}
-                className="w-full flex items-center justify-center px-8 py-4 bg-white text-slate-900 rounded-2xl hover:bg-slate-100 transition-all font-bold tracking-wide shadow-lg shadow-slate-200 disabled:opacity-50"
+                className={`${adminPrimaryButtonClass} w-full justify-center py-4 disabled:opacity-50`}
               >
                 {saving ? (
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <div className="h-5 w-5 rounded-full border-2 border-[#F5F0E8] border-t-transparent animate-spin" />
                 ) : (
                   <>
-                    <Save size={20} className="mr-2 text-green-600" />
+                    <Save size={18} className="mr-2" />
                     {isNew ? 'Créer le produit' : 'Enregistrer'}
                   </>
                 )}
               </button>
 
               {saveMsg && (
-                <div className={`p-4 rounded-xl text-sm font-bold text-center ${
-                  saveMsg.includes('Erreur') ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600'
-                }`}>
-                  {saveMsg}
-                </div>
+                <AdminAlert tone={saveMsg.includes('Erreur') ? 'error' : 'success'} className="justify-center text-center">
+                  <p className="text-sm font-semibold">{saveMsg}</p>
+                </AdminAlert>
               )}
             </div>
           </div>
@@ -989,23 +1005,23 @@ export default function ProductsList() {
       {/* ══════════════════════════════════════════════ */}
       {rejectingId && (
         <div className="fixed inset-0 z-[200] bg-white/60 backdrop-blur-sm flex items-center justify-center p-6" onClick={() => setRejectingId(null)}>
-          <div className="bg-white rounded-[32px] p-8 max-w-md w-full shadow-2xl" onClick={e => e.stopPropagation()}>
-            <h3 className="font-sans font-bold text-slate-900 text-xl mb-4">Refuser le produit</h3>
-            <p className="text-sm text-gray-400 mb-4">Indiquez la raison du refus (sera envoyée au partenaire).</p>
+          <div className="w-full max-w-md rounded-[2rem] border border-[#E9E2D6] bg-white p-8 shadow-2xl" onClick={e => e.stopPropagation()}>
+            <h3 className="mb-4 font-display text-3xl font-semibold text-[#0A0A0A]">Refuser le produit</h3>
+            <p className="mb-4 text-sm text-[#6F675B]">Indiquez la raison du refus (sera envoyée au partenaire).</p>
             <textarea
               value={rejectReason}
               onChange={e => setRejectReason(e.target.value)}
               placeholder="Raison du refus..."
-              className="w-full h-28 p-4 bg-gray-50 border-none rounded-2xl text-sm focus:bg-white focus:ring-2 focus:ring-green-500/20 outline-none transition-all resize-none mb-4"
+              className={`${adminTextareaClass} mb-4 h-28 rounded-2xl`}
             />
             <div className="flex space-x-3">
-              <button onClick={() => setRejectingId(null)} className="flex-1 py-3 bg-gray-100 text-slate-900 rounded-xl font-bold text-sm hover:bg-gray-200 transition-all">
+              <button onClick={() => setRejectingId(null)} className={`${adminSecondaryButtonClass} flex-1 justify-center py-3`}>
                 Annuler
               </button>
               <button
                 onClick={rejectPartnerProduct}
                 disabled={!rejectReason.trim()}
-                className="flex-1 py-3 bg-red-500 text-slate-900 rounded-xl font-bold text-sm hover:bg-red-600 transition-all disabled:opacity-50"
+                className="flex-1 rounded-2xl border border-[#7C2D2D]/18 bg-[#FBF1F0] py-3 text-sm font-semibold uppercase tracking-[0.18em] text-[#7C2D2D] transition-all hover:bg-[#F7E6E4] disabled:opacity-50"
               >
                 Confirmer le refus
               </button>

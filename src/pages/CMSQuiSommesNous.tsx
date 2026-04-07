@@ -4,6 +4,16 @@ import {
   Image as ImageIcon, Eye, X, User, Heart, Target, Quote, Video
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import {
+  AdminAlert,
+  AdminFieldRow,
+  AdminIconBadge,
+  AdminSectionShell,
+  adminGhostButtonClass,
+  adminInputClass,
+  adminPrimaryButtonClass,
+  adminTextareaClass,
+} from '../components/AdminPrimitives';
 
 // ══════════════════════════════════════════════
 // TYPES
@@ -53,20 +63,30 @@ async function convertImageToJpeg(file: File): Promise<File> {
   });
 }
 
-// ── Field Row Component ──
-const FieldRow = ({ label, description, children, noBorder }: {
-  label: string; description?: string; children: React.ReactNode; noBorder?: boolean;
-}) => (
-  <div className={`py-5 ${noBorder ? '' : 'border-b border-gray-100'}`}>
-    <div className="flex items-start justify-between gap-8">
-      <div className="w-52 shrink-0">
-        <p className="text-sm font-semibold text-gray-900">{label}</p>
-        {description && <p className="text-xs text-gray-500 mt-1 leading-relaxed">{description}</p>}
+function SectionHeader({
+  eyebrow,
+  title,
+  description,
+  icon: Icon,
+}: {
+  eyebrow: string;
+  title: string;
+  description?: string;
+  icon: typeof User;
+}) {
+  return (
+    <div className="border-b border-[#0A0A0A]/8 bg-[#F8F4EC] px-8 py-6">
+        <div className="flex items-start gap-4">
+        <AdminIconBadge icon={Icon} className="rounded-none border-[#C9A84C]/35" />
+        <div>
+          <p className="text-[10px] uppercase tracking-[0.3em] text-[#9A9A8A]">{eyebrow}</p>
+          <h2 className="mt-2 font-display text-3xl font-semibold text-[#0A0A0A]">{title}</h2>
+          {description && <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#9A9A8A]">{description}</p>}
+        </div>
       </div>
-      <div className="flex-1">{children}</div>
     </div>
-  </div>
-);
+  );
+}
 
 // ══════════════════════════════════════════════
 // MAIN COMPONENT
@@ -78,6 +98,7 @@ export default function CMSQuiSommesNous() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [jsonError, setJsonError] = useState<string | null>(null);
   const [uploading, setUploading] = useState<string | null>(null);
 
   // ── Présentation AFRIKHER ──
@@ -168,22 +189,39 @@ export default function CMSQuiSommesNous() {
       if (config['about_values_label']) setValuesSectionLabel(config['about_values_label']);
       if (config['about_values_title']) setValuesSectionTitle(config['about_values_title']);
       if (config['about_values_intro']) setValuesSectionIntro(config['about_values_intro']);
+      const parseIssues: string[] = [];
       try {
         const parsed = config['about_valeurs'] ? JSON.parse(config['about_valeurs']) : null;
         if (parsed && Array.isArray(parsed) && parsed.length > 0) setValeurs(parsed);
-      } catch { /* keep defaults */ }
+        if (config['about_valeurs'] && parsed && !Array.isArray(parsed)) {
+          parseIssues.push('`about_valeurs` doit contenir un tableau JSON valide.');
+        }
+      } catch {
+        if (config['about_valeurs']) parseIssues.push('Le JSON de `about_valeurs` est invalide.');
+      }
 
       // Galerie
       try {
         const parsed = config['about_galerie'] ? JSON.parse(config['about_galerie']) : [];
         if (Array.isArray(parsed)) setPhotos(parsed);
-      } catch { /* keep empty */ }
+        if (config['about_galerie'] && !Array.isArray(parsed)) {
+          parseIssues.push('`about_galerie` doit contenir un tableau JSON valide.');
+        }
+      } catch {
+        if (config['about_galerie']) parseIssues.push('Le JSON de `about_galerie` est invalide.');
+      }
 
       // Vidéos
       try {
         const parsed = config['about_videos'] ? JSON.parse(config['about_videos']) : [];
         if (Array.isArray(parsed)) setVideos(parsed);
-      } catch { /* keep empty */ }
+        if (config['about_videos'] && !Array.isArray(parsed)) {
+          parseIssues.push('`about_videos` doit contenir un tableau JSON valide.');
+        }
+      } catch {
+        if (config['about_videos']) parseIssues.push('Le JSON de `about_videos` est invalide.');
+      }
+      setJsonError(parseIssues.length ? parseIssues.join(' ') : null);
       if (config['about_media_label']) setMediaSectionLabel(config['about_media_label']);
       if (config['about_media_title']) setMediaSectionTitle(config['about_media_title']);
       if (config['about_media_intro']) setMediaSectionIntro(config['about_media_intro']);
@@ -326,7 +364,10 @@ export default function CMSQuiSommesNous() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-40">
-        <RefreshCw size={32} className="animate-spin text-green-600" />
+        <div className="flex flex-col items-center gap-4 text-center">
+          <RefreshCw size={28} className="animate-spin text-[#C9A84C]" />
+          <p className="text-sm uppercase tracking-[0.24em] text-[#9A9A8A]">Chargement de la page institutionnelle</p>
+        </div>
       </div>
     );
   }
@@ -343,24 +384,28 @@ export default function CMSQuiSommesNous() {
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       {/* ── Header ── */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-5 border-b border-[#0A0A0A]/10 pb-8 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <h1 className="text-3xl font-sans font-bold text-slate-900">Qui sommes-nous</h1>
-          <p className="text-gray-400 mt-1">Présentez AFRIKHER et sa fondatrice</p>
+          <p className="text-[10px] uppercase tracking-[0.32em] text-[#9A9A8A]">CMS Institutionnel</p>
+          <h1 className="mt-3 font-display text-5xl font-semibold leading-none text-[#0A0A0A]">Qui sommes-nous</h1>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[#9A9A8A]">
+            Travaillez la présence de la marque, le portrait de la fondatrice et toute la matière éditoriale
+            qui construit l’identité AFRIKHER.
+          </p>
         </div>
         <div className="flex items-center gap-3">
           <a
             href="https://afrikher-client.vercel.app/qui-sommes-nous"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-2xl text-sm text-gray-600 hover:border-gold hover:text-green-600 transition-all"
+            className={adminGhostButtonClass}
           >
             <Eye size={16} /> Voir la page
           </a>
           <button
             onClick={saveAll}
             disabled={saving}
-            className="flex items-center gap-2 px-6 py-2.5 bg-white text-slate-900 rounded-2xl font-semibold text-sm hover:bg-slate-100 transition-all shadow-lg shadow-slate-200 disabled:opacity-50"
+            className={adminPrimaryButtonClass}
           >
             {saving ? <RefreshCw size={16} className="animate-spin" /> : saved ? <Check size={16} /> : <Save size={16} />}
             {saving ? 'Sauvegarde...' : saved ? 'Sauvegardé !' : 'Enregistrer tout'}
@@ -370,29 +415,43 @@ export default function CMSQuiSommesNous() {
 
       {/* Error */}
       {error && (
-        <div className="flex items-center gap-3 bg-red-50 text-red-700 px-5 py-4 rounded-2xl border border-red-100">
+        <AdminAlert tone="error">
           <AlertCircle size={18} /> <span className="text-sm">{error}</span>
           <button onClick={() => setError(null)} className="ml-auto"><X size={16} /></button>
-        </div>
+        </AdminAlert>
+      )}
+
+      {jsonError && !error && (
+        <AdminAlert tone="error">
+          <AlertCircle size={18} /> <span className="text-sm">{jsonError}</span>
+          <button onClick={() => setJsonError(null)} className="ml-auto"><X size={16} /></button>
+        </AdminAlert>
+      )}
+
+      {saved && (
+        <AdminAlert tone="warning">
+          <Check size={18} />
+          <span className="text-sm">Les contenus institutionnels ont bien été mis à jour.</span>
+        </AdminAlert>
       )}
 
       {/* ── Tabs ── */}
-      <div className="flex gap-2 bg-white p-1.5 rounded-2xl border border-gray-100 shadow-sm overflow-x-auto">
+      <div className="overflow-x-auto border border-[#0A0A0A]/10 bg-[#F8F4EC] p-2">
         {tabs.map(tab => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${
+            className={`mr-2 inline-flex items-center gap-2 px-5 py-3 text-sm font-medium transition-all whitespace-nowrap ${
               activeTab === tab.key
-                ? 'bg-white text-slate-900 shadow-lg shadow-slate-200'
-                : 'text-gray-500 hover:text-slate-900 hover:bg-gray-50'
+                ? 'border border-[#0A0A0A] bg-[#0A0A0A] text-[#F5F0E8]'
+                : 'border border-transparent bg-transparent text-[#6F6C62] hover:border-[#0A0A0A]/10 hover:bg-white hover:text-[#0A0A0A]'
             }`}
           >
             <tab.icon size={16} />
             {tab.label}
             {tab.count !== undefined && (
-              <span className={`ml-1 text-xs px-2 py-0.5 rounded-full ${
-                activeTab === tab.key ? 'bg-white/20 text-slate-900' : 'bg-gray-100 text-gray-500'
+              <span className={`ml-1 px-2 py-0.5 text-[10px] uppercase tracking-[0.2em] ${
+                activeTab === tab.key ? 'bg-[#F5F0E8]/12 text-[#F5F0E8]' : 'bg-white text-[#9A9A8A]'
               }`}>{tab.count}</span>
             )}
           </button>
@@ -403,55 +462,54 @@ export default function CMSQuiSommesNous() {
       {/* TAB: PRÉSENTATION */}
       {/* ══════════════════════════════════════════════ */}
       {activeTab === 'presentation' && (
-        <div className="bg-white rounded-[28px] border border-gray-50 shadow-sm overflow-hidden">
-          <div className="px-8 py-6 border-b border-gray-100 bg-gradient-to-r from-cream/30 to-transparent">
-            <h2 className="text-xl font-sans font-bold text-slate-900 flex items-center gap-3">
-              <Heart size={22} className="text-green-600" />
-              Présentation AFRIKHER
-            </h2>
-            <p className="text-sm text-gray-500 mt-1">Le texte principal de la page "Qui sommes-nous"</p>
-          </div>
+        <AdminSectionShell>
+          <SectionHeader
+            eyebrow="Identité"
+            title="Présentation AFRIKHER"
+            description='Le récit principal de la page "Qui sommes-nous", pensé comme un manifeste de marque.'
+            icon={Heart}
+          />
           <div className="px-8 pb-8">
-            <FieldRow label="Label de section" description="Petit label premium au-dessus du hero">
+            <AdminFieldRow label="Label de section" description="Petit label premium au-dessus du hero">
               <input type="text" value={aboutHeroLabel} onChange={e => setAboutHeroLabel(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all"
+                className={adminInputClass}
                 placeholder="Maison éditoriale" />
-            </FieldRow>
+            </AdminFieldRow>
 
-            <FieldRow label="Titre" description="Titre principal de la page">
+            <AdminFieldRow label="Titre" description="Titre principal de la page">
               <input type="text" value={aboutTitre} onChange={e => setAboutTitre(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all"
+                className={`${adminInputClass} font-display text-xl`}
                 placeholder="Qui sommes-nous ?" />
-            </FieldRow>
+            </AdminFieldRow>
 
-            <FieldRow label="Sous-titre" description="Phrase d'accroche sous le titre">
+            <AdminFieldRow label="Sous-titre" description="Phrase d'accroche sous le titre">
               <input type="text" value={aboutSousTitre} onChange={e => setAboutSousTitre(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all"
+                className={adminInputClass}
                 placeholder="Plus qu'un magazine" />
-            </FieldRow>
+            </AdminFieldRow>
 
-            <FieldRow label="Accroche hero" description="Sous-texte introductif juste sous le titre principal">
+            <AdminFieldRow label="Accroche hero" description="Sous-texte introductif juste sous le titre principal">
               <input type="text" value={aboutHeroSubtitle} onChange={e => setAboutHeroSubtitle(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all"
+                className={adminInputClass}
                 placeholder="L'histoire d'AFRIKHER, entre élégance, influence et vision." />
-            </FieldRow>
+            </AdminFieldRow>
 
-            <FieldRow label="Image principale" description="Photo illustrant AFRIKHER (équipe, événement, etc.)">
+            <AdminFieldRow label="Image principale" description="Photo illustrant AFRIKHER (équipe, événement, etc.)">
               <div className="flex items-center gap-6">
                 {aboutImage ? (
                   <div className="relative group">
-                    <img src={aboutImage} alt="" className="w-40 h-28 rounded-xl object-cover border border-gray-100" />
+                    <img src={aboutImage} alt="" className="h-32 w-48 border border-[#0A0A0A]/10 object-cover" />
                     <button onClick={() => setAboutImage('')}
-                      className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-slate-900 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      className="absolute -right-2 -top-2 flex h-7 w-7 items-center justify-center bg-[#7C2D2D] text-white opacity-0 transition-opacity group-hover:opacity-100">
                       <X size={12} />
                     </button>
                   </div>
                 ) : (
-                  <div className="w-40 h-28 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400">
+                  <div className="flex h-32 w-48 items-center justify-center border border-dashed border-[#0A0A0A]/14 bg-[#F8F4EC] text-[#9A9A8A]">
                     <ImageIcon size={28} />
                   </div>
                 )}
-                <label className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-600 hover:border-gold hover:text-green-600 cursor-pointer transition-all">
+                <label className={adminGhostButtonClass}>
                   {uploading === 'about-main' ? <RefreshCw size={14} className="animate-spin" /> : <Upload size={14} />}
                   {uploading === 'about-main' ? 'Upload...' : 'Choisir une image'}
                   <input type="file" accept="image/*" className="hidden"
@@ -463,68 +521,74 @@ export default function CMSQuiSommesNous() {
                     }} />
                 </label>
               </div>
-            </FieldRow>
+            </AdminFieldRow>
 
-            <FieldRow label="Texte principal" description="Premier paragraphe de présentation">
+            <AdminFieldRow label="Texte principal" description="Premier paragraphe de présentation">
               <textarea value={aboutTexte} onChange={e => setAboutTexte(e.target.value)} rows={4}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all resize-none"
+                className={adminTextareaClass}
                 placeholder="AFRIKHER est une plateforme..." />
-            </FieldRow>
+            </AdminFieldRow>
 
-            <FieldRow label="Texte secondaire" description="Deuxième paragraphe (mission, vision)">
+            <AdminFieldRow label="Texte secondaire" description="Deuxième paragraphe (mission, vision)">
               <textarea value={aboutTexte2} onChange={e => setAboutTexte2(e.target.value)} rows={4}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all resize-none"
+                className={adminTextareaClass}
                 placeholder="Notre mission..." />
-            </FieldRow>
+            </AdminFieldRow>
 
-            <FieldRow label="Citation" description="Phrase en exergue, affichée en doré" noBorder>
+            <AdminFieldRow label="Citation" description="Phrase en exergue, affichée en doré" noBorder>
               <input type="text" value={aboutCitation} onChange={e => setAboutCitation(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all italic"
+                className={`${adminInputClass} italic`}
                 placeholder="L'élégance hors du commun..." />
-            </FieldRow>
+            </AdminFieldRow>
           </div>
-        </div>
+        </AdminSectionShell>
       )}
 
       {/* ══════════════════════════════════════════════ */}
       {/* TAB: FONDATRICE */}
       {/* ══════════════════════════════════════════════ */}
       {activeTab === 'fondatrice' && (
-        <div className="bg-white rounded-[28px] border border-gray-50 shadow-sm overflow-hidden">
-          <div className="px-8 py-6 border-b border-gray-100 bg-gradient-to-r from-cream/30 to-transparent">
-            <h2 className="text-xl font-sans font-bold text-slate-900 flex items-center gap-3">
-              <User size={22} className="text-green-600" />
-              La Fondatrice
-            </h2>
-            <p className="text-sm text-gray-500 mt-1">Informations sur Hadassa Hélène EKILA-LUMANDE</p>
-          </div>
+        <AdminSectionShell>
+          <SectionHeader
+            eyebrow="Portrait"
+            title="La Fondatrice"
+            description="La section la plus sensible de la page. Elle doit porter la stature, la voix et la vision de la maison."
+            icon={User}
+          />
           <div className="px-8 pb-8">
-            <FieldRow label="Label de section" description="Petit label premium au-dessus du portrait">
+            <AdminFieldRow label="Label de section" description="Petit label premium au-dessus du portrait">
               <input type="text" value={fondSectionLabel} onChange={e => setFondSectionLabel(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all" />
-            </FieldRow>
+                className={adminInputClass} />
+            </AdminFieldRow>
 
-            <FieldRow label="Titre de section" description="Titre affiché pour le bloc fondatrice">
+            <AdminFieldRow label="Titre de section" description="Titre affiché pour le bloc fondatrice">
               <input type="text" value={fondSectionTitle} onChange={e => setFondSectionTitle(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all" />
-            </FieldRow>
+                className={`${adminInputClass} font-display text-xl`} />
+            </AdminFieldRow>
 
-            <FieldRow label="Photo" description="Portrait officiel de la fondatrice">
+            <AdminFieldRow label="Photo" description="Portrait officiel de la fondatrice">
               <div className="flex items-center gap-6">
                 {fondPhoto ? (
                   <div className="relative group">
-                    <img src={fondPhoto} alt="" className="w-28 h-28 rounded-full object-cover border-2 border-gray-100" />
+                    <img src={fondPhoto} alt="" className="h-40 w-32 border border-[#0A0A0A]/10 object-cover" />
                     <button onClick={() => setFondPhoto('')}
-                      className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-slate-900 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      className="absolute -right-2 -top-2 flex h-7 w-7 items-center justify-center bg-[#7C2D2D] text-white opacity-0 transition-opacity group-hover:opacity-100">
                       <X size={12} />
                     </button>
                   </div>
                 ) : (
-                  <div className="w-28 h-28 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                  <div className="flex h-40 w-32 items-center justify-center border border-dashed border-[#0A0A0A]/14 bg-[#F8F4EC] text-[#9A9A8A]">
                     <User size={28} />
                   </div>
                 )}
-                <label className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-600 hover:border-gold hover:text-green-600 cursor-pointer transition-all">
+                <div className="space-y-4">
+                  <div className="max-w-sm border border-[#0A0A0A]/10 bg-[#F8F4EC] p-4">
+                    <p className="text-[10px] uppercase tracking-[0.28em] text-[#9A9A8A]">Portrait éditorial</p>
+                    <p className="mt-2 text-sm leading-relaxed text-[#0A0A0A]">
+                      Privilégiez une image sobre, cadrée et affirmée. Ici, on met en scène une présence, pas un simple avatar.
+                    </p>
+                  </div>
+                  <label className={adminGhostButtonClass}>
                   {uploading === 'fondatrice' ? <RefreshCw size={14} className="animate-spin" /> : <Upload size={14} />}
                   {uploading === 'fondatrice' ? 'Upload...' : 'Choisir une photo'}
                   <input type="file" accept="image/*" className="hidden"
@@ -534,39 +598,40 @@ export default function CMSQuiSommesNous() {
                       try { const url = await uploadImage(file, 'foundress', 'portrait'); setFondPhoto(url); }
                       catch (err: unknown) { setError('Erreur upload: ' + (err instanceof Error ? err.message : 'Erreur')); }
                     }} />
-                </label>
+                  </label>
+                </div>
               </div>
-            </FieldRow>
+            </AdminFieldRow>
 
-            <FieldRow label="Nom complet" description="Nom affiché sur la page">
+            <AdminFieldRow label="Nom complet" description="Nom affiché sur la page">
               <input type="text" value={fondNom} onChange={e => setFondNom(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all font-semibold" />
-            </FieldRow>
+                className={`${adminInputClass} font-display text-xl`} />
+            </AdminFieldRow>
 
-            <FieldRow label="Titre / Fonction" description="Titre officiel">
+            <AdminFieldRow label="Titre / Fonction" description="Titre officiel">
               <input type="text" value={fondTitre} onChange={e => setFondTitre(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all" />
-            </FieldRow>
+                className={adminInputClass} />
+            </AdminFieldRow>
 
-            <FieldRow label="Biographie (partie 1)" description="Premier paragraphe de la bio">
+            <AdminFieldRow label="Biographie (partie 1)" description="Premier paragraphe de la bio">
               <textarea value={fondBio} onChange={e => setFondBio(e.target.value)} rows={4}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all resize-none" />
-            </FieldRow>
+                className={adminTextareaClass} />
+            </AdminFieldRow>
 
-            <FieldRow label="Biographie (partie 2)" description="Deuxième paragraphe (optionnel)">
+            <AdminFieldRow label="Biographie (partie 2)" description="Deuxième paragraphe (optionnel)">
               <textarea value={fondBio2} onChange={e => setFondBio2(e.target.value)} rows={4}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all resize-none" />
-            </FieldRow>
+                className={adminTextareaClass} />
+            </AdminFieldRow>
 
-            <FieldRow label="Citation personnelle" description="Phrase inspirante de la fondatrice" noBorder>
-              <div className="flex items-start gap-3">
-                <Quote size={18} className="text-green-600 shrink-0 mt-3" />
+            <AdminFieldRow label="Citation personnelle" description="Phrase inspirante de la fondatrice" noBorder>
+              <div className="flex items-start gap-4 border border-[#C9A84C]/25 bg-[#FBF7ED] p-5">
+                <Quote size={18} className="mt-1 shrink-0 text-[#C9A84C]" />
                 <textarea value={fondCitation} onChange={e => setFondCitation(e.target.value)} rows={2}
-                  className="flex-1 px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all resize-none italic" />
+                  className="flex-1 border-none bg-transparent p-0 text-sm italic leading-relaxed text-[#0A0A0A] outline-none placeholder:text-[#9A9A8A]" />
               </div>
-            </FieldRow>
+            </AdminFieldRow>
           </div>
-        </div>
+        </AdminSectionShell>
       )}
 
       {/* ══════════════════════════════════════════════ */}
@@ -574,63 +639,66 @@ export default function CMSQuiSommesNous() {
       {/* ══════════════════════════════════════════════ */}
       {activeTab === 'valeurs' && (
         <div className="space-y-6">
-          <div className="bg-white rounded-[28px] border border-gray-50 shadow-sm overflow-hidden">
-            <div className="px-8 py-6 border-b border-gray-100 bg-gradient-to-r from-cream/30 to-transparent">
-              <h2 className="text-xl font-sans font-bold text-slate-900 flex items-center gap-3">
-                <Target size={22} className="text-green-600" />
-                Paramètres de la section valeurs
-              </h2>
-            </div>
+          <AdminSectionShell>
+            <SectionHeader
+              eyebrow="Piliers"
+              title="Paramètres de la section valeurs"
+              description="Cette zone ne doit plus ressembler à un CRUD. Chaque valeur doit se lire comme un pilier de marque."
+              icon={Target}
+            />
             <div className="px-8 pb-8">
-              <FieldRow label="Label de section">
+              <AdminFieldRow label="Label de section">
                 <input type="text" value={valuesSectionLabel} onChange={e => setValuesSectionLabel(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all" />
-              </FieldRow>
-              <FieldRow label="Titre de section">
+                  className={adminInputClass} />
+              </AdminFieldRow>
+              <AdminFieldRow label="Titre de section">
                 <input type="text" value={valuesSectionTitle} onChange={e => setValuesSectionTitle(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all" />
-              </FieldRow>
-              <FieldRow label="Texte d'introduction" noBorder>
+                  className={`${adminInputClass} font-display text-xl`} />
+              </AdminFieldRow>
+              <AdminFieldRow label="Texte d'introduction" noBorder>
                 <textarea value={valuesSectionIntro} onChange={e => setValuesSectionIntro(e.target.value)} rows={3}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all resize-none" />
-              </FieldRow>
+                  className={adminTextareaClass} />
+              </AdminFieldRow>
             </div>
-          </div>
+          </AdminSectionShell>
 
           <div className="flex justify-end">
             <button onClick={addValeur}
-              className="flex items-center gap-2 px-5 py-2.5 bg-green-600 text-slate-900 rounded-2xl font-semibold text-sm hover:bg-green-600/90 transition-all shadow-lg shadow-gold/20">
+              className={adminPrimaryButtonClass}>
               <Plus size={16} /> Ajouter une valeur
             </button>
           </div>
 
           {valeurs.map(valeur => (
-            <div key={valeur.id} className="bg-white rounded-[28px] border border-gray-50 shadow-sm overflow-hidden">
-              <div className="px-8 py-5 border-b border-gray-100 flex items-center justify-between bg-gradient-to-r from-cream/30 to-transparent">
+            <AdminSectionShell key={valeur.id}>
+              <div className="flex items-center justify-between border-b border-[#0A0A0A]/8 bg-[#F8F4EC] px-8 py-5">
                 <div className="flex items-center gap-3">
-                  <span className="text-2xl">{valeur.icone}</span>
-                  <h3 className="text-lg font-sans font-bold text-slate-900">{valeur.titre || 'Sans titre'}</h3>
+                  <span className="flex h-11 w-11 items-center justify-center border border-[#C9A84C]/35 bg-white text-xl text-[#C9A84C]">{valeur.icone}</span>
+                  <div>
+                    <p className="text-[10px] uppercase tracking-[0.28em] text-[#9A9A8A]">Pilier de marque</p>
+                    <h3 className="mt-1 font-display text-2xl font-semibold text-[#0A0A0A]">{valeur.titre || 'Sans titre'}</h3>
+                  </div>
                 </div>
                 <button onClick={() => { if (confirm('Supprimer cette valeur ?')) removeValeur(valeur.id); }}
-                  className="p-2 hover:bg-red-50 rounded-xl transition-colors text-gray-400 hover:text-red-500">
+                  className="p-2 text-[#9A9A8A] transition-colors hover:bg-[#FBF1F0] hover:text-[#7C2D2D]">
                   <Trash2 size={16} />
                 </button>
               </div>
               <div className="px-8 pb-6">
-                <FieldRow label="Icône" description="Emoji ou symbole (1 caractère)">
+                <AdminFieldRow label="Icône" description="Emoji ou symbole (1 caractère)">
                   <input type="text" value={valeur.icone} onChange={e => updateValeur(valeur.id, 'icone', e.target.value)}
-                    className="w-20 px-4 py-3 border border-gray-200 rounded-xl text-center text-xl focus:outline-none focus:border-green-500 transition-all" maxLength={2} />
-                </FieldRow>
-                <FieldRow label="Titre">
+                    className="w-24 border border-[#0A0A0A]/12 bg-[#F8F4EC] px-4 py-3 text-center text-xl text-[#0A0A0A] outline-none transition-all focus:border-[#C9A84C] focus:bg-white focus:ring-2 focus:ring-[#C9A84C]/12" maxLength={2} />
+                </AdminFieldRow>
+                <AdminFieldRow label="Titre">
                   <input type="text" value={valeur.titre} onChange={e => updateValeur(valeur.id, 'titre', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm font-semibold focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all" />
-                </FieldRow>
-                <FieldRow label="Description" noBorder>
+                    className={`${adminInputClass} font-display text-xl`} />
+                </AdminFieldRow>
+                <AdminFieldRow label="Description" noBorder>
                   <textarea value={valeur.description} onChange={e => updateValeur(valeur.id, 'description', e.target.value)} rows={2}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all resize-none" />
-                </FieldRow>
+                    className={adminTextareaClass} />
+                </AdminFieldRow>
               </div>
-            </div>
+            </AdminSectionShell>
           ))}
         </div>
       )}
@@ -639,15 +707,16 @@ export default function CMSQuiSommesNous() {
       {/* TAB: GALERIE */}
       {/* ══════════════════════════════════════════════ */}
       {activeTab === 'galerie' && (
-        <div className="bg-white rounded-[28px] border border-gray-50 shadow-sm overflow-hidden">
-          <div className="px-8 py-6 border-b border-gray-100 flex items-center justify-between bg-gradient-to-r from-cream/30 to-transparent">
+        <AdminSectionShell>
+          <div className="flex items-center justify-between border-b border-[#0A0A0A]/8 bg-[#F8F4EC] px-8 py-6">
             <div>
-              <h2 className="text-xl font-sans font-bold text-slate-900 flex items-center gap-3">
-                <ImageIcon size={22} className="text-green-600" /> Galerie Photos
+              <p className="text-[10px] uppercase tracking-[0.3em] text-[#9A9A8A]">Sélection visuelle</p>
+              <h2 className="mt-2 flex items-center gap-3 font-display text-3xl font-semibold text-[#0A0A0A]">
+                <ImageIcon size={22} className="text-[#C9A84C]" /> Galerie Photos
               </h2>
-              <p className="text-sm text-gray-500 mt-1">Photos de l'équipe, événements, coulisses</p>
+              <p className="mt-2 text-sm text-[#9A9A8A]">Photos de l'équipe, événements, coulisses et matière éditoriale.</p>
             </div>
-            <label className="flex items-center gap-2 px-5 py-2.5 bg-green-600 text-slate-900 rounded-2xl font-semibold text-sm hover:bg-green-600/90 cursor-pointer transition-all shadow-lg shadow-gold/20">
+            <label className={adminPrimaryButtonClass}>
               {uploading ? <RefreshCw size={16} className="animate-spin" /> : <Plus size={16} />}
               Ajouter des photos
               <input type="file" accept="image/*" multiple className="hidden"
@@ -660,79 +729,96 @@ export default function CMSQuiSommesNous() {
           </div>
           <div className="p-8">
             {photos.length === 0 ? (
-              <div className="text-center py-16">
-                <ImageIcon size={48} className="mx-auto text-gray-200 mb-4" />
-                <p className="text-gray-400 text-sm">Aucune photo</p>
+              <div className="border border-dashed border-[#0A0A0A]/14 bg-[#F8F4EC] py-20 text-center">
+                <p className="text-[10px] uppercase tracking-[0.3em] text-[#9A9A8A]">Galerie vide</p>
+                <h3 className="mt-3 font-display text-3xl font-semibold text-[#0A0A0A]">Aucune image éditoriale</h3>
+                <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-[#9A9A8A]">
+                  Ajoutez ici une matière visuelle sobre et incarnée. Cette section doit ressembler à une sélection, pas à un dossier de fichiers.
+                </p>
               </div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {photos.map(photo => (
                   <div key={photo.id} className="group relative">
-                    <div className="aspect-square rounded-2xl overflow-hidden bg-gray-100 border border-gray-50">
+                    <div className="aspect-square overflow-hidden border border-[#0A0A0A]/10 bg-[#F8F4EC]">
                       <img src={photo.url} alt={photo.legende} className="w-full h-full object-cover" />
                     </div>
                     <button onClick={() => setPhotos(prev => prev.filter(p => p.id !== photo.id))}
-                      className="absolute top-2 right-2 w-7 h-7 bg-red-500 text-slate-900 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                      className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center bg-[#0A0A0A]/88 text-[#F5F0E8] opacity-0 transition-opacity group-hover:opacity-100">
                       <X size={12} />
                     </button>
                     <input type="text" value={photo.legende}
                       onChange={e => setPhotos(prev => prev.map(p => p.id === photo.id ? { ...p, legende: e.target.value } : p))}
-                      placeholder="Légende..." className="mt-2 w-full px-3 py-2 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-green-500 transition-all" />
+                      placeholder="Légende..." className="mt-3 w-full border border-[#0A0A0A]/12 bg-[#F8F4EC] px-3 py-2 text-xs text-[#0A0A0A] outline-none transition-all placeholder:text-[#9A9A8A] focus:border-[#C9A84C] focus:bg-white" />
                   </div>
                 ))}
               </div>
             )}
           </div>
-        </div>
+        </AdminSectionShell>
       )}
 
       {/* ══════════════════════════════════════════════ */}
       {/* TAB: VIDÉOS */}
       {/* ══════════════════════════════════════════════ */}
       {activeTab === 'videos' && (
-        <div className="bg-white rounded-[28px] border border-gray-50 shadow-sm overflow-hidden">
-          <div className="px-8 py-6 border-b border-gray-100 flex items-center justify-between bg-gradient-to-r from-cream/30 to-transparent">
+        <AdminSectionShell>
+          <div className="flex items-center justify-between border-b border-[#0A0A0A]/8 bg-[#F8F4EC] px-8 py-6">
             <div>
-              <h2 className="text-xl font-sans font-bold text-slate-900 flex items-center gap-3">
-                <Video size={22} className="text-green-600" /> Vidéos
+              <p className="text-[10px] uppercase tracking-[0.3em] text-[#9A9A8A]">Format vivant</p>
+              <h2 className="mt-2 flex items-center gap-3 font-display text-3xl font-semibold text-[#0A0A0A]">
+                <Video size={22} className="text-[#C9A84C]" /> Vidéos
               </h2>
-              <p className="text-sm text-gray-500 mt-1">Vidéos YouTube ou Vimeo</p>
+              <p className="mt-2 text-sm text-[#9A9A8A]">Vidéos YouTube ou Vimeo à intégrer avec plus de calme et de respiration.</p>
             </div>
             <button onClick={addVideo}
-              className="flex items-center gap-2 px-5 py-2.5 bg-green-600 text-slate-900 rounded-2xl font-semibold text-sm hover:bg-green-600/90 transition-all shadow-lg shadow-gold/20">
+              className={adminPrimaryButtonClass}>
               <Plus size={16} /> Ajouter une vidéo
             </button>
           </div>
           <div className="p-8">
             {videos.length === 0 ? (
-              <div className="text-center py-16">
-                <Video size={48} className="mx-auto text-gray-200 mb-4" />
-                <p className="text-gray-400 text-sm">Aucune vidéo</p>
+              <div className="border border-dashed border-[#0A0A0A]/14 bg-[#F8F4EC] py-20 text-center">
+                <p className="text-[10px] uppercase tracking-[0.3em] text-[#9A9A8A]">Vidéos</p>
+                <h3 className="mt-3 font-display text-3xl font-semibold text-[#0A0A0A]">Aucun format intégré</h3>
+                <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-[#9A9A8A]">
+                  Ajoutez des prises de parole, interviews ou capsules pour prolonger la présence éditoriale d’AFRIKHER.
+                </p>
               </div>
             ) : (
               <div className="space-y-6">
                 {videos.map(video => (
-                  <div key={video.id} className="border border-gray-100 rounded-2xl p-6 relative group">
+                  <div key={video.id} className="relative border border-[#0A0A0A]/10 bg-white p-6">
                     <button onClick={() => setVideos(prev => prev.filter(v => v.id !== video.id))}
-                      className="absolute top-4 right-4 p-2 text-gray-400 hover:text-red-500 transition-colors">
+                      className="absolute right-4 top-4 p-2 text-[#9A9A8A] transition-colors hover:bg-[#FBF1F0] hover:text-[#7C2D2D]">
                       <Trash2 size={16} />
                     </button>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-xs font-semibold text-gray-700 mb-1">Titre</label>
+                        <label className="mb-2 block text-[10px] uppercase tracking-[0.24em] text-[#9A9A8A]">Titre</label>
                         <input type="text" value={video.titre}
                           onChange={e => setVideos(prev => prev.map(v => v.id === video.id ? { ...v, titre: e.target.value } : v))}
-                          className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 transition-all" placeholder="Titre" />
+                          className={adminInputClass} placeholder="Titre" />
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-gray-700 mb-1">URL YouTube/Vimeo</label>
+                        <label className="mb-2 block text-[10px] uppercase tracking-[0.24em] text-[#9A9A8A]">URL YouTube/Vimeo</label>
                         <input type="url" value={video.url}
                           onChange={e => setVideos(prev => prev.map(v => v.id === video.id ? { ...v, url: e.target.value } : v))}
-                          className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 transition-all" placeholder="https://youtube.com/watch?v=..." />
+                          className={adminInputClass} placeholder="https://youtube.com/watch?v=..." />
                       </div>
                     </div>
+                    <div className="mt-4">
+                      <label className="mb-2 block text-[10px] uppercase tracking-[0.24em] text-[#9A9A8A]">Description</label>
+                      <textarea
+                        value={video.description}
+                        onChange={e => setVideos(prev => prev.map(v => v.id === video.id ? { ...v, description: e.target.value } : v))}
+                        rows={3}
+                        className={adminTextareaClass}
+                        placeholder="Contexte, angle éditorial ou note d’accompagnement"
+                      />
+                    </div>
                     {video.url && video.url.includes('youtu') && (
-                      <div className="mt-3 aspect-video rounded-xl overflow-hidden bg-gray-100 max-w-xs">
+                      <div className="mt-5 aspect-video max-w-md overflow-hidden border border-[#0A0A0A]/10 bg-[#F8F4EC]">
                         <iframe src={`https://www.youtube.com/embed/${extractYouTubeId(video.url)}`}
                           className="w-full h-full" allowFullScreen />
                       </div>
@@ -742,52 +828,51 @@ export default function CMSQuiSommesNous() {
               </div>
             )}
           </div>
-        </div>
+        </AdminSectionShell>
       )}
 
       {activeTab === 'sections' && (
-        <div className="bg-white rounded-[28px] border border-gray-50 shadow-sm overflow-hidden">
-          <div className="px-8 py-6 border-b border-gray-100 bg-gradient-to-r from-cream/30 to-transparent">
-            <h2 className="text-xl font-sans font-bold text-slate-900 flex items-center gap-3">
-              <Quote size={22} className="text-green-600" />
-              Paramètres de section
-            </h2>
-            <p className="text-sm text-gray-500 mt-1">Labels, intros et fermeture du dernier écran</p>
-          </div>
+        <AdminSectionShell>
+          <SectionHeader
+            eyebrow="Cadre éditorial"
+            title="Paramètres de section"
+            description="Labels, intros et fermeture de page pour garder une cohérence narrative sur tout l’écran."
+            icon={Quote}
+          />
           <div className="px-8 pb-8">
-            <FieldRow label="Label médias">
+            <AdminFieldRow label="Label médias">
               <input type="text" value={mediaSectionLabel} onChange={e => setMediaSectionLabel(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all" />
-            </FieldRow>
-            <FieldRow label="Titre médias">
+                className={adminInputClass} />
+            </AdminFieldRow>
+            <AdminFieldRow label="Titre médias">
               <input type="text" value={mediaSectionTitle} onChange={e => setMediaSectionTitle(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all" />
-            </FieldRow>
-            <FieldRow label="Introduction médias">
+                className={`${adminInputClass} font-display text-xl`} />
+            </AdminFieldRow>
+            <AdminFieldRow label="Introduction médias">
               <textarea value={mediaSectionIntro} onChange={e => setMediaSectionIntro(e.target.value)} rows={3}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all resize-none" />
-            </FieldRow>
-            <FieldRow label="Texte de clôture">
+                className={adminTextareaClass} />
+            </AdminFieldRow>
+            <AdminFieldRow label="Texte de clôture">
               <textarea value={closingText} onChange={e => setClosingText(e.target.value)} rows={3}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all resize-none" />
-            </FieldRow>
-            <FieldRow label="CTA de clôture">
+                className={adminTextareaClass} />
+            </AdminFieldRow>
+            <AdminFieldRow label="CTA de clôture">
               <input type="text" value={closingCtaLabel} onChange={e => setClosingCtaLabel(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all" />
-            </FieldRow>
-            <FieldRow label="Lien du CTA" noBorder>
+                className={adminInputClass} />
+            </AdminFieldRow>
+            <AdminFieldRow label="Lien du CTA" noBorder>
               <input type="text" value={closingCtaLink} onChange={e => setClosingCtaLink(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-gold/10 transition-all"
+                className={adminInputClass}
                 placeholder="/magazine" />
-            </FieldRow>
+            </AdminFieldRow>
           </div>
-        </div>
+        </AdminSectionShell>
       )}
 
       {/* ── Bottom Save ── */}
       <div className="flex justify-end pt-4 pb-8">
         <button onClick={saveAll} disabled={saving}
-          className="flex items-center gap-2 px-8 py-3 bg-white text-slate-900 rounded-2xl font-semibold text-sm hover:bg-slate-100 transition-all shadow-lg shadow-slate-200 disabled:opacity-50">
+          className={adminPrimaryButtonClass}>
           {saving ? <RefreshCw size={16} className="animate-spin" /> : saved ? <Check size={16} /> : <Save size={16} />}
           {saving ? 'Sauvegarde...' : saved ? 'Sauvegardé !' : 'Enregistrer toutes les modifications'}
         </button>

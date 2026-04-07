@@ -1,24 +1,28 @@
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { Settings } from 'lucide-react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import AdminLayout from './components/AdminLayout';
 import AdminLogin from './pages/AdminLogin';
-import Dashboard from './pages/Dashboard';
-import ArticlesList from './pages/ArticlesList';
-import ArticleEditor from './pages/ArticleEditor';
-import ProductsList from './pages/ProductsList';
-import ProductEditor from './pages/ProductEditor';
-import OrdersList from './pages/OrdersList';
-import UsersList from './pages/UsersList';
-import CMSConfig from './pages/CMSConfig';
-import CMSAccueil from './pages/CMSAccueil';
-import CMSMagazine from './pages/CMSMagazine';
-import CMSRubriques from './pages/CMSRubriques';
-import CMSQuiSommesNous from './pages/CMSQuiSommesNous';
-import CMSAbonnement from './pages/CMSAbonnement';
-import CMSContact from './pages/CMSContact';
-import CMSPartenaires from './pages/CMSPartenaires';
-import SettingsPaiements from './pages/SettingsPaiements';
+
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const ArticlesList = lazy(() => import('./pages/ArticlesList'));
+const ArticleEditor = lazy(() => import('./pages/ArticleEditor'));
+const CategoriesList = lazy(() => import('./pages/CategoriesList'));
+const GalleryList = lazy(() => import('./pages/GalleryList'));
+const ProductsList = lazy(() => import('./pages/ProductsList'));
+const ProductEditor = lazy(() => import('./pages/ProductEditor'));
+const OrdersList = lazy(() => import('./pages/OrdersList'));
+const UsersList = lazy(() => import('./pages/UsersList'));
+const CMSConfig = lazy(() => import('./pages/CMSConfig'));
+const CMSAccueil = lazy(() => import('./pages/CMSAccueil'));
+const CMSMagazine = lazy(() => import('./pages/CMSMagazine'));
+const CMSRubriques = lazy(() => import('./pages/CMSRubriques'));
+const CMSQuiSommesNous = lazy(() => import('./pages/CMSQuiSommesNous'));
+const CMSAbonnement = lazy(() => import('./pages/CMSAbonnement'));
+const CMSContact = lazy(() => import('./pages/CMSContact'));
+const CMSPartenaires = lazy(() => import('./pages/CMSPartenaires'));
+const SettingsPaiements = lazy(() => import('./pages/SettingsPaiements'));
 
 // Placeholder for other pages
 const Placeholder = ({ title }: { title: string }) => (
@@ -35,6 +39,21 @@ const Placeholder = ({ title }: { title: string }) => (
     </Link>
   </div>
 );
+
+function RouteLoader() {
+  return (
+    <div className="flex min-h-[40vh] items-center justify-center">
+      <div className="flex flex-col items-center gap-4 text-center">
+        <div className="h-11 w-11 animate-spin rounded-full border-4 border-[#C9A84C] border-t-transparent" />
+        <p className="text-[10px] uppercase tracking-[0.28em] text-[#9A9A8A]">Chargement de l’espace admin</p>
+      </div>
+    </div>
+  );
+}
+
+function withRouteSuspense(node: React.ReactNode) {
+  return <Suspense fallback={<RouteLoader />}>{node}</Suspense>;
+}
 
 // Protected route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -68,38 +87,38 @@ export default function App() {
               <AdminLayout />
             </ProtectedRoute>
           }>
-            <Route index element={<Dashboard />} />
+            <Route index element={withRouteSuspense(<Dashboard />)} />
 
             {/* Éditorial */}
-            <Route path="articles" element={<ArticlesList />} />
-            <Route path="articles/new" element={<ArticleEditor />} />
-            <Route path="articles/:id" element={<ArticleEditor />} />
-            <Route path="categories" element={<Placeholder title="Gestion des Catégories" />} />
-            <Route path="galerie" element={<Placeholder title="Galerie Photos" />} />
+            <Route path="articles" element={withRouteSuspense(<ArticlesList />)} />
+            <Route path="articles/new" element={withRouteSuspense(<ArticleEditor />)} />
+            <Route path="articles/:id" element={withRouteSuspense(<ArticleEditor />)} />
+            <Route path="categories" element={withRouteSuspense(<CategoriesList />)} />
+            <Route path="galerie" element={withRouteSuspense(<GalleryList />)} />
             {/* Blog fusionné dans Articles (onglets Éditorial / Blog) */}
 
             {/* Boutique */}
-            <Route path="boutique/produits" element={<ProductsList />} />
-            <Route path="boutique/produits/new" element={<ProductEditor />} />
-            <Route path="boutique/produits/:id" element={<ProductEditor />} />
-            <Route path="boutique/commandes" element={<OrdersList />} />
+            <Route path="boutique/produits" element={withRouteSuspense(<ProductsList />)} />
+            <Route path="boutique/produits/new" element={withRouteSuspense(<ProductEditor />)} />
+            <Route path="boutique/produits/:id" element={withRouteSuspense(<ProductEditor />)} />
+            <Route path="boutique/commandes" element={withRouteSuspense(<OrdersList />)} />
 
             {/* Utilisateurs */}
-            <Route path="utilisateurs/lecteurs" element={<UsersList pageType="readers" />} />
-            <Route path="utilisateurs/partenaires" element={<UsersList pageType="partners" />} />
+            <Route path="utilisateurs/lecteurs" element={withRouteSuspense(<UsersList pageType="readers" />)} />
+            <Route path="utilisateurs/partenaires" element={withRouteSuspense(<UsersList pageType="partners" />)} />
             <Route path="utilisateurs/abonnements" element={<Placeholder title="Gestion des Abonnements" />} />
 
             {/* Pages du site (CMS) */}
-            <Route path="cms/accueil" element={<CMSAccueil />} />
-            <Route path="cms/magazine" element={<CMSMagazine />} />
-            <Route path="cms/rubriques" element={<CMSRubriques />} />
-            <Route path="cms/qui-sommes-nous" element={<CMSQuiSommesNous />} />
-            <Route path="cms/abonnement" element={<CMSAbonnement />} />
-            <Route path="cms/contact" element={<CMSContact />} />
-            <Route path="cms/partenaires" element={<CMSPartenaires />} />
+            <Route path="cms/accueil" element={withRouteSuspense(<CMSAccueil />)} />
+            <Route path="cms/magazine" element={withRouteSuspense(<CMSMagazine />)} />
+            <Route path="cms/rubriques" element={withRouteSuspense(<CMSRubriques />)} />
+            <Route path="cms/qui-sommes-nous" element={withRouteSuspense(<CMSQuiSommesNous />)} />
+            <Route path="cms/abonnement" element={withRouteSuspense(<CMSAbonnement />)} />
+            <Route path="cms/contact" element={withRouteSuspense(<CMSContact />)} />
+            <Route path="cms/partenaires" element={withRouteSuspense(<CMSPartenaires />)} />
 
             {/* CMS & Design */}
-            <Route path="cms/config" element={<CMSConfig />} />
+            <Route path="cms/config" element={withRouteSuspense(<CMSConfig />)} />
             <Route path="cms/design" element={<Placeholder title="Design & Thème" />} />
 
             {/* Marketing */}
@@ -107,7 +126,7 @@ export default function App() {
             <Route path="marketing/publicites" element={<Placeholder title="Gestion des Publicités" />} />
 
             {/* Paramètres */}
-            <Route path="parametres/paiements" element={<SettingsPaiements />} />
+            <Route path="parametres/paiements" element={withRouteSuspense(<SettingsPaiements />)} />
             <Route path="parametres/notifications" element={<Placeholder title="Paramètres de Notifications" />} />
           </Route>
 

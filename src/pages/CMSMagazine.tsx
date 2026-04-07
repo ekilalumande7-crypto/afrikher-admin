@@ -5,6 +5,18 @@ import {
   BookOpen, ArrowUp, ArrowDown, X
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import {
+  AdminAlert,
+  AdminFieldRow,
+  AdminIconBadge,
+  AdminSectionHeader,
+  AdminSectionShell,
+  adminGhostButtonClass,
+  adminInputClass,
+  adminPrimaryButtonClass,
+  adminSecondaryButtonClass,
+  adminTextareaClass,
+} from '../components/AdminPrimitives';
 
 interface Magazine {
   id: string;
@@ -23,21 +35,6 @@ interface Magazine {
 }
 
 type ViewMode = 'list' | 'editor';
-
-// ── Field Row Component (OUTSIDE to prevent re-mount on every render) ──
-const FieldRow = ({ label, description, children, noBorder }: {
-  label: string; description?: string; children: React.ReactNode; noBorder?: boolean;
-}) => (
-  <div className={`py-6 ${noBorder ? '' : 'border-b border-gray-100'}`}>
-    <div className="flex items-start justify-between gap-8">
-      <div className="w-56 shrink-0">
-        <p className="text-sm font-semibold text-gray-900">{label}</p>
-        {description && <p className="text-sm text-gray-500 mt-1">{description}</p>}
-      </div>
-      <div className="flex-1">{children}</div>
-    </div>
-  </div>
-);
 
 export default function CMSMagazine() {
   const [magazines, setMagazines] = useState<Magazine[]>([]);
@@ -374,10 +371,10 @@ export default function CMSMagazine() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-96">
+      <div className="flex h-96 items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <RefreshCw size={24} className="animate-spin text-gray-400" />
-          <p className="text-sm text-gray-500">Chargement des magazines...</p>
+          <RefreshCw size={24} className="animate-spin text-[#C9A84C]" />
+          <p className="text-sm text-[#6F675B]">Chargement des magazines...</p>
         </div>
       </div>
     );
@@ -389,16 +386,15 @@ export default function CMSMagazine() {
   if (viewMode === 'editor' && editingMagazine) {
     return (
       <div className="max-w-5xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
               onClick={() => { setViewMode('list'); setEditingMagazine(null); }}
-              className="flex items-center px-3 py-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+              className={`${adminGhostButtonClass} px-3 py-2 text-[11px]`}
             >
               ← Retour
             </button>
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="font-display text-3xl font-semibold text-[#0A0A0A]">
               {editingMagazine.id ? 'Modifier le magazine' : 'Nouveau magazine'}
             </h1>
           </div>
@@ -406,11 +402,7 @@ export default function CMSMagazine() {
             <button
               onClick={handleSave}
               disabled={saving}
-              className={`flex items-center px-5 py-2 rounded-lg text-sm font-medium transition-colors ${
-                saved
-                  ? 'bg-green-600 text-slate-900'
-                  : 'bg-gray-900 text-slate-900 hover:bg-gray-800'
-              }`}
+              className={`${adminPrimaryButtonClass} ${saved ? 'bg-[#3A342A]' : ''}`}
             >
               {saving ? <><RefreshCw size={14} className="mr-2 animate-spin" /> Enregistrement...</>
                 : saved ? <><Check size={14} className="mr-2" /> Enregistré</>
@@ -419,19 +411,22 @@ export default function CMSMagazine() {
           </div>
         </div>
 
-        {/* Error */}
         {error && (
-          <div className="flex items-center gap-3 p-4 mb-4 bg-red-50 border border-red-200 rounded-lg">
+          <AdminAlert tone="error" className="mb-4">
             <AlertCircle size={18} className="text-red-500 shrink-0" />
-            <p className="text-sm text-red-700 flex-1">{error}</p>
-            <button onClick={() => setError(null)} className="text-sm text-red-500 hover:text-red-700 font-medium">Fermer</button>
-          </div>
+            <p className="flex-1 text-sm">{error}</p>
+            <button onClick={() => setError(null)} className="text-sm font-medium hover:opacity-70">Fermer</button>
+          </AdminAlert>
         )}
 
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <AdminSectionShell className="overflow-hidden">
+          <AdminSectionHeader
+            eyebrow="Edition du numero"
+            title={editingMagazine.id ? 'Ajuster la ligne editoriale' : 'Composer un nouveau numero'}
+            description="Renseignez les informations du numero, sa couverture, son prix et l'ordre de ses pages sans quitter l'atelier magazine."
+          />
           <div className="px-10 py-6">
-            {/* Title */}
-            <FieldRow label="Titre" description="Le titre complet du magazine.">
+            <AdminFieldRow label="Titre" description="Le titre complet du magazine.">
               <input
                 type="text"
                 value={editingMagazine.title || ''}
@@ -439,35 +434,32 @@ export default function CMSMagazine() {
                   const title = e.target.value;
                   setEditingMagazine(prev => prev ? { ...prev, title, slug: generateSlug(title) } : null);
                 }}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={`${adminInputClass} rounded-2xl`}
                 placeholder="AFRIKHER N°5 — Titre du numéro"
               />
-            </FieldRow>
+            </AdminFieldRow>
 
-            {/* Slug */}
-            <FieldRow label="Slug URL" description="Identifiant unique pour l'URL.">
+            <AdminFieldRow label="Slug URL" description="Identifiant unique pour l'URL.">
               <input
                 type="text"
                 value={editingMagazine.slug || ''}
                 onChange={(e) => setEditingMagazine(prev => prev ? { ...prev, slug: e.target.value } : null)}
-                className="w-full max-w-md px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={`${adminInputClass} max-w-md rounded-2xl font-mono`}
                 placeholder="afrikher-n5-titre"
               />
-            </FieldRow>
+            </AdminFieldRow>
 
-            {/* Description */}
-            <FieldRow label="Description" description="Courte description du numéro.">
+            <AdminFieldRow label="Description" description="Courte description du numéro.">
               <textarea
                 value={editingMagazine.description || ''}
                 onChange={(e) => setEditingMagazine(prev => prev ? { ...prev, description: e.target.value } : null)}
                 rows={3}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                className={`${adminTextareaClass} rounded-2xl`}
                 placeholder="Description du contenu de ce numéro..."
               />
-            </FieldRow>
+            </AdminFieldRow>
 
-            {/* Price */}
-            <FieldRow label="Prix" description="Prix unitaire du magazine en euros.">
+            <AdminFieldRow label="Prix" description="Prix unitaire du magazine en euros.">
               <div className="flex items-center gap-3 max-w-xs">
                 <input
                   type="text"
@@ -483,25 +475,24 @@ export default function CMSMagazine() {
                       }
                     }
                   }}
-                  className="w-32 px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className={`${adminInputClass} w-32 rounded-2xl`}
                   placeholder="9.99"
                 />
-                <span className="text-sm text-gray-500 font-medium">EUR</span>
+                <span className="text-sm font-medium text-[#6F675B]">EUR</span>
               </div>
-            </FieldRow>
+            </AdminFieldRow>
 
-            {/* Cover Image */}
-            <FieldRow label="Couverture" description="Image de couverture (page 1). Format A4 portrait recommandé (1240x1754px ou 2480x3508px).">
+            <AdminFieldRow label="Couverture" description="Image de couverture (page 1). Format A4 portrait recommandé (1240x1754px ou 2480x3508px).">
               <div className="flex items-start gap-6">
-                <div className="w-32 h-44 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center border border-gray-200 shrink-0">
+                <div className="h-44 w-32 shrink-0 overflow-hidden rounded-2xl border border-[#E5E0D8] bg-[#F8F6F2] flex items-center justify-center">
                   {editingMagazine.cover_image ? (
                     <img src={editingMagazine.cover_image} alt="Couverture" className="w-full h-full object-cover" />
                   ) : (
-                    <ImageIcon size={28} className="text-gray-400" />
+                    <ImageIcon size={28} className="text-[#9A9A8A]" />
                   )}
                 </div>
                 <div className="flex flex-col gap-3">
-                  <label className={`inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer transition-colors ${uploading === 'cover' ? 'opacity-50 cursor-wait' : ''}`}>
+                  <label className={`${adminGhostButtonClass} cursor-pointer ${uploading === 'cover' ? 'opacity-50 cursor-wait' : ''}`}>
                     {uploading === 'cover' ? (
                       <><RefreshCw size={14} className="mr-2 animate-spin" /> Upload...</>
                     ) : (
@@ -515,26 +506,24 @@ export default function CMSMagazine() {
                       disabled={uploading === 'cover'}
                     />
                   </label>
-                  <span className="text-xs text-gray-400">JPEG recommandé, format A4 portrait</span>
+                  <span className="text-xs text-[#9A9A8A]">JPEG recommandé, format A4 portrait</span>
                   {editingMagazine.cover_image && (
                     <input
                       type="text"
                       value={editingMagazine.cover_image}
                       onChange={(e) => setEditingMagazine(prev => prev ? { ...prev, cover_image: e.target.value } : null)}
-                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-xs text-gray-400 font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className={`${adminInputClass} rounded-2xl px-3 py-2 text-xs font-mono text-[#6F675B]`}
                       placeholder="Ou collez une URL"
                     />
                   )}
                 </div>
               </div>
-            </FieldRow>
+            </AdminFieldRow>
 
-            {/* Pages Upload */}
-            <FieldRow label="Pages du magazine" description="Uploadez les pages JPEG du magazine (format A4). Vous pouvez réordonner les pages après upload." noBorder>
+            <AdminFieldRow label="Pages du magazine" description="Uploadez les pages JPEG du magazine (format A4). Vous pouvez réordonner les pages après upload." noBorder>
               <div className="space-y-4">
-                {/* Upload button */}
                 <div className="flex items-center gap-4">
-                  <label className={`inline-flex items-center px-5 py-3 border-2 border-dashed border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 hover:border-blue-400 cursor-pointer transition-all ${uploading === 'pages' ? 'opacity-50 cursor-wait' : ''}`}>
+                  <label className={`inline-flex cursor-pointer items-center rounded-2xl border border-dashed border-[#C9A84C]/35 bg-[#FBF8F2] px-5 py-3 text-xs font-semibold uppercase tracking-[0.22em] text-[#0A0A0A] transition-all hover:border-[#C9A84C] hover:bg-white ${uploading === 'pages' ? 'opacity-50 cursor-wait' : ''}`}>
                     {uploading === 'pages' ? (
                       <><RefreshCw size={14} className="mr-2 animate-spin" /> Upload {uploadProgress}%...</>
                     ) : (
@@ -549,38 +538,35 @@ export default function CMSMagazine() {
                       disabled={uploading === 'pages'}
                     />
                   </label>
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-[#6F675B]">
                     {(editingMagazine.pages || []).length} page(s) ajoutée(s)
                   </span>
                 </div>
 
-                {/* Upload progress bar */}
                 {uploading === 'pages' && (
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="h-2 w-full rounded-full bg-[#ECE7DF]">
                     <div
-                      className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                      className="h-2 rounded-full bg-[#C9A84C] transition-all duration-300"
                       style={{ width: `${uploadProgress}%` }}
                     />
                   </div>
                 )}
 
-                {/* Pages grid */}
                 {(editingMagazine.pages || []).length > 0 && (
                   <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 mt-4">
                     {(editingMagazine.pages || []).map((pageUrl, index) => (
                       <div key={index} className="relative group">
-                        <div className="aspect-[3/4] bg-gray-100 rounded overflow-hidden border border-gray-200">
+                        <div className="aspect-[3/4] overflow-hidden rounded-xl border border-[#E5E0D8] bg-[#F8F6F2]">
                           <img src={pageUrl} alt={`Page ${index + 1}`} className="w-full h-full object-cover" />
                         </div>
-                        <span className="absolute bottom-1 left-1 bg-black/70 text-slate-900 text-[10px] px-1.5 py-0.5 rounded font-mono">
+                        <span className="absolute bottom-1 left-1 rounded bg-black/70 px-1.5 py-0.5 text-[10px] font-mono text-[#F5F0E8]">
                           {index + 1}
                         </span>
-                        {/* Actions overlay */}
                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all rounded flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100">
                           {index > 0 && (
                             <button
                               onClick={() => movePage(index, 'up')}
-                              className="w-6 h-6 bg-white rounded-full flex items-center justify-center text-gray-700 hover:bg-blue-500 hover:text-slate-900 transition-colors"
+                              className="flex h-6 w-6 items-center justify-center rounded-full bg-white text-[#0A0A0A] transition-colors hover:bg-[#C9A84C] hover:text-[#0A0A0A]"
                               title="Monter"
                             >
                               <ArrowUp size={12} />
@@ -589,7 +575,7 @@ export default function CMSMagazine() {
                           {index < (editingMagazine.pages || []).length - 1 && (
                             <button
                               onClick={() => movePage(index, 'down')}
-                              className="w-6 h-6 bg-white rounded-full flex items-center justify-center text-gray-700 hover:bg-blue-500 hover:text-slate-900 transition-colors"
+                              className="flex h-6 w-6 items-center justify-center rounded-full bg-white text-[#0A0A0A] transition-colors hover:bg-[#C9A84C] hover:text-[#0A0A0A]"
                               title="Descendre"
                             >
                               <ArrowDown size={12} />
@@ -597,7 +583,7 @@ export default function CMSMagazine() {
                           )}
                           <button
                             onClick={() => removePage(index)}
-                            className="w-6 h-6 bg-white rounded-full flex items-center justify-center text-gray-700 hover:bg-red-500 hover:text-slate-900 transition-colors"
+                            className="flex h-6 w-6 items-center justify-center rounded-full bg-white text-[#0A0A0A] transition-colors hover:bg-[#7C2D2D] hover:text-[#F5F0E8]"
                             title="Supprimer"
                           >
                             <X size={12} />
@@ -608,9 +594,9 @@ export default function CMSMagazine() {
                   </div>
                 )}
               </div>
-            </FieldRow>
+            </AdminFieldRow>
           </div>
-        </div>
+        </AdminSectionShell>
       </div>
     );
   }
@@ -620,25 +606,25 @@ export default function CMSMagazine() {
   // ══════════════════════════════════════
   return (
     <div className="max-w-6xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Magazines</h1>
-          <p className="text-sm text-gray-500 mt-1">Gérez vos numéros de magazine digital</p>
+          <p className="text-[10px] uppercase tracking-[0.32em] text-[#9A9A8A]">Editions & numéros</p>
+          <h1 className="mt-3 font-display text-5xl font-semibold text-[#0A0A0A]">Magazines</h1>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[#6F675B]">Pilotez la collection des numéros digitaux, leur pricing et la mise en scene de la page magazine publique.</p>
         </div>
         <div className="flex items-center gap-3">
           <a
             href="https://afrikher-client.vercel.app/magazine"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+            className={adminGhostButtonClass}
           >
             <ExternalLink size={16} className="mr-2" />
             Voir le site
           </a>
           <button
             onClick={startNewMagazine}
-            className="flex items-center px-5 py-2 rounded-lg text-sm font-medium bg-gray-900 text-slate-900 hover:bg-gray-800 transition-colors"
+            className={adminPrimaryButtonClass}
           >
             <Plus size={14} className="mr-2" />
             Nouveau magazine
@@ -646,43 +632,36 @@ export default function CMSMagazine() {
         </div>
       </div>
 
-      {/* Error */}
       {error && (
-        <div className="flex items-center gap-3 p-4 mb-4 bg-red-50 border border-red-200 rounded-lg">
+        <AdminAlert tone="error" className="mb-4">
           <AlertCircle size={18} className="text-red-500 shrink-0" />
-          <p className="text-sm text-red-700 flex-1">{error}</p>
-          <button onClick={() => setError(null)} className="text-sm text-red-500 hover:text-red-700 font-medium">Fermer</button>
-        </div>
+          <p className="flex-1 text-sm">{error}</p>
+          <button onClick={() => setError(null)} className="text-sm font-medium hover:opacity-70">Fermer</button>
+        </AdminAlert>
       )}
 
-      {/* Success */}
       {saved && (
-        <div className="flex items-center gap-3 p-4 mb-4 bg-green-50 border border-green-200 rounded-lg">
-          <Check size={18} className="text-green-500 shrink-0" />
-          <p className="text-sm text-green-700">Magazine enregistré avec succès.</p>
-        </div>
+        <AdminAlert tone="success" className="mb-4">
+          <Check size={18} className="shrink-0" />
+          <p className="text-sm">Magazine enregistré avec succès.</p>
+        </AdminAlert>
       )}
 
-      {/* ══════ HERO CONFIGURATION ══════ */}
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden mb-8">
-        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-          <div>
-            <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
-              <ImageIcon size={18} className="text-amber-500" />
-              Banniere de la page Magazine
-            </h2>
-            <p className="text-xs text-gray-500 mt-0.5">
-              Image et texte affiches en haut de la page Magazine du site public
-            </p>
+      <AdminSectionShell className="mb-8 overflow-hidden">
+        <div className="flex items-center justify-between border-b border-[#0A0A0A]/8 bg-[#FBF8F2] px-6 py-4">
+          <div className="flex items-start gap-4">
+            <AdminIconBadge icon={ImageIcon} />
+            <div>
+              <h2 className="text-base font-semibold text-[#0A0A0A]">Banniere de la page Magazine</h2>
+              <p className="mt-0.5 text-xs text-[#6F675B]">
+                Image et texte affiches en haut de la page Magazine du site public
+              </p>
+            </div>
           </div>
           <button
             onClick={saveHeroConfig}
             disabled={heroSaving}
-            className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              heroSaved
-                ? 'bg-green-600 text-slate-900'
-                : 'bg-gray-900 text-slate-900 hover:bg-gray-800'
-            }`}
+            className={`${adminPrimaryButtonClass} px-4 py-2.5 ${heroSaved ? 'bg-[#3A342A]' : ''}`}
           >
             {heroSaving ? <><RefreshCw size={14} className="mr-2 animate-spin" /> Enregistrement...</>
               : heroSaved ? <><Check size={14} className="mr-2" /> Enregistre !</>
@@ -690,13 +669,12 @@ export default function CMSMagazine() {
           </button>
         </div>
         <div className="p-6">
-          {/* Hero image preview + upload */}
           <div className="flex gap-6 mb-6">
-            <div className="w-80 h-48 bg-gray-100 rounded-lg overflow-hidden border border-gray-200 shrink-0 relative">
+            <div className="relative h-48 w-80 shrink-0 overflow-hidden rounded-2xl border border-[#E5E0D8] bg-[#F8F6F2]">
               {heroImage ? (
                 <img src={heroImage} alt="Hero Magazine" className="w-full h-full object-cover" />
               ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
+                <div className="flex h-full w-full flex-col items-center justify-center text-[#9A9A8A]">
                   <ImageIcon size={32} className="mb-2" />
                   <span className="text-xs">Aucune image</span>
                 </div>
@@ -706,11 +684,11 @@ export default function CMSMagazine() {
               )}
             </div>
             <div className="flex flex-col gap-3 flex-1">
-              <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider">Image de banniere</label>
-              <p className="text-xs text-gray-500">
+              <label className="text-xs font-semibold uppercase tracking-[0.24em] text-[#9A9A8A]">Image de banniere</label>
+              <p className="text-xs text-[#6F675B]">
                 Cette image s'affiche en grand en haut de la page Magazine. Format recommande : 1920x800px minimum, paysage.
               </p>
-              <label className={`inline-flex items-center w-fit px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer transition-colors ${heroUploading ? 'opacity-50 cursor-wait' : ''}`}>
+              <label className={`${adminGhostButtonClass} w-fit cursor-pointer ${heroUploading ? 'opacity-50 cursor-wait' : ''}`}>
                 {heroUploading ? (
                   <><RefreshCw size={14} className="mr-2 animate-spin" /> Upload...</>
                 ) : (
@@ -729,54 +707,52 @@ export default function CMSMagazine() {
                   type="text"
                   value={heroImage}
                   onChange={(e) => setHeroImage(e.target.value)}
-                  className="px-3 py-2 border border-gray-200 rounded-lg text-xs text-gray-500 font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={`${adminInputClass} rounded-2xl px-3 py-2 text-xs font-mono text-[#6F675B]`}
                   placeholder="Ou collez une URL d'image"
                 />
               )}
             </div>
           </div>
 
-          {/* Hero title */}
           <div className="mb-4">
-            <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider block mb-2">
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.24em] text-[#9A9A8A]">
               Titre principal
             </label>
             <input
               type="text"
               value={heroTitle}
               onChange={(e) => setHeroTitle(e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className={`${adminInputClass} rounded-2xl`}
               placeholder="Le magazine qui celebre la femme africaine entrepreneure"
             />
           </div>
 
-          {/* Hero subtitle */}
           <div>
-            <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider block mb-2">
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.24em] text-[#9A9A8A]">
               Sous-titre
             </label>
             <textarea
               value={heroSubtitle}
               onChange={(e) => setHeroSubtitle(e.target.value)}
               rows={2}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              className={`${adminTextareaClass} rounded-2xl`}
               placeholder="Portraits, interviews exclusives et analyses pour celles qui batissent l'Afrique de demain."
             />
           </div>
         </div>
-      </div>
+      </AdminSectionShell>
 
       {/* Empty state */}
       {magazines.length === 0 && (
-        <div className="bg-white border border-gray-200 rounded-xl p-20 text-center">
-          <BookOpen size={48} className="text-gray-300 mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Aucun magazine</h2>
-          <p className="text-sm text-gray-500 mb-6 max-w-sm mx-auto">
+        <div className="rounded-[2rem] border border-[#E5E0D8] bg-white p-20 text-center">
+          <BookOpen size={48} className="mx-auto mb-4 text-[#C9A84C]" />
+          <h2 className="mb-2 font-display text-3xl font-semibold text-[#0A0A0A]">Aucun magazine</h2>
+          <p className="mx-auto mb-6 max-w-sm text-sm leading-relaxed text-[#6F675B]">
             Créez votre premier numéro de magazine digital. Chaque magazine est constitué de pages JPEG au format A4.
           </p>
           <button
             onClick={startNewMagazine}
-            className="inline-flex items-center px-6 py-3 bg-gray-900 text-slate-900 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors"
+            className={adminPrimaryButtonClass}
           >
             <Plus size={14} className="mr-2" />
             Créer un magazine
@@ -786,65 +762,62 @@ export default function CMSMagazine() {
 
       {/* Magazines list */}
       {magazines.length > 0 && (
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-          <div className="divide-y divide-gray-100">
+        <div className="overflow-hidden rounded-[2rem] border border-[#E5E0D8] bg-white">
+          <div className="divide-y divide-[#EFE8DD]">
             {magazines.map((mag) => (
-              <div key={mag.id} className="flex items-center gap-6 p-5 hover:bg-gray-50/50 transition-colors">
-                {/* Cover thumbnail */}
-                <div className="w-16 h-22 bg-gray-100 rounded overflow-hidden shrink-0 border border-gray-200">
+              <div key={mag.id} className="flex items-center gap-6 p-5 transition-colors hover:bg-[#FBF8F2]">
+                <div className="h-22 w-16 shrink-0 overflow-hidden rounded-lg border border-[#E5E0D8] bg-[#F8F6F2]">
                   {mag.cover_image ? (
                     <img src={mag.cover_image} alt={mag.title} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <ImageIcon size={20} className="text-gray-400" />
+                      <ImageIcon size={20} className="text-[#9A9A8A]" />
                     </div>
                   )}
                 </div>
 
-                {/* Info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-3 mb-1">
-                    <h3 className="text-sm font-bold text-gray-900 truncate">{mag.title}</h3>
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                    <h3 className="truncate font-display text-xl font-semibold text-[#0A0A0A]">{mag.title}</h3>
+                    <span className={`inline-flex items-center rounded-full border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] ${
                       mag.status === 'published'
-                        ? 'bg-green-100 text-green-700'
+                        ? 'border-[#C9A84C]/30 bg-[#FBF7ED] text-[#6D5622]'
                         : mag.status === 'archived'
-                          ? 'bg-gray-100 text-gray-500'
-                          : 'bg-amber-100 text-amber-700'
+                          ? 'border-[#D9D1C2] bg-[#F5F3EF] text-[#6F675B]'
+                          : 'border-[#E5E0D8] bg-[#F8F6F2] text-[#6F675B]'
                     }`}>
                       {mag.status === 'published' ? 'Publié' : mag.status === 'archived' ? 'Archivé' : 'Brouillon'}
                     </span>
                   </div>
-                  <p className="text-xs text-gray-500 truncate">{mag.description || 'Pas de description'}</p>
-                  <div className="flex items-center gap-4 mt-2 text-xs text-gray-400">
+                  <p className="truncate text-sm text-[#6F675B]">{mag.description || 'Pas de description'}</p>
+                  <div className="mt-2 flex items-center gap-4 text-xs text-[#9A9A8A]">
                     <span>{mag.page_count} pages</span>
                     <span>{mag.price?.toFixed(2)} €</span>
                     <span>/{mag.slug}</span>
                   </div>
                 </div>
 
-                {/* Actions */}
                 <div className="flex items-center gap-2 shrink-0">
                   <button
                     onClick={() => togglePublish(mag)}
-                    className={`flex items-center px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                    className={`inline-flex items-center rounded-2xl border px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] transition-colors ${
                       mag.status === 'published'
-                        ? 'border-amber-300 text-amber-700 hover:bg-amber-50'
-                        : 'border-green-300 text-green-700 hover:bg-green-50'
+                        ? 'border-[#C9A84C]/35 text-[#6D5622] hover:bg-[#FBF7ED]'
+                        : 'border-[#D9D1C2] text-[#0A0A0A] hover:bg-[#F5F3EF]'
                     }`}
                   >
                     {mag.status === 'published' ? <><EyeOff size={12} className="mr-1.5" /> Dépublier</> : <><Eye size={12} className="mr-1.5" /> Publier</>}
                   </button>
                   <button
                     onClick={() => startEditMagazine(mag)}
-                    className="flex items-center px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
+                    className={adminSecondaryButtonClass}
                   >
                     Modifier
                   </button>
                   <button
                     onClick={() => handleDelete(mag.id)}
                     disabled={deletingId === mag.id}
-                    className="flex items-center px-2 py-1.5 rounded-lg text-xs font-medium text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
+                    className="inline-flex items-center rounded-2xl px-2 py-2 text-[#7C2D2D] transition-colors hover:bg-[#FBF1F0] disabled:opacity-50"
                   >
                     {deletingId === mag.id ? <RefreshCw size={14} className="animate-spin" /> : <Trash2 size={14} />}
                   </button>

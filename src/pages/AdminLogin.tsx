@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Shield, Mail, Lock, ArrowRight, AlertCircle } from 'lucide-react';
+import { AdminAlert, adminInputClass, adminPrimaryButtonClass } from '../components/AdminPrimitives';
 
 export default function AdminLogin() {
   const { user, loading, signIn } = useAuth();
@@ -35,36 +36,42 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center px-4">
+    <div className="min-h-screen bg-[#F6F1E8] px-4">
+      <div className="absolute inset-x-0 top-0 h-72 bg-[radial-gradient(circle_at_top,rgba(201,168,76,0.14),transparent_60%)]" />
+      <div className="relative flex min-h-screen items-center justify-center">
       <div className="w-full max-w-md">
-        {/* Header */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-600/10 mb-6">
+          <div className="mb-4 text-[10px] uppercase tracking-[0.34em] text-[#9A9A8A]">
+            Administration AFRIKHER
+          </div>
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-[1.75rem] border border-[#C9A84C]/25 bg-white mb-6 shadow-sm">
             <Shield size={36} className="text-[#C9A84C]" />
           </div>
-          <h1 className="text-3xl font-sans font-bold text-slate-900 tracking-wide">AFRIKHER</h1>
-          <p className="text-[#C9A84C] text-xs uppercase tracking-[0.3em] mt-2 font-bold">
+          <h1 className="font-display text-4xl font-semibold tracking-[0.08em] text-[#0A0A0A]">AFRIKHER</h1>
+          <p className="mt-3 text-xs uppercase tracking-[0.3em] text-[#C9A84C]">
             Portail Administrateur
           </p>
-          <div className="mt-6 px-6 py-3 bg-green-600/10 border border-slate-300 rounded-xl inline-block">
-            <p className="text-[#C9A84C] text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+          <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-[#6F675B]">
+            Un espace reserve a l’equipe pour piloter les contenus, l’image de marque et les activations editoriales.
+          </p>
+          <div className="mt-6 inline-block rounded-2xl border border-[#C9A84C]/25 bg-[#FBF7ED] px-6 py-3">
+            <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-[#6D5622]">
               <AlertCircle size={14} />
               Accès strictement réservé aux administrateurs
             </p>
           </div>
         </div>
 
-        {/* Login Form */}
-        <form onSubmit={handleSubmit} className="bg-white shadow-lg border border-slate-200 rounded-3xl p-8 space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6 rounded-[2rem] border border-[#E9E2D6] bg-white p-8 shadow-[0_24px_80px_rgba(10,10,10,0.08)]">
           {error && (
-            <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-5 py-4 rounded-xl text-sm flex items-start gap-3">
+            <AdminAlert tone="error" className="items-start">
               <AlertCircle size={18} className="flex-shrink-0 mt-0.5" />
               <span>{error}</span>
-            </div>
+            </AdminAlert>
           )}
 
           <div className="space-y-2">
-            <label className="text-[10px] uppercase tracking-widest text-[#9A9A8A] font-bold block">
+            <label className="block text-[10px] font-semibold uppercase tracking-[0.28em] text-[#9A9A8A]">
               Email administrateur
             </label>
             <div className="relative">
@@ -75,13 +82,13 @@ export default function AdminLogin() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 placeholder="admin@afrikher.com"
-                className="w-full pl-12 pr-4 py-4 bg-white border border-slate-300 rounded-xl text-slate-900 text-sm focus:outline-none focus:border-green-500 transition-colors placeholder:text-slate-400"
+                className={`${adminInputClass} rounded-2xl pl-12 py-4`}
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-[10px] uppercase tracking-widest text-[#9A9A8A] font-bold block">
+            <label className="block text-[10px] font-semibold uppercase tracking-[0.28em] text-[#9A9A8A]">
               Mot de passe
             </label>
             <div className="relative">
@@ -92,7 +99,7 @@ export default function AdminLogin() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 placeholder="••••••••"
-                className="w-full pl-12 pr-4 py-4 bg-white border border-slate-300 rounded-xl text-slate-900 text-sm focus:outline-none focus:border-green-500 transition-colors placeholder:text-slate-400"
+                className={`${adminInputClass} rounded-2xl pl-12 py-4`}
               />
             </div>
           </div>
@@ -100,10 +107,10 @@ export default function AdminLogin() {
           <button
             type="submit"
             disabled={submitting || !email || !password}
-            className="w-full py-4 bg-green-600 text-[#0A0A0A] rounded-xl text-sm uppercase tracking-widest font-bold hover:bg-green-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className={`${adminPrimaryButtonClass} w-full justify-center rounded-2xl py-4`}
           >
             {submitting ? (
-              <div className="w-5 h-5 border-2 border-white border-t-transparent animate-spin rounded-full" />
+              <div className="h-5 w-5 rounded-full border-2 border-[#F5F0E8] border-t-transparent animate-spin" />
             ) : (
               <>
                 Se connecter
@@ -113,9 +120,10 @@ export default function AdminLogin() {
           </button>
         </form>
 
-        <p className="text-center text-[#9A9A8A] text-xs mt-8">
+        <p className="mt-8 text-center text-xs text-[#9A9A8A]">
           &copy; {new Date().getFullYear()} AFRIKHER — Tous droits réservés
         </p>
+      </div>
       </div>
     </div>
   );

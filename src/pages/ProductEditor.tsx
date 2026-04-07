@@ -14,6 +14,15 @@ import {
 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { cn } from '../lib/utils';
+import {
+  AdminIconBadge,
+  AdminSectionHeader,
+  AdminSectionShell,
+  adminGhostButtonClass,
+  adminInputClass,
+  adminPrimaryButtonClass,
+  adminTextareaClass,
+} from '../components/AdminPrimitives';
 
 export default function ProductEditor() {
   const navigate = useNavigate();
@@ -46,19 +55,22 @@ export default function ProductEditor() {
     <div className="max-w-6xl mx-auto space-y-8 animate-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <button onClick={() => navigate(-1)} className="p-2 hover:bg-white rounded-full transition-colors text-gray-400 hover:text-slate-900">
+          <button onClick={() => navigate(-1)} className={`${adminGhostButtonClass} rounded-2xl px-3 py-2 text-[11px]`}>
             <ChevronLeft size={24} />
           </button>
-          <h1 className="text-3xl font-sans font-bold text-slate-900">
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.3em] text-[#9A9A8A]">Edition boutique</p>
+            <h1 className="mt-2 font-display text-4xl font-semibold text-[#0A0A0A]">
             {isEditing ? 'Modifier le produit' : 'Nouveau produit'}
-          </h1>
+            </h1>
+          </div>
         </div>
         <div className="flex items-center space-x-3">
           <button 
             onClick={() => handleSave()}
-            className="flex items-center px-8 py-3.5 bg-white text-slate-900 rounded-2xl hover:bg-slate-100 transition-all font-bold tracking-wide shadow-lg shadow-slate-200"
+            className={adminPrimaryButtonClass}
           >
-            <Save size={20} className="mr-2 text-green-600" />
+            <Save size={18} className="mr-2" />
             Enregistrer le produit
           </button>
         </div>
@@ -66,98 +78,114 @@ export default function ProductEditor() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
-          <div className="bg-white p-8 rounded-[32px] border border-gray-50 shadow-sm space-y-6">
-            <h3 className="text-xl font-sans font-bold text-slate-900 border-b border-gray-50 pb-4">Informations Générales</h3>
+          <AdminSectionShell>
+            <AdminSectionHeader
+              eyebrow="Informations generales"
+              title="Identite produit"
+              description="Cadrez le nom, la promesse et le vocabulaire du produit dans une logique plus editoriale que marchande."
+            />
             
-            <div className="space-y-4">
+            <div className="space-y-4 p-8">
               <div>
-                <label className="block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">Nom du produit</label>
+                <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.24em] text-[#9A9A8A]">Nom du produit</label>
                 <input 
                   type="text" 
                   placeholder="Ex: Huile de Baobab Pure" 
-                  className="w-full p-4 bg-gray-50 border-none rounded-2xl text-sm focus:bg-white focus:ring-2 focus:ring-green-500/20 outline-none transition-all"
+                  className={`${adminInputClass} rounded-2xl`}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 />
               </div>
               
               <div>
-                <label className="block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">Description</label>
+                <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.24em] text-[#9A9A8A]">Description</label>
                 <textarea 
                   placeholder="Décrivez les bienfaits, l'utilisation et la composition..." 
-                  className="w-full h-48 p-4 bg-gray-50 border-none rounded-2xl text-sm focus:bg-white focus:ring-2 focus:ring-green-500/20 outline-none transition-all resize-none"
+                  className={`${adminTextareaClass} h-48 rounded-2xl`}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                 />
               </div>
             </div>
-          </div>
+          </AdminSectionShell>
 
-          <div className="bg-white p-8 rounded-[32px] border border-gray-50 shadow-sm space-y-6">
-            <h3 className="text-xl font-sans font-bold text-slate-900 border-b border-gray-50 pb-4">Médias</h3>
+          <AdminSectionShell>
+            <AdminSectionHeader
+              eyebrow="Visuels"
+              title="Mise en scene des medias"
+              description="Travaillez les images du produit comme un asset de marque, pas comme un simple fichier catalogue."
+            />
             
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 gap-4 p-8 md:grid-cols-4">
               {images.map((img, i) => (
-                <div key={i} className="aspect-square rounded-2xl overflow-hidden relative group border border-gray-100">
+                <div key={i} className="relative aspect-square overflow-hidden rounded-2xl border border-[#E5E0D8] bg-[#F8F6F2]">
                   <img src={img} alt="" className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-white/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <button onClick={() => removeImage(i)} className="p-2 bg-white rounded-full text-red-500 shadow-lg"><Trash2 size={16} /></button>
+                    <button onClick={() => removeImage(i)} className="rounded-full bg-white p-2 text-[#7C2D2D] shadow-lg"><Trash2 size={16} /></button>
                   </div>
                 </div>
               ))}
               <button 
                 onClick={addImage}
-                className="aspect-square rounded-2xl border-2 border-dashed border-gray-200 hover:border-gold/30 hover:bg-green-50 transition-all flex flex-col items-center justify-center text-gray-400 hover:text-green-600"
+                className="flex aspect-square flex-col items-center justify-center rounded-2xl border border-dashed border-[#C9A84C]/35 bg-[#FBF8F2] text-[#6F675B] transition-all hover:border-[#C9A84C] hover:bg-white hover:text-[#0A0A0A]"
               >
                 <Plus size={24} className="mb-2" />
                 <span className="text-[10px] font-bold uppercase tracking-wider">Ajouter</span>
               </button>
             </div>
-          </div>
+          </AdminSectionShell>
 
-          <div className="bg-white p-8 rounded-[32px] border border-gray-50 shadow-sm space-y-6">
-            <h3 className="text-xl font-sans font-bold text-slate-900 border-b border-gray-50 pb-4">Inventaire & Prix</h3>
+          <AdminSectionShell>
+            <AdminSectionHeader
+              eyebrow="Structure commerciale"
+              title="Prix & disponibilite"
+              description="Conservez une lecture simple et premium des informations de vente et de disponibilite."
+            />
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 p-8 md:grid-cols-2">
               <div>
-                <label className="block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">Prix de vente (€)</label>
+                <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.24em] text-[#9A9A8A]">Prix de vente (€)</label>
                 <div className="relative">
-                  <DollarSign size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" />
+                  <DollarSign size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9A9A8A]" />
                   <input 
                     type="number" 
                     placeholder="0.00" 
-                    className="w-full pl-12 pr-6 py-4 bg-gray-50 border-none rounded-2xl text-sm focus:bg-white focus:ring-2 focus:ring-green-500/20 outline-none transition-all"
+                    className={`${adminInputClass} rounded-2xl pl-12 pr-6 py-4`}
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">Stock initial</label>
+                <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.24em] text-[#9A9A8A]">Stock initial</label>
                 <div className="relative">
-                  <Package size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" />
+                  <Package size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9A9A8A]" />
                   <input 
                     type="number" 
                     placeholder="0" 
-                    className="w-full pl-12 pr-6 py-4 bg-gray-50 border-none rounded-2xl text-sm focus:bg-white focus:ring-2 focus:ring-green-500/20 outline-none transition-all"
+                    className={`${adminInputClass} rounded-2xl pl-12 pr-6 py-4`}
                     value={stock}
                     onChange={(e) => setStock(e.target.value)}
                   />
                 </div>
               </div>
             </div>
-          </div>
+          </AdminSectionShell>
         </div>
 
         <div className="space-y-8">
-          <div className="bg-white p-8 rounded-[32px] border border-gray-50 shadow-sm space-y-6">
-            <h3 className="text-xl font-sans font-bold text-slate-900 border-b border-gray-50 pb-4">Organisation</h3>
+          <AdminSectionShell>
+            <AdminSectionHeader
+              eyebrow="Organisation"
+              title="Cadre de diffusion"
+              description="Choisissez la famille du produit et le niveau de visibilite sans basculer dans un panneau trop technique."
+            />
             
-            <div className="space-y-6">
+            <div className="space-y-6 p-8">
               <div>
-                <label className="block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">Catégorie</label>
+                <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.24em] text-[#9A9A8A]">Catégorie</label>
                 <select 
-                  className="w-full p-4 bg-gray-50 border-none rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-green-500/20"
+                  className={`${adminInputClass} rounded-2xl font-semibold`}
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
                 >
@@ -173,43 +201,46 @@ export default function ProductEditor() {
                 <label className="block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">Statut du produit</label>
                 <div className="space-y-2">
                   {[
-                    { id: 'active', label: 'Actif', desc: 'Visible sur la boutique', color: 'bg-emerald-500' },
-                    { id: 'draft', label: 'Brouillon', desc: 'Masqué pour le moment', color: 'bg-green-600' },
-                    { id: 'archived', label: 'Archivé', desc: 'Retiré de la vente', color: 'bg-gray-400' },
+                    { id: 'active', label: 'Actif', desc: 'Visible sur la boutique' },
+                    { id: 'draft', label: 'Brouillon', desc: 'Masqué pour le moment' },
+                    { id: 'archived', label: 'Archivé', desc: 'Retiré de la vente' },
                   ].map((s) => (
                     <button
                       key={s.id}
                       onClick={() => setStatus(s.id)}
                       className={cn(
-                        "w-full p-4 rounded-2xl border text-left transition-all flex items-center justify-between",
-                        status === s.id ? "border-gold bg-green-50" : "border-gray-50 hover:border-gray-200"
+                        "flex w-full items-center justify-between rounded-2xl border p-4 text-left transition-all",
+                        status === s.id ? "border-[#C9A84C]/35 bg-[#FBF7ED]" : "border-[#E5E0D8] bg-[#F8F6F2] hover:border-[#D6CCBC]"
                       )}
                     >
                       <div>
-                        <p className="text-sm font-bold text-slate-900">{s.label}</p>
-                        <p className="text-[10px] text-gray-400">{s.desc}</p>
+                        <p className="text-sm font-bold text-[#0A0A0A]">{s.label}</p>
+                        <p className="text-[10px] text-[#9A9A8A]">{s.desc}</p>
                       </div>
-                      {status === s.id && <Check size={18} className="text-green-600" />}
+                      {status === s.id && <Check size={18} className="text-[#C9A84C]" />}
                     </button>
                   ))}
                 </div>
               </div>
             </div>
-          </div>
+          </AdminSectionShell>
 
-          <div className="bg-white p-8 rounded-[32px] text-slate-900 space-y-6 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-green-50 rounded-full -mr-16 -mt-16 blur-3xl" />
-            <h3 className="text-xl font-sans font-bold text-green-600 relative z-10">Aide & Conseils</h3>
-            <div className="space-y-4 relative z-10">
+          <div className="relative overflow-hidden rounded-[2rem] border border-[#C9A84C]/20 bg-[#FBF7ED] p-8 text-[#0A0A0A]">
+            <div className="absolute right-0 top-0 -mr-16 -mt-16 h-32 w-32 rounded-full bg-[#C9A84C]/10 blur-3xl" />
+            <div className="relative z-10 flex items-center gap-4">
+              <AdminIconBadge icon={Info} />
+              <h3 className="font-display text-2xl font-semibold text-[#0A0A0A]">Aide & Conseils</h3>
+            </div>
+            <div className="relative z-10 mt-6 space-y-4">
               <div className="flex space-x-3">
-                <Info size={18} className="text-green-600 shrink-0 mt-1" />
-                <p className="text-xs text-gray-300 leading-relaxed">
+                <Info size={18} className="mt-1 shrink-0 text-[#C9A84C]" />
+                <p className="text-xs leading-relaxed text-[#6F675B]">
                   Utilisez des images haute résolution (min. 1000x1000px) sur fond neutre pour un rendu premium.
                 </p>
               </div>
               <div className="flex space-x-3">
-                <Info size={18} className="text-green-600 shrink-0 mt-1" />
-                <p className="text-xs text-gray-300 leading-relaxed">
+                <Info size={18} className="mt-1 shrink-0 text-[#C9A84C]" />
+                <p className="text-xs leading-relaxed text-[#6F675B]">
                   Une description détaillée améliore votre référencement naturel (SEO).
                 </p>
               </div>

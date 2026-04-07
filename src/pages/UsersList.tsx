@@ -2,6 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Search, Shield, Calendar, RefreshCw, UserPlus, Check, X, Ban, Pause, Play } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { supabase } from '../lib/supabase';
+import {
+  AdminAlert,
+  AdminIconBadge,
+  adminGhostButtonClass,
+  adminInputClass,
+  adminPrimaryButtonClass,
+  adminSecondaryButtonClass,
+} from '../components/AdminPrimitives';
 
 interface UserProfile {
   id: string;
@@ -237,12 +245,12 @@ export default function UsersList({ pageType }: UsersListProps) {
   };
 
   const getRoleBadge = (role: string, isBlocked: boolean) => {
-    if (isBlocked) return { label: 'Bloque', className: 'bg-red-50 text-red-600' };
+    if (isBlocked) return { label: 'Bloque', className: 'border-[#7C2D2D]/18 bg-[#FBF1F0] text-[#7C2D2D]' };
     switch (role) {
-      case 'partner': return { label: 'Actif', className: 'bg-green-50 text-green-600' };
-      case 'pending_partner': return { label: 'En attente', className: 'bg-orange-50 text-orange-500' };
-      case 'rejected_partner': return { label: 'Refuse', className: 'bg-red-50 text-red-500' };
-      default: return { label: role, className: 'bg-gray-50 text-gray-500' };
+      case 'partner': return { label: 'Actif', className: 'border-[#C9A84C]/30 bg-[#FBF7ED] text-[#6D5622]' };
+      case 'pending_partner': return { label: 'En attente', className: 'border-[#D9D1C2] bg-[#F5F3EF] text-[#6F675B]' };
+      case 'rejected_partner': return { label: 'Refuse', className: 'border-[#7C2D2D]/18 bg-[#FBF1F0] text-[#7C2D2D]' };
+      default: return { label: role, className: 'border-[#E5E0D8] bg-[#F8F6F2] text-[#6F675B]' };
     }
   };
 
@@ -250,8 +258,11 @@ export default function UsersList({ pageType }: UsersListProps) {
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="flex items-end justify-between">
         <div>
-          <h1 className="text-4xl font-sans font-bold text-slate-900">{pageTitle}</h1>
-          <p className="text-gray-400 text-sm mt-1">
+          <p className="text-[10px] uppercase tracking-[0.32em] text-[#9A9A8A]">
+            {isReadersPage ? 'Audience & comptes' : 'Réseau & profils'}
+          </p>
+          <h1 className="mt-3 font-display text-5xl font-semibold text-[#0A0A0A]">{pageTitle}</h1>
+          <p className="mt-3 text-sm leading-relaxed text-[#6F675B]">
             {users.length} {pageTitle.toLowerCase()} — {pageDescription}
           </p>
         </div>
@@ -259,7 +270,7 @@ export default function UsersList({ pageType }: UsersListProps) {
           {!isReadersPage && (
             <button
               onClick={() => setShowAddModal(true)}
-              className="flex items-center px-6 py-3 bg-green-600 text-slate-900 rounded-2xl hover:bg-green-600/90 transition-all font-bold tracking-wide shadow-lg shadow-gold/10"
+              className={adminPrimaryButtonClass}
             >
               <UserPlus size={18} className="mr-2" />
               Ajouter
@@ -267,29 +278,31 @@ export default function UsersList({ pageType }: UsersListProps) {
           )}
           <button
             onClick={fetchUsers}
-            className="flex items-center px-6 py-3 bg-white text-slate-900 rounded-2xl hover:bg-slate-100 transition-all font-bold tracking-wide shadow-lg shadow-slate-200"
+            className={adminGhostButtonClass}
           >
-            <RefreshCw size={18} className="mr-2 text-green-600" />
+            <RefreshCw size={18} className="mr-2" />
             Actualiser
           </button>
         </div>
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-2xl text-sm">{error}</div>
+        <AdminAlert tone="error">
+          <p className="text-sm">{error}</p>
+        </AdminAlert>
       )}
 
       {/* Filters */}
-      <div className="bg-white p-6 rounded-[32px] border border-gray-50 shadow-sm flex flex-wrap items-center justify-between gap-6">
+      <div className="flex flex-wrap items-center justify-between gap-6 rounded-[2rem] border border-[#E9E2D6] bg-white p-6 shadow-sm">
         <div className="flex items-center space-x-4 flex-1 min-w-[300px]">
           <div className="relative flex-1">
-            <Search size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300" />
+            <Search size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-[#9A9A8A]" />
             <input
               type="text"
               placeholder="Rechercher par nom, email, entreprise..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-14 pr-6 py-4 bg-gray-50 border-none rounded-2xl text-sm focus:bg-white focus:ring-2 focus:ring-green-500/20 outline-none transition-all placeholder:text-gray-300"
+              className={`${adminInputClass} rounded-2xl py-4 pl-14`}
             />
           </div>
           {!isReadersPage && (
@@ -304,10 +317,10 @@ export default function UsersList({ pageType }: UsersListProps) {
                   key={f.key}
                   onClick={() => setStatusFilter(f.key)}
                   className={cn(
-                    "text-xs px-3 py-1.5 rounded-lg font-bold transition-all",
+                    "rounded-2xl px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] transition-all",
                     statusFilter === f.key
-                      ? "bg-green-600/20 text-green-600"
-                      : "bg-gray-50 text-gray-400 hover:bg-gray-100"
+                      ? "border border-[#C9A84C]/30 bg-[#FBF7ED] text-[#6D5622]"
+                      : "border border-[#E5E0D8] bg-[#F8F6F2] text-[#6F675B] hover:border-[#D6CCBC]"
                   )}
                 >
                   {f.label} ({f.count})
@@ -319,12 +332,12 @@ export default function UsersList({ pageType }: UsersListProps) {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-[32px] border border-gray-50 shadow-sm overflow-hidden">
+      <div className="overflow-hidden rounded-[2rem] border border-[#E9E2D6] bg-white shadow-sm">
         <table className="w-full text-left">
-          <thead className="bg-gray-50/50 text-[10px] uppercase tracking-widest font-bold text-gray-400">
+          <thead className="bg-[#FBF8F2] text-[10px] font-semibold uppercase tracking-[0.24em] text-[#9A9A8A]">
             <tr>
               <th className="px-8 py-6 w-12">
-                <input type="checkbox" className="rounded-md border-gray-200 text-green-600 focus:ring-gold w-4 h-4" />
+                <input type="checkbox" className="h-4 w-4 rounded-md border-[#D9D1C2] text-[#C9A84C]" />
               </th>
               <th className="px-6 py-6">Utilisateur</th>
               {!isReadersPage && <th className="px-6 py-6">Entreprise</th>}
@@ -333,7 +346,7 @@ export default function UsersList({ pageType }: UsersListProps) {
               <th className="px-6 py-6 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-50">
+          <tbody className="divide-y divide-[#F1ECE4]">
             {loading ? (
               <tr>
                 <td colSpan={isReadersPage ? 5 : 6} className="px-10 py-20 text-center">
@@ -342,7 +355,7 @@ export default function UsersList({ pageType }: UsersListProps) {
               </tr>
             ) : filteredUsers.length === 0 ? (
               <tr>
-                <td colSpan={isReadersPage ? 5 : 6} className="px-10 py-20 text-center text-gray-400">
+                <td colSpan={isReadersPage ? 5 : 6} className="px-10 py-20 text-center text-[#6F675B]">
                   {searchQuery ? 'Aucun resultat.' : `Aucun ${isReadersPage ? 'lecteur' : 'partenaire'}.`}
                 </td>
               </tr>
@@ -350,36 +363,36 @@ export default function UsersList({ pageType }: UsersListProps) {
               const badge = getRoleBadge(user.role, user.is_blocked);
               const isActionLoading = actionLoading === user.id;
               return (
-                <tr key={user.id} className="hover:bg-gray-50/50 transition-colors group">
+                <tr key={user.id} className="group transition-colors hover:bg-[#FBF8F2]">
                   <td className="px-8 py-5">
-                    <input type="checkbox" className="rounded-md border-gray-200 text-green-600 focus:ring-gold w-4 h-4" />
+                    <input type="checkbox" className="h-4 w-4 rounded-md border-[#D9D1C2] text-[#C9A84C]" />
                   </td>
                   <td className="px-6 py-5">
                     <div className="flex items-center space-x-4">
-                      <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center text-green-600 font-bold text-sm">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#C9A84C]/25 bg-[#FBF7ED] font-semibold text-sm text-[#6D5622]">
                         {(user.full_name || user.email || '?').charAt(0).toUpperCase()}
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-slate-900">{user.full_name || 'Sans nom'}</p>
-                        <p className="text-[10px] text-gray-400 mt-0.5">{user.email || user.id.slice(0, 12)}</p>
+                        <p className="font-display text-xl font-semibold text-[#0A0A0A]">{user.full_name || 'Sans nom'}</p>
+                        <p className="mt-0.5 text-[11px] text-[#9A9A8A]">{user.email || user.id.slice(0, 12)}</p>
                       </div>
                     </div>
                   </td>
                   {!isReadersPage && (
                     <td className="px-6 py-5">
                       <div>
-                        <p className="text-sm text-slate-900">{user.company_name || '—'}</p>
-                        {user.sector && <p className="text-[10px] text-gray-400">{user.sector}</p>}
+                        <p className="text-sm text-[#0A0A0A]">{user.company_name || '—'}</p>
+                        {user.sector && <p className="text-[10px] uppercase tracking-[0.18em] text-[#9A9A8A]">{user.sector}</p>}
                       </div>
                     </td>
                   )}
                   <td className="px-6 py-5">
-                    <span className={cn("text-[10px] px-3 py-1.5 rounded-lg font-bold uppercase tracking-wider", badge.className)}>
+                    <span className={cn("rounded-full border px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.22em]", badge.className)}>
                       {badge.label}
                     </span>
                   </td>
                   <td className="px-6 py-5">
-                    <span className="text-xs text-gray-400">
+                    <span className="text-xs text-[#9A9A8A]">
                       {user.created_at ? new Date(user.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
                     </span>
                   </td>
@@ -393,14 +406,14 @@ export default function UsersList({ pageType }: UsersListProps) {
                             <>
                               <button
                                 onClick={() => validatePartner(user.id)}
-                                className="p-2 bg-green-50 text-green-600 rounded-xl hover:bg-green-100 transition-all"
+                                className="rounded-2xl border border-[#C9A84C]/30 bg-[#FBF7ED] p-2 text-[#6D5622] transition-all hover:bg-[#F7EED9]"
                                 title="Valider"
                               >
                                 <Check size={16} />
                               </button>
                               <button
                                 onClick={() => rejectPartner(user.id)}
-                                className="p-2 bg-red-50 text-red-500 rounded-xl hover:bg-red-100 transition-all"
+                                className="rounded-2xl border border-[#7C2D2D]/18 bg-[#FBF1F0] p-2 text-[#7C2D2D] transition-all hover:bg-[#F7E6E4]"
                                 title="Refuser"
                               >
                                 <X size={16} />
@@ -410,10 +423,10 @@ export default function UsersList({ pageType }: UsersListProps) {
                           <button
                             onClick={() => toggleBlock(user.id, user.is_blocked)}
                             className={cn(
-                              "p-2 rounded-xl transition-all",
+                              "rounded-2xl border p-2 transition-all",
                               user.is_blocked
-                                ? "bg-green-50 text-green-600 hover:bg-green-100"
-                                : "bg-red-50 text-red-500 hover:bg-red-100"
+                                ? "border-[#C9A84C]/30 bg-[#FBF7ED] text-[#6D5622] hover:bg-[#F7EED9]"
+                                : "border-[#7C2D2D]/18 bg-[#FBF1F0] text-[#7C2D2D] hover:bg-[#F7E6E4]"
                             )}
                             title={user.is_blocked ? 'Debloquer' : 'Bloquer'}
                           >
@@ -428,8 +441,8 @@ export default function UsersList({ pageType }: UsersListProps) {
             })}
           </tbody>
         </table>
-        <div className="p-6 bg-gray-50/30 border-t border-gray-50 flex items-center justify-between">
-          <p className="text-xs text-gray-400">
+        <div className="flex items-center justify-between border-t border-[#F1ECE4] bg-[#FBF8F2] p-6">
+          <p className="text-xs text-[#9A9A8A]">
             {filteredUsers.length} affiche{filteredUsers.length !== 1 ? 's' : ''}
             {searchQuery || statusFilter !== 'all' ? ` (sur ${users.length} total)` : ''}
           </p>
@@ -440,56 +453,56 @@ export default function UsersList({ pageType }: UsersListProps) {
       {showAddModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowAddModal(false)} />
-          <div className="relative bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl">
-            <h2 className="text-2xl font-sans font-bold mb-6">Ajouter un partenaire</h2>
+          <div className="relative w-full max-w-md rounded-[2rem] border border-[#E9E2D6] bg-white p-8 shadow-2xl">
+            <h2 className="mb-6 font-display text-3xl font-semibold text-[#0A0A0A]">Ajouter un partenaire</h2>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Nom complet *</label>
+                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.22em] text-[#9A9A8A]">Nom complet *</label>
                 <input
                   type="text"
                   value={addForm.full_name}
                   onChange={(e) => setAddForm(f => ({ ...f, full_name: e.target.value }))}
-                  className="w-full px-4 py-3 bg-gray-50 rounded-xl text-sm focus:ring-2 focus:ring-green-500/20 outline-none"
+                  className={`${adminInputClass} rounded-2xl`}
                   placeholder="Prenom Nom"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Email *</label>
+                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.22em] text-[#9A9A8A]">Email *</label>
                 <input
                   type="email"
                   value={addForm.email}
                   onChange={(e) => setAddForm(f => ({ ...f, email: e.target.value }))}
-                  className="w-full px-4 py-3 bg-gray-50 rounded-xl text-sm focus:ring-2 focus:ring-green-500/20 outline-none"
+                  className={`${adminInputClass} rounded-2xl`}
                   placeholder="email@exemple.com"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Mot de passe par defaut</label>
+                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.22em] text-[#9A9A8A]">Mot de passe par defaut</label>
                 <input
                   type="text"
                   value={addForm.password}
                   onChange={(e) => setAddForm(f => ({ ...f, password: e.target.value }))}
-                  className="w-full px-4 py-3 bg-gray-50 rounded-xl text-sm focus:ring-2 focus:ring-green-500/20 outline-none"
+                  className={`${adminInputClass} rounded-2xl`}
                 />
-                <p className="text-[10px] text-gray-400 mt-1">Le partenaire pourra modifier son mot de passe.</p>
+                <p className="mt-1 text-[10px] text-[#9A9A8A]">Le partenaire pourra modifier son mot de passe.</p>
               </div>
               <div>
-                <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Entreprise</label>
+                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.22em] text-[#9A9A8A]">Entreprise</label>
                 <input
                   type="text"
                   value={addForm.company_name}
                   onChange={(e) => setAddForm(f => ({ ...f, company_name: e.target.value }))}
-                  className="w-full px-4 py-3 bg-gray-50 rounded-xl text-sm focus:ring-2 focus:ring-green-500/20 outline-none"
+                  className={`${adminInputClass} rounded-2xl`}
                   placeholder="Nom de l'entreprise"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Secteur</label>
+                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.22em] text-[#9A9A8A]">Secteur</label>
                 <select
                   value={addForm.sector}
                   onChange={(e) => setAddForm(f => ({ ...f, sector: e.target.value }))}
-                  className="w-full px-4 py-3 bg-gray-50 rounded-xl text-sm focus:ring-2 focus:ring-green-500/20 outline-none"
+                  className={`${adminInputClass} rounded-2xl`}
                 >
                   <option value="">Selectionner un secteur</option>
                   <option value="FinTech">FinTech</option>
@@ -503,16 +516,16 @@ export default function UsersList({ pageType }: UsersListProps) {
                 </select>
               </div>
 
-              {addError && <p className="text-red-500 text-xs">{addError}</p>}
+              {addError && <p className="text-xs text-[#7C2D2D]">{addError}</p>}
 
               <div className="flex gap-3 pt-4">
                 <button
                   onClick={handleAddPartner}
                   disabled={addLoading}
-                  className="flex-1 py-3 bg-white text-slate-900 rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-slate-100 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  className={`${adminPrimaryButtonClass} flex-1 justify-center py-3 disabled:opacity-50`}
                 >
                   {addLoading ? (
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent animate-spin rounded-full" />
+                    <div className="h-4 w-4 rounded-full border-2 border-[#F5F0E8] border-t-transparent animate-spin" />
                   ) : (
                     <>
                       <UserPlus size={16} />
@@ -522,7 +535,7 @@ export default function UsersList({ pageType }: UsersListProps) {
                 </button>
                 <button
                   onClick={() => setShowAddModal(false)}
-                  className="px-6 py-3 border border-gray-200 rounded-xl text-sm text-gray-500 hover:bg-gray-50 transition-all"
+                  className={`${adminSecondaryButtonClass} px-6 py-3`}
                 >
                   Annuler
                 </button>

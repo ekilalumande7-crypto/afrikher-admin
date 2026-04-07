@@ -1,6 +1,15 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Save, RefreshCw, Check, AlertCircle, ExternalLink, Plus, Trash2, GripVertical } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import {
+  AdminAlert,
+  AdminFieldRow,
+  AdminSectionHeader,
+  AdminSectionShell,
+  adminGhostButtonClass,
+  adminInputClass,
+  adminTextareaClass,
+} from '../components/AdminPrimitives';
 
 interface SiteConfigMap {
   [key: string]: string;
@@ -9,30 +18,6 @@ interface SiteConfigMap {
 interface FaqItem {
   question: string;
   answer: string;
-}
-
-// ========================================
-// Sub-components defined OUTSIDE the main component
-// to prevent focus loss on re-render
-// ========================================
-
-function FieldRow({ label, description, children, noBorder }: {
-  label: string;
-  description?: string;
-  children: React.ReactNode;
-  noBorder?: boolean;
-}) {
-  return (
-    <div className={`py-6 ${noBorder ? '' : 'border-b border-gray-100'}`}>
-      <div className="flex items-start justify-between gap-8">
-        <div className="w-72 shrink-0">
-          <p className="text-sm font-semibold text-gray-900">{label}</p>
-          {description && <p className="text-sm text-gray-500 mt-1">{description}</p>}
-        </div>
-        <div className="flex-1">{children}</div>
-      </div>
-    </div>
-  );
 }
 
 function FeatureEditor({ features, onUpdate, onRemove, onAdd }: {
@@ -45,17 +30,17 @@ function FeatureEditor({ features, onUpdate, onRemove, onAdd }: {
     <div className="space-y-2">
       {features.map((feature, i) => (
         <div key={i} className="flex items-center gap-2">
-          <GripVertical size={14} className="text-gray-300 shrink-0" />
+          <GripVertical size={14} className="shrink-0 text-[#C9A84C]" />
           <input
             type="text"
             value={feature}
             onChange={(e) => onUpdate(i, e.target.value)}
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className={`${adminInputClass} flex-1 px-3 py-2`}
             placeholder="Avantage..."
           />
           <button
             onClick={() => onRemove(i)}
-            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+            className="p-2 text-[#9A9A8A] transition-colors hover:bg-[#FBF1F0] hover:text-[#7C2D2D]"
           >
             <Trash2 size={14} />
           </button>
@@ -63,7 +48,7 @@ function FeatureEditor({ features, onUpdate, onRemove, onAdd }: {
       ))}
       <button
         onClick={onAdd}
-        className="flex items-center gap-2 px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+        className="inline-flex items-center gap-2 border border-[#C9A84C]/30 bg-[#FBF7ED] px-3 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#6D5622] transition-all hover:border-[#C9A84C] hover:text-[#0A0A0A]"
       >
         <Plus size={14} /> Ajouter un avantage
       </button>
@@ -80,33 +65,33 @@ function FaqEditor({ items, onUpdateItem, onRemoveItem, onAddItem }: {
   return (
     <div className="space-y-4">
       {items.map((item, i) => (
-        <div key={i} className="p-4 border border-gray-200 rounded-xl bg-gray-50 space-y-3">
+        <div key={i} className="space-y-3 border border-[#0A0A0A]/10 bg-[#F8F4EC] p-5">
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1 space-y-3">
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Question</label>
+                <label className="mb-2 block text-[10px] uppercase tracking-[0.24em] text-[#9A9A8A]">Question</label>
                 <input
                   type="text"
                   value={item.question}
                   onChange={(e) => onUpdateItem(i, 'question', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                  className={adminInputClass}
                   placeholder="Ex: Puis-je annuler à tout moment ?"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Réponse</label>
+                <label className="mb-2 block text-[10px] uppercase tracking-[0.24em] text-[#9A9A8A]">Réponse</label>
                 <textarea
                   value={item.answer}
                   onChange={(e) => onUpdateItem(i, 'answer', e.target.value)}
                   rows={2}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none bg-white"
+                  className={adminTextareaClass}
                   placeholder="La réponse à cette question..."
                 />
               </div>
             </div>
             <button
               onClick={() => onRemoveItem(i)}
-              className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors mt-5"
+              className="mt-5 p-2 text-[#9A9A8A] transition-colors hover:bg-[#FBF1F0] hover:text-[#7C2D2D]"
             >
               <Trash2 size={16} />
             </button>
@@ -115,7 +100,7 @@ function FaqEditor({ items, onUpdateItem, onRemoveItem, onAddItem }: {
       ))}
       <button
         onClick={onAddItem}
-        className="flex items-center gap-2 px-4 py-2.5 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors border border-dashed border-blue-300"
+        className="inline-flex items-center gap-2 border border-dashed border-[#C9A84C]/50 bg-[#FBF7ED] px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.22em] text-[#6D5622] transition-all hover:border-[#C9A84C] hover:text-[#0A0A0A]"
       >
         <Plus size={14} /> Ajouter une question
       </button>
@@ -269,8 +254,8 @@ export default function CMSAbonnement() {
     return (
       <div className="flex items-center justify-center h-96">
         <div className="flex flex-col items-center gap-3">
-          <RefreshCw size={24} className="animate-spin text-gray-400" />
-          <p className="text-sm text-gray-500">Chargement...</p>
+          <RefreshCw size={24} className="animate-spin text-[#C9A84C]" />
+          <p className="text-sm uppercase tracking-[0.24em] text-[#9A9A8A]">Chargement des offres</p>
         </div>
       </div>
     );
@@ -290,18 +275,26 @@ export default function CMSAbonnement() {
   return (
     <div className="max-w-6xl mx-auto">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Page Abonnement</h1>
+      <div className="mb-8 flex flex-col gap-5 border-b border-[#0A0A0A]/10 pb-8 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <p className="text-[10px] uppercase tracking-[0.32em] text-[#9A9A8A]">CMS Conversion</p>
+          <h1 className="mt-3 font-display text-5xl font-semibold leading-none text-[#0A0A0A]">Page Abonnement</h1>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[#9A9A8A]">
+            Travaillez la proposition de valeur, la hiérarchie des offres et la réassurance avec une lecture premium, claire et rentable.
+          </p>
+        </div>
         <div className="flex items-center gap-3">
           <a href="https://afrikher-client.vercel.app/abonnement" target="_blank" rel="noopener noreferrer"
-            className="flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+            className={adminGhostButtonClass}>
             <ExternalLink size={16} className="mr-2" /> Voir la page
           </a>
           <button onClick={handleSave} disabled={saving || !hasChanges}
-            className={`flex items-center px-5 py-2 rounded-lg text-sm font-medium transition-colors ${
-              hasChanges ? 'bg-gray-900 text-white hover:bg-gray-800'
-              : saved ? 'bg-green-600 text-white'
-              : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+            className={`inline-flex items-center gap-2 px-6 py-3 text-xs font-semibold uppercase tracking-[0.24em] transition-all ${
+              hasChanges
+                ? 'bg-[#0A0A0A] text-[#F5F0E8] hover:bg-[#C9A84C] hover:text-[#0A0A0A]'
+                : saved
+                  ? 'bg-[#C9A84C] text-[#0A0A0A]'
+                  : 'cursor-not-allowed bg-[#EAE2D3] text-[#9A9A8A]'
             }`}>
             {saving ? <><RefreshCw size={14} className="mr-2 animate-spin" /> Enregistrement...</>
              : saved ? <><Check size={14} className="mr-2" /> Enregistré</>
@@ -312,30 +305,30 @@ export default function CMSAbonnement() {
 
       {/* Alerts */}
       {error && (
-        <div className="flex items-center gap-3 p-4 mb-4 bg-red-50 border border-red-200 rounded-lg">
-          <AlertCircle size={18} className="text-red-500 shrink-0" />
-          <p className="text-sm text-red-700 flex-1">{error}</p>
-          <button onClick={() => setError(null)} className="text-sm text-red-500 hover:text-red-700 font-medium">Fermer</button>
-        </div>
+        <AdminAlert tone="error" className="mb-4">
+          <AlertCircle size={18} className="shrink-0 text-[#7C2D2D]" />
+          <p className="flex-1 text-sm text-[#7C2D2D]">{error}</p>
+          <button onClick={() => setError(null)} className="text-sm font-medium text-[#7C2D2D] hover:opacity-80">Fermer</button>
+        </AdminAlert>
       )}
       {hasChanges && (
-        <div className="flex items-center gap-3 p-4 mb-4 bg-amber-50 border border-amber-200 rounded-lg">
-          <AlertCircle size={16} className="text-amber-500 shrink-0" />
-          <p className="text-sm text-amber-700">Modifications non enregistrées.</p>
-        </div>
+        <AdminAlert tone="warning" className="mb-4">
+          <AlertCircle size={16} className="shrink-0 text-[#6D5622]" />
+          <p className="text-sm text-[#6D5622]">Modifications non enregistrées.</p>
+        </AdminAlert>
       )}
 
       {/* Main layout */}
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+      <div className="overflow-hidden border border-[#0A0A0A]/10 bg-white">
         <div className="flex min-h-[600px]">
           {/* Sidebar tabs */}
-          <nav className="w-52 border-r border-gray-200 py-4 shrink-0">
+          <nav className="w-60 shrink-0 border-r border-[#0A0A0A]/10 bg-[#F8F4EC] py-4">
             {tabs.map((tab) => (
               <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                className={`w-full text-left px-6 py-2.5 text-sm transition-colors ${
+                className={`w-full px-6 py-3 text-left text-sm transition-colors ${
                   activeTab === tab.id
-                    ? 'text-blue-600 bg-blue-50 font-medium border-r-2 border-blue-600'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    ? 'border-r-2 border-[#C9A84C] bg-white font-medium text-[#0A0A0A]'
+                    : 'text-[#6F6C62] hover:bg-white/70 hover:text-[#0A0A0A]'
                 }`}>
                 {tab.label}
               </button>
@@ -343,291 +336,390 @@ export default function CMSAbonnement() {
           </nav>
 
           {/* Content */}
-          <div className="flex-1 px-10 py-6">
+          <div className="flex-1 px-10 py-8">
 
             {/* GENERAL */}
             {activeTab === 'general' && (
-              <div>
-                <h2 className="text-lg font-bold text-gray-900 mb-1">Paramètres généraux</h2>
-                <p className="text-sm text-gray-500 mb-6">Activation et textes de la page abonnement.</p>
+              <AdminSectionShell>
+                <AdminSectionHeader
+                  eyebrow="Positionnement"
+                  title="Paramètres généraux"
+                  description="Activation, hero et cadrage éditorial de la page abonnement. Ici on pose la valeur perçue avant même de parler prix."
+                />
+                <div className="px-8 pb-8">
 
-                <FieldRow label="Abonnements actifs" description="Activer ou désactiver la page d'abonnement sur le site public.">
+                <AdminFieldRow label="Abonnements actifs" description="Activer ou désactiver la page d'abonnement sur le site public.">
                   <div className="flex items-center gap-3">
                     <button onClick={() => updateConfig('sub_enabled', config.sub_enabled === 'true' ? 'false' : 'true')}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${config.sub_enabled === 'true' ? 'bg-green-600' : 'bg-gray-300'}`}>
-                      <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${config.sub_enabled === 'true' ? 'translate-x-6' : 'translate-x-1'}`} />
+                      className={`relative inline-flex h-6 w-11 items-center transition-colors ${config.sub_enabled === 'true' ? 'bg-[#0A0A0A]' : 'bg-[#D8D1C2]'}`}>
+                      <span className={`inline-block h-4 w-4 transform bg-white transition-transform ${config.sub_enabled === 'true' ? 'translate-x-6' : 'translate-x-1'}`} />
                     </button>
-                    <span className={`text-sm font-medium ${config.sub_enabled === 'true' ? 'text-green-700' : 'text-gray-500'}`}>
+                    <span className={`text-sm font-medium ${config.sub_enabled === 'true' ? 'text-[#6D5622]' : 'text-[#9A9A8A]'}`}>
                       {config.sub_enabled === 'true' ? "Actif — les visiteurs peuvent s'abonner" : "Désactivé — la page affiche un message d'attente"}
                     </span>
                   </div>
-                </FieldRow>
+                </AdminFieldRow>
 
-                <FieldRow label="Titre de la page" description="Le titre affiché en grand dans le hero.">
+                <AdminFieldRow label="Titre de la page" description="Le titre affiché en grand dans le hero.">
                   <input type="text" value={config.sub_hero_title || ''}
                     onChange={(e) => updateConfig('sub_hero_title', e.target.value)}
-                    className="w-full max-w-md px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`${adminInputClass} max-w-md font-display text-xl`}
                     placeholder="Abonnements" />
-                </FieldRow>
+                </AdminFieldRow>
 
-                <FieldRow label="Label hero" description="Petit label premium au-dessus du titre principal.">
+                <AdminFieldRow label="Label hero" description="Petit label premium au-dessus du titre principal.">
                   <input type="text" value={config.sub_hero_label || ''}
                     onChange={(e) => updateConfig('sub_hero_label', e.target.value)}
-                    className="w-full max-w-md px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`${adminInputClass} max-w-md`}
                     placeholder="ACCÈS PRIVILÉGIÉ" />
-                </FieldRow>
+                </AdminFieldRow>
 
-                <FieldRow label="Sous-titre" description="Texte doré italique sous le titre principal." noBorder>
+                <AdminFieldRow label="Sous-titre" description="Texte doré italique sous le titre principal." noBorder>
                   <textarea value={config.sub_hero_subtitle || ''}
                     onChange={(e) => updateConfig('sub_hero_subtitle', e.target.value)}
                     rows={3}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                    className={`${adminTextareaClass} italic`}
                     placeholder="Rejoignez une communauté de femmes visionnaires..." />
-                </FieldRow>
+                </AdminFieldRow>
 
-                <FieldRow label="Label section offres" description="Petit label au-dessus du bloc des formules.">
+                <AdminFieldRow label="Label section offres" description="Petit label au-dessus du bloc des formules.">
                   <input type="text" value={config.sub_section_label || ''}
                     onChange={(e) => updateConfig('sub_section_label', e.target.value)}
-                    className="w-full max-w-md px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`${adminInputClass} max-w-md`}
                     placeholder="Les formules" />
-                </FieldRow>
+                </AdminFieldRow>
 
-                <FieldRow label="Titre section offres" description="Titre principal du bloc des abonnements.">
+                <AdminFieldRow label="Titre section offres" description="Titre principal du bloc des abonnements.">
                   <input type="text" value={config.sub_section_title || ''}
                     onChange={(e) => updateConfig('sub_section_title', e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`${adminInputClass} font-display text-xl`}
                     placeholder="Deux accès pensés comme une expérience éditoriale" />
-                </FieldRow>
+                </AdminFieldRow>
 
-                <FieldRow label="Texte d'introduction offres" description="Court texte sous le titre de section." >
+                <AdminFieldRow label="Texte d'introduction offres" description="Court texte sous le titre de section." >
                   <textarea value={config.sub_section_intro || ''}
                     onChange={(e) => updateConfig('sub_section_intro', e.target.value)}
                     rows={3}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                    className={adminTextareaClass}
                     placeholder="Choisissez la formule qui accompagne votre lecture..." />
-                </FieldRow>
+                </AdminFieldRow>
 
-                <FieldRow label="Label section aide" description="Petit label affiché au-dessus du bloc FAQ / aide." noBorder>
+                <AdminFieldRow label="Label section aide" description="Petit label affiché au-dessus du bloc FAQ / aide." noBorder>
                   <input type="text" value={config.sub_help_label || ''}
                     onChange={(e) => updateConfig('sub_help_label', e.target.value)}
-                    className="w-full max-w-md px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`${adminInputClass} max-w-md`}
                     placeholder="Réassurance" />
-                </FieldRow>
-              </div>
+                </AdminFieldRow>
+                </div>
+              </AdminSectionShell>
             )}
 
             {/* PLAN MENSUEL */}
             {activeTab === 'mensuel' && (
-              <div>
-                <h2 className="text-lg font-bold text-gray-900 mb-1">Plan Mensuel</h2>
-                <p className="text-sm text-gray-500 mb-6">Configuration du plan d'abonnement mensuel.</p>
+              <div className="space-y-6">
+                <AdminSectionShell>
+                  <AdminSectionHeader
+                    eyebrow="Offre"
+                    title="Plan Mensuel"
+                    description="Façonnez une formule simple, immédiate et lisible. Cette carte doit inspirer l’accès sans noyer la valeur."
+                  />
+                  <div className="grid gap-0 lg:grid-cols-[1.35fr,0.85fr]">
+                    <div className="px-8 pb-8">
 
-                <FieldRow label="Nom du plan" description="Le titre affiché sur la carte.">
+                <AdminFieldRow label="Nom du plan" description="Le titre affiché sur la carte.">
                   <input type="text" value={config.sub_monthly_name || ''}
                     onChange={(e) => updateConfig('sub_monthly_name', e.target.value)}
-                    className="w-full max-w-sm px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`${adminInputClass} max-w-sm font-display text-xl`}
                     placeholder="Mensuel" />
-                </FieldRow>
+                </AdminFieldRow>
 
-                <FieldRow label="Prix" description="Le montant en euros.">
+                <AdminFieldRow label="Prix" description="Le montant en euros.">
                   <div className="flex items-center gap-2 max-w-xs">
                     <input type="text" inputMode="decimal"
                       value={config.sub_monthly_price || ''}
                       onChange={(e) => updateConfig('sub_monthly_price', e.target.value)}
-                      className="w-24 px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-24 border border-[#0A0A0A]/12 bg-[#F8F4EC] px-4 py-2.5 text-sm text-[#0A0A0A] outline-none transition-all focus:border-[#C9A84C] focus:bg-white focus:ring-2 focus:ring-[#C9A84C]/12"
                       placeholder="15" />
-                    <span className="text-lg font-medium text-gray-600">€</span>
-                    <span className="text-sm text-gray-400">/</span>
+                    <span className="text-lg font-medium text-[#0A0A0A]">€</span>
+                    <span className="text-sm text-[#9A9A8A]">/</span>
                     <input type="text" value={config.sub_monthly_period || ''}
                       onChange={(e) => updateConfig('sub_monthly_period', e.target.value)}
-                      className="w-20 px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-24 border border-[#0A0A0A]/12 bg-[#F8F4EC] px-3 py-2.5 text-sm text-[#0A0A0A] outline-none transition-all focus:border-[#C9A84C] focus:bg-white focus:ring-2 focus:ring-[#C9A84C]/12"
                       placeholder="mois" />
                   </div>
-                </FieldRow>
+                </AdminFieldRow>
 
-                <FieldRow label="Prix avant réduction" description="Laisser vide si pas de réduction. Le prix barré sera affiché à côté du prix actuel.">
+                <AdminFieldRow label="Prix avant réduction" description="Laisser vide si pas de réduction. Le prix barré sera affiché à côté du prix actuel.">
                   <div className="flex items-center gap-2 max-w-xs">
                     <input type="text" inputMode="decimal"
                       value={config.sub_monthly_original_price || ''}
                       onChange={(e) => updateConfig('sub_monthly_original_price', e.target.value)}
-                      className="w-24 px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-24 border border-[#0A0A0A]/12 bg-[#F8F4EC] px-4 py-2.5 text-sm text-[#0A0A0A] outline-none transition-all focus:border-[#C9A84C] focus:bg-white focus:ring-2 focus:ring-[#C9A84C]/12"
                       placeholder="Ex: 20" />
-                    <span className="text-lg font-medium text-gray-600">€</span>
+                    <span className="text-lg font-medium text-[#0A0A0A]">€</span>
                   </div>
-                </FieldRow>
+                </AdminFieldRow>
 
-                <FieldRow label="Label réduction" description="Texte affiché sur le badge de réduction (ex: -25%, Promo, etc.)">
+                <AdminFieldRow label="Label réduction" description="Texte affiché sur le badge de réduction (ex: -25%, Promo, etc.)">
                   <input type="text" value={config.sub_monthly_discount_label || ''}
                     onChange={(e) => updateConfig('sub_monthly_discount_label', e.target.value)}
-                    className="w-full max-w-xs px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`${adminInputClass} max-w-xs`}
                     placeholder="Ex: -25%" />
-                </FieldRow>
+                </AdminFieldRow>
 
-                <FieldRow label="Description" description="Texte court sous le prix.">
+                <AdminFieldRow label="Description" description="Texte court sous le prix.">
                   <input type="text" value={config.sub_monthly_description || ''}
                     onChange={(e) => updateConfig('sub_monthly_description', e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={adminInputClass}
                     placeholder="L'accès complet à l'univers AFRIKHER..." />
-                </FieldRow>
+                </AdminFieldRow>
 
-                <FieldRow label="Note complémentaire" description="Petite phrase courte près du prix ou sous le plan.">
+                <AdminFieldRow label="Note complémentaire" description="Petite phrase courte près du prix ou sous le plan.">
                   <input type="text" value={config.sub_monthly_note || ''}
                     onChange={(e) => updateConfig('sub_monthly_note', e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={adminInputClass}
                     placeholder="Lecture immédiate, sans engagement." />
-                </FieldRow>
+                </AdminFieldRow>
 
-                <FieldRow label="Texte du bouton" description="Le texte affiché sur le bouton CTA.">
+                <AdminFieldRow label="Texte du bouton" description="Le texte affiché sur le bouton CTA.">
                   <input type="text" value={config.sub_monthly_cta || ''}
                     onChange={(e) => updateConfig('sub_monthly_cta', e.target.value)}
-                    className="w-full max-w-sm px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`${adminInputClass} max-w-sm`}
                     placeholder="S'abonner" />
-                </FieldRow>
+                </AdminFieldRow>
 
-                <FieldRow label="Avantages" description="Liste des avantages inclus dans ce plan." noBorder>
+                <AdminFieldRow label="Avantages" description="Liste des avantages inclus dans ce plan." noBorder>
                   <FeatureEditor
                     features={monthlyFeatures}
                     onUpdate={(i, v) => updateFeature('sub_monthly_features', i, v)}
                     onRemove={(i) => removeFeature('sub_monthly_features', i)}
                     onAdd={() => addFeature('sub_monthly_features')}
                   />
-                </FieldRow>
+                </AdminFieldRow>
+                    </div>
+                    <div className="border-l border-[#0A0A0A]/8 bg-[#F8F4EC] p-8">
+                      <p className="text-[10px] uppercase tracking-[0.3em] text-[#9A9A8A]">Aperçu de l’offre</p>
+                      <div className="mt-4 border border-[#0A0A0A]/10 bg-white p-6">
+                        {config.sub_monthly_discount_label && (
+                          <span className="inline-flex bg-[#FBF7ED] px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-[#6D5622]">
+                            {config.sub_monthly_discount_label}
+                          </span>
+                        )}
+                        <h3 className="mt-4 font-display text-3xl font-semibold text-[#0A0A0A]">
+                          {config.sub_monthly_name || 'Mensuel'}
+                        </h3>
+                        <div className="mt-4 flex items-end gap-2">
+                          <span className="font-display text-5xl font-semibold text-[#0A0A0A]">
+                            {config.sub_monthly_price || '15'}€
+                          </span>
+                          <span className="pb-2 text-sm text-[#9A9A8A]">/ {config.sub_monthly_period || 'mois'}</span>
+                        </div>
+                        {config.sub_monthly_original_price && (
+                          <p className="mt-2 text-sm text-[#9A9A8A] line-through">
+                            {config.sub_monthly_original_price}€
+                          </p>
+                        )}
+                        <p className="mt-4 text-sm leading-relaxed text-[#0A0A0A]">
+                          {config.sub_monthly_description || "L'accès complet à l'univers AFRIKHER..."}
+                        </p>
+                        {config.sub_monthly_note && (
+                          <p className="mt-3 text-xs uppercase tracking-[0.22em] text-[#9A9A8A]">{config.sub_monthly_note}</p>
+                        )}
+                        <div className="mt-6 bg-[#0A0A0A] px-4 py-3 text-center text-xs font-semibold uppercase tracking-[0.24em] text-[#F5F0E8]">
+                          {config.sub_monthly_cta || "S'abonner"}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </AdminSectionShell>
               </div>
             )}
 
             {/* PLAN ANNUEL */}
             {activeTab === 'annuel' && (
-              <div>
-                <h2 className="text-lg font-bold text-gray-900 mb-1">Plan Annuel</h2>
-                <p className="text-sm text-gray-500 mb-6">Configuration du plan d'abonnement annuel.</p>
+              <div className="space-y-6">
+                <AdminSectionShell>
+                  <AdminSectionHeader
+                    eyebrow="Offre premium"
+                    title="Plan Annuel"
+                    description="Ici, le design doit soutenir la valeur perçue. On vend un engagement éditorial plus profond, pas seulement une remise."
+                  />
+                  <div className="grid gap-0 lg:grid-cols-[1.35fr,0.85fr]">
+                    <div className="px-8 pb-8">
 
-                <FieldRow label="Mis en avant" description="Afficher le badge 'Le plus populaire' et le style doré.">
+                <AdminFieldRow label="Mis en avant" description="Afficher le badge 'Le plus populaire' et le style doré.">
                   <div className="flex items-center gap-3">
                     <button onClick={() => updateConfig('sub_annual_featured', config.sub_annual_featured === 'true' ? 'false' : 'true')}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${config.sub_annual_featured === 'true' ? 'bg-blue-600' : 'bg-gray-300'}`}>
-                      <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${config.sub_annual_featured === 'true' ? 'translate-x-6' : 'translate-x-1'}`} />
+                      className={`relative inline-flex h-6 w-11 items-center transition-colors ${config.sub_annual_featured === 'true' ? 'bg-[#0A0A0A]' : 'bg-[#D8D1C2]'}`}>
+                      <span className={`inline-block h-4 w-4 transform bg-white transition-transform ${config.sub_annual_featured === 'true' ? 'translate-x-6' : 'translate-x-1'}`} />
                     </button>
-                    <span className="text-sm text-gray-600">{config.sub_annual_featured === 'true' ? 'Mis en avant' : 'Style normal'}</span>
+                    <span className="text-sm text-[#9A9A8A]">{config.sub_annual_featured === 'true' ? 'Mis en avant' : 'Style normal'}</span>
                   </div>
-                </FieldRow>
+                </AdminFieldRow>
 
-                <FieldRow label="Nom du plan" description="Le titre affiché sur la carte.">
+                <AdminFieldRow label="Nom du plan" description="Le titre affiché sur la carte.">
                   <input type="text" value={config.sub_annual_name || ''}
                     onChange={(e) => updateConfig('sub_annual_name', e.target.value)}
-                    className="w-full max-w-sm px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`${adminInputClass} max-w-sm font-display text-xl`}
                     placeholder="Annuel" />
-                </FieldRow>
+                </AdminFieldRow>
 
-                <FieldRow label="Prix" description="Le montant en euros.">
+                <AdminFieldRow label="Prix" description="Le montant en euros.">
                   <div className="flex items-center gap-2 max-w-xs">
                     <input type="text" inputMode="decimal"
                       value={config.sub_annual_price || ''}
                       onChange={(e) => updateConfig('sub_annual_price', e.target.value)}
-                      className="w-24 px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-24 border border-[#0A0A0A]/12 bg-[#F8F4EC] px-4 py-2.5 text-sm text-[#0A0A0A] outline-none transition-all focus:border-[#C9A84C] focus:bg-white focus:ring-2 focus:ring-[#C9A84C]/12"
                       placeholder="150" />
-                    <span className="text-lg font-medium text-gray-600">€</span>
-                    <span className="text-sm text-gray-400">/</span>
+                    <span className="text-lg font-medium text-[#0A0A0A]">€</span>
+                    <span className="text-sm text-[#9A9A8A]">/</span>
                     <input type="text" value={config.sub_annual_period || ''}
                       onChange={(e) => updateConfig('sub_annual_period', e.target.value)}
-                      className="w-20 px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-24 border border-[#0A0A0A]/12 bg-[#F8F4EC] px-3 py-2.5 text-sm text-[#0A0A0A] outline-none transition-all focus:border-[#C9A84C] focus:bg-white focus:ring-2 focus:ring-[#C9A84C]/12"
                       placeholder="an" />
                   </div>
-                </FieldRow>
+                </AdminFieldRow>
 
-                <FieldRow label="Prix avant réduction" description="Laisser vide si pas de réduction. Le prix barré sera affiché à côté du prix actuel.">
+                <AdminFieldRow label="Prix avant réduction" description="Laisser vide si pas de réduction. Le prix barré sera affiché à côté du prix actuel.">
                   <div className="flex items-center gap-2 max-w-xs">
                     <input type="text" inputMode="decimal"
                       value={config.sub_annual_original_price || ''}
                       onChange={(e) => updateConfig('sub_annual_original_price', e.target.value)}
-                      className="w-24 px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-24 border border-[#0A0A0A]/12 bg-[#F8F4EC] px-4 py-2.5 text-sm text-[#0A0A0A] outline-none transition-all focus:border-[#C9A84C] focus:bg-white focus:ring-2 focus:ring-[#C9A84C]/12"
                       placeholder="Ex: 200" />
-                    <span className="text-lg font-medium text-gray-600">€</span>
+                    <span className="text-lg font-medium text-[#0A0A0A]">€</span>
                   </div>
-                </FieldRow>
+                </AdminFieldRow>
 
-                <FieldRow label="Label réduction" description="Texte affiché sur le badge de réduction (ex: -17%, Promo, etc.)">
+                <AdminFieldRow label="Label réduction" description="Texte affiché sur le badge de réduction (ex: -17%, Promo, etc.)">
                   <input type="text" value={config.sub_annual_discount_label || ''}
                     onChange={(e) => updateConfig('sub_annual_discount_label', e.target.value)}
-                    className="w-full max-w-xs px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`${adminInputClass} max-w-xs`}
                     placeholder="Ex: -17%" />
-                </FieldRow>
+                </AdminFieldRow>
 
-                <FieldRow label="Description" description="Texte court sous le prix.">
+                <AdminFieldRow label="Description" description="Texte court sous le prix.">
                   <input type="text" value={config.sub_annual_description || ''}
                     onChange={(e) => updateConfig('sub_annual_description', e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={adminInputClass}
                     placeholder="Le choix de l'excellence..." />
-                </FieldRow>
+                </AdminFieldRow>
 
-                <FieldRow label="Note complémentaire" description="Petite phrase courte près du prix ou sous le plan.">
+                <AdminFieldRow label="Note complémentaire" description="Petite phrase courte près du prix ou sous le plan.">
                   <input type="text" value={config.sub_annual_note || ''}
                     onChange={(e) => updateConfig('sub_annual_note', e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={adminInputClass}
                     placeholder="Accès annuel + privilèges AFRIKHER." />
-                </FieldRow>
+                </AdminFieldRow>
 
-                <FieldRow label="Badge premium" description="Remplace le badge codé en dur sur la carte annuelle.">
+                <AdminFieldRow label="Badge premium" description="Remplace le badge codé en dur sur la carte annuelle.">
                   <input type="text" value={config.sub_annual_badge || ''}
                     onChange={(e) => updateConfig('sub_annual_badge', e.target.value)}
-                    className="w-full max-w-sm px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`${adminInputClass} max-w-sm`}
                     placeholder="Le plus populaire" />
-                </FieldRow>
+                </AdminFieldRow>
 
-                <FieldRow label="Texte du bouton" description="Le texte affiché sur le bouton CTA.">
+                <AdminFieldRow label="Texte du bouton" description="Le texte affiché sur le bouton CTA.">
                   <input type="text" value={config.sub_annual_cta || ''}
                     onChange={(e) => updateConfig('sub_annual_cta', e.target.value)}
-                    className="w-full max-w-sm px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`${adminInputClass} max-w-sm`}
                     placeholder="S'abonner & Économiser" />
-                </FieldRow>
+                </AdminFieldRow>
 
-                <FieldRow label="Avantages" description="Liste des avantages inclus dans ce plan." noBorder>
+                <AdminFieldRow label="Avantages" description="Liste des avantages inclus dans ce plan." noBorder>
                   <FeatureEditor
                     features={annualFeatures}
                     onUpdate={(i, v) => updateFeature('sub_annual_features', i, v)}
                     onRemove={(i) => removeFeature('sub_annual_features', i)}
                     onAdd={() => addFeature('sub_annual_features')}
                   />
-                </FieldRow>
+                </AdminFieldRow>
+                    </div>
+                    <div className="border-l border-[#0A0A0A]/8 bg-[#F8F4EC] p-8">
+                      <p className="text-[10px] uppercase tracking-[0.3em] text-[#9A9A8A]">Aperçu de l’offre</p>
+                      <div className={`mt-4 border p-6 ${config.sub_annual_featured === 'true' ? 'border-[#C9A84C]/45 bg-[#FBF7ED]' : 'border-[#0A0A0A]/10 bg-white'}`}>
+                        {(config.sub_annual_badge || config.sub_annual_featured === 'true') && (
+                          <span className="inline-flex bg-[#0A0A0A] px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-[#F5F0E8]">
+                            {config.sub_annual_badge || 'Le plus populaire'}
+                          </span>
+                        )}
+                        {config.sub_annual_discount_label && (
+                          <span className="ml-2 inline-flex bg-white px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-[#6D5622]">
+                            {config.sub_annual_discount_label}
+                          </span>
+                        )}
+                        <h3 className="mt-4 font-display text-3xl font-semibold text-[#0A0A0A]">
+                          {config.sub_annual_name || 'Annuel'}
+                        </h3>
+                        <div className="mt-4 flex items-end gap-2">
+                          <span className="font-display text-5xl font-semibold text-[#0A0A0A]">
+                            {config.sub_annual_price || '150'}€
+                          </span>
+                          <span className="pb-2 text-sm text-[#9A9A8A]">/ {config.sub_annual_period || 'an'}</span>
+                        </div>
+                        {config.sub_annual_original_price && (
+                          <p className="mt-2 text-sm text-[#9A9A8A] line-through">
+                            {config.sub_annual_original_price}€
+                          </p>
+                        )}
+                        <p className="mt-4 text-sm leading-relaxed text-[#0A0A0A]">
+                          {config.sub_annual_description || "Le choix de l'excellence..."}
+                        </p>
+                        {config.sub_annual_note && (
+                          <p className="mt-3 text-xs uppercase tracking-[0.22em] text-[#9A9A8A]">{config.sub_annual_note}</p>
+                        )}
+                        <div className="mt-6 bg-[#0A0A0A] px-4 py-3 text-center text-xs font-semibold uppercase tracking-[0.24em] text-[#F5F0E8]">
+                          {config.sub_annual_cta || "S'abonner & Économiser"}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </AdminSectionShell>
               </div>
             )}
 
             {/* FAQ */}
             {activeTab === 'faq' && (
-              <div>
-                <h2 className="text-lg font-bold text-gray-900 mb-1">Section FAQ</h2>
-                <p className="text-sm text-gray-500 mb-6">Les questions/réponses affichées en bas de la page abonnement.</p>
+              <AdminSectionShell>
+                <AdminSectionHeader
+                  eyebrow="Réassurance"
+                  title="Section FAQ"
+                  description="La fin de page doit rassurer, clarifier et lever les dernières hésitations avant conversion."
+                />
+                <div className="px-8 pb-8">
 
-                <FieldRow label="Titre" description="Le titre de la section FAQ.">
+                <AdminFieldRow label="Titre" description="Le titre de la section FAQ.">
                   <input type="text" value={config.sub_faq_title || ''}
                     onChange={(e) => updateConfig('sub_faq_title', e.target.value)}
-                    className="w-full max-w-md px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={` max-w-md font-display text-xl`}
                     placeholder="Une question ?" />
-                </FieldRow>
+                </AdminFieldRow>
 
-                <FieldRow label="Texte d'accompagnement" description="Le paragraphe sous le titre.">
+                <AdminFieldRow label="Texte d'accompagnement" description="Le paragraphe sous le titre.">
                   <textarea value={config.sub_faq_text || ''}
                     onChange={(e) => updateConfig('sub_faq_text', e.target.value)}
                     rows={3}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                    className={adminTextareaClass}
                     placeholder="Notre équipe est à votre disposition..." />
-                </FieldRow>
+                </AdminFieldRow>
 
-                <FieldRow label="Email de support" description="L'adresse email affichée pour les questions.">
+                <AdminFieldRow label="Email de support" description="L'adresse email affichée pour les questions.">
                   <input type="email" value={config.sub_faq_email || ''}
                     onChange={(e) => updateConfig('sub_faq_email', e.target.value)}
-                    className="w-full max-w-md px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`${adminInputClass} max-w-md`}
                     placeholder="support@afrikher.com" />
-                </FieldRow>
+                </AdminFieldRow>
 
-                <FieldRow label="Questions / Réponses" description="Ajoutez, modifiez ou supprimez les FAQ." noBorder>
+                <AdminFieldRow label="Questions / Réponses" description="Ajoutez, modifiez ou supprimez les FAQ." noBorder>
                   <FaqEditor
                     items={faqItems}
                     onUpdateItem={updateFaqItem}
                     onRemoveItem={removeFaqItem}
                     onAddItem={addFaqItem}
                   />
-                </FieldRow>
-              </div>
+                </AdminFieldRow>
+                </div>
+              </AdminSectionShell>
             )}
 
           </div>

@@ -18,6 +18,12 @@ import {
   FileText,
   ExternalLink
 } from 'lucide-react'
+import {
+  AdminIconBadge,
+  adminGhostButtonClass,
+  adminInputClass,
+  adminSecondaryButtonClass,
+} from '../components/AdminPrimitives'
 
 interface OrderItem {
   product_id: string
@@ -50,12 +56,12 @@ interface Order {
   fidepay_payment_url: string | null
 }
 
-const statusConfig: Record<string, { label: string; bg: string; text: string; dot: string; icon: React.ReactNode }> = {
-  pending: { label: 'En attente', bg: 'bg-amber-50', text: 'text-amber-700', dot: 'bg-amber-400', icon: <Clock className="w-4 h-4" /> },
-  paid: { label: 'Payée', bg: 'bg-green-50', text: 'text-green-700', dot: 'bg-green-500', icon: <CheckCircle className="w-4 h-4" /> },
-  shipped: { label: 'Expédiée', bg: 'bg-blue-50', text: 'text-blue-700', dot: 'bg-blue-500', icon: <Truck className="w-4 h-4" /> },
-  delivered: { label: 'Livrée', bg: 'bg-emerald-50', text: 'text-emerald-700', dot: 'bg-emerald-500', icon: <CheckCircle className="w-4 h-4" /> },
-  cancelled: { label: 'Annulée', bg: 'bg-red-50', text: 'text-red-700', dot: 'bg-red-400', icon: <XCircle className="w-4 h-4" /> }
+const statusConfig: Record<string, { label: string; bg: string; text: string; dot: string; border: string; icon: React.ReactNode }> = {
+  pending: { label: 'En attente', bg: 'bg-[#FBF7ED]', text: 'text-[#6D5622]', dot: 'bg-[#C9A84C]', border: 'border-[#C9A84C]/30', icon: <Clock className="w-4 h-4" /> },
+  paid: { label: 'Payée', bg: 'bg-[#F5F3EF]', text: 'text-[#3A342A]', dot: 'bg-[#0A0A0A]', border: 'border-[#D9D1C2]', icon: <CheckCircle className="w-4 h-4" /> },
+  shipped: { label: 'Expédiée', bg: 'bg-[#F8F6F2]', text: 'text-[#6F675B]', dot: 'bg-[#9A9A8A]', border: 'border-[#E5E0D8]', icon: <Truck className="w-4 h-4" /> },
+  delivered: { label: 'Livrée', bg: 'bg-[#FBF7ED]', text: 'text-[#6D5622]', dot: 'bg-[#C9A84C]', border: 'border-[#C9A84C]/30', icon: <CheckCircle className="w-4 h-4" /> },
+  cancelled: { label: 'Annulée', bg: 'bg-[#FBF1F0]', text: 'text-[#7C2D2D]', dot: 'bg-[#7C2D2D]', border: 'border-[#7C2D2D]/18', icon: <XCircle className="w-4 h-4" /> }
 }
 
 const statusFlow: Record<string, string[]> = {
@@ -128,22 +134,23 @@ export default function OrdersList() {
     <div className="p-6 lg:p-8 max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-900">Commandes</h1>
-        <p className="text-slate-500 text-sm mt-1">Gérez et suivez toutes les commandes</p>
+        <p className="text-[10px] uppercase tracking-[0.32em] text-[#9A9A8A]">Commandes & suivi</p>
+        <h1 className="mt-3 font-display text-5xl font-semibold text-[#0A0A0A]">Commandes</h1>
+        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[#6F675B]">Suivez les achats, la progression de traitement et les informations client dans une lecture plus claire, plus calme et plus premium.</p>
       </div>
 
       {/* Stats bar */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
         {[
-          { label: 'Total', val: stats.total, color: 'text-slate-700' },
-          { label: 'En attente', val: stats.pending, color: 'text-amber-600' },
-          { label: 'Payées', val: stats.paid, color: 'text-green-600' },
-          { label: 'Expédiées', val: stats.shipped, color: 'text-blue-600' },
-          { label: 'Livrées', val: stats.delivered, color: 'text-emerald-600' },
-          { label: 'Annulées', val: stats.cancelled, color: 'text-red-500' },
+          { label: 'Total', val: stats.total, color: 'text-[#0A0A0A]' },
+          { label: 'En attente', val: stats.pending, color: 'text-[#6D5622]' },
+          { label: 'Payées', val: stats.paid, color: 'text-[#3A342A]' },
+          { label: 'Expédiées', val: stats.shipped, color: 'text-[#6F675B]' },
+          { label: 'Livrées', val: stats.delivered, color: 'text-[#6D5622]' },
+          { label: 'Annulées', val: stats.cancelled, color: 'text-[#7C2D2D]' },
         ].map(s => (
-          <div key={s.label} className="bg-white border border-slate-200 rounded-xl p-4">
-            <p className="text-xs font-medium text-slate-500">{s.label}</p>
+          <div key={s.label} className="rounded-[1.75rem] border border-[#E9E2D6] bg-white p-4 shadow-sm">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#9A9A8A]">{s.label}</p>
             <p className={`text-2xl font-bold mt-1 ${s.color}`}>{s.val}</p>
           </div>
         ))}
@@ -152,19 +159,19 @@ export default function OrdersList() {
       {/* Search + Filter */}
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <div className="flex-1 relative">
-          <Search className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-3 top-3 w-4 h-4 text-[#9A9A8A]" />
           <input
             type="text"
             placeholder="Rechercher par email, nom ou ID..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500"
+            className={`${adminInputClass} rounded-2xl py-2.5 pl-10`}
           />
         </div>
         <select
           value={filterStatus}
           onChange={e => setFilterStatus(e.target.value)}
-          className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500"
+          className={`${adminInputClass} w-auto rounded-2xl py-2.5`}
         >
           <option value="all">Tous les statuts</option>
           <option value="pending">En attente</option>
@@ -178,12 +185,13 @@ export default function OrdersList() {
       {/* Loading */}
       {loading ? (
         <div className="flex items-center justify-center py-16">
-          <Loader className="w-8 h-8 animate-spin text-green-600" />
+          <Loader className="w-8 h-8 animate-spin text-[#C9A84C]" />
         </div>
       ) : filtered.length === 0 ? (
         <div className="text-center py-16">
-          <Package className="w-16 h-16 mx-auto mb-4 text-slate-200" />
-          <p className="text-slate-500">Aucune commande trouvée</p>
+          <Package className="mx-auto mb-4 h-16 w-16 text-[#C9A84C]" />
+          <p className="font-display text-3xl font-semibold text-[#0A0A0A]">Aucune commande trouvée</p>
+          <p className="mt-2 text-sm text-[#6F675B]">Ajustez les filtres ou attendez les prochaines commandes.</p>
         </div>
       ) : (
         /* Orders list — expandable rows */
@@ -194,7 +202,7 @@ export default function OrdersList() {
             const transitions = statusFlow[order.status] || []
 
             return (
-              <div key={order.id} className={`bg-white border rounded-xl overflow-hidden transition-all ${isOpen ? 'border-green-300 shadow-md' : 'border-slate-200 hover:border-slate-300'}`}>
+              <div key={order.id} className={`overflow-hidden rounded-[1.75rem] border bg-white transition-all ${isOpen ? 'border-[#C9A84C]/35 shadow-md' : 'border-[#E9E2D6] hover:border-[#D8CEBF]'}`}>
                 {/* Row header — click to expand */}
                 <button
                   onClick={() => setExpandedId(isOpen ? null : order.id)}
@@ -205,49 +213,49 @@ export default function OrdersList() {
 
                   {/* Customer + ID */}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-slate-900 truncate">{getName(order)}</p>
-                    <p className="text-xs text-slate-400 mt-0.5">#{order.id.slice(0, 8).toUpperCase()} · {fmtDate(order.created_at)}</p>
+                    <p className="truncate font-display text-xl font-semibold text-[#0A0A0A]">{getName(order)}</p>
+                    <p className="mt-0.5 text-[11px] text-[#9A9A8A]">#{order.id.slice(0, 8).toUpperCase()} · {fmtDate(order.created_at)}</p>
                   </div>
 
                   {/* Items count */}
-                  <div className="hidden sm:block text-xs text-slate-500">
+                  <div className="hidden text-xs text-[#6F675B] sm:block">
                     {order.items?.length || 0} article(s)
                   </div>
 
                   {/* Status badge */}
-                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${st.bg} ${st.text}`}>
+                  <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${st.bg} ${st.text} ${st.border}`}>
                     {st.icon}
                     {st.label}
                   </span>
 
                   {/* Total */}
-                  <span className="text-sm font-bold text-slate-900 w-24 text-right">{fmt(order.total)}</span>
+                  <span className="w-24 text-right text-sm font-semibold text-[#0A0A0A]">{fmt(order.total)}</span>
 
                   {/* Chevron */}
-                  {isOpen ? <ChevronUp className="w-5 h-5 text-slate-400 shrink-0" /> : <ChevronDown className="w-5 h-5 text-slate-400 shrink-0" />}
+                  {isOpen ? <ChevronUp className="h-5 w-5 shrink-0 text-[#9A9A8A]" /> : <ChevronDown className="h-5 w-5 shrink-0 text-[#9A9A8A]" />}
                 </button>
 
                 {/* Expanded detail panel */}
                 {isOpen && (
-                  <div className="border-t border-slate-100 px-5 pb-5">
+                  <div className="border-t border-[#F1ECE4] px-5 pb-5">
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-5">
 
                       {/* COL 1: Client info */}
                       <div className="space-y-4">
-                        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Client</h3>
+                        <h3 className="text-xs font-semibold uppercase tracking-[0.22em] text-[#9A9A8A]">Client</h3>
                         <div className="space-y-2.5">
                           <div className="flex items-center gap-2.5 text-sm">
-                            <User className="w-4 h-4 text-slate-400 shrink-0" />
-                            <span className="text-slate-900 font-medium">{getName(order)}</span>
+                            <User className="h-4 w-4 shrink-0 text-[#9A9A8A]" />
+                            <span className="font-medium text-[#0A0A0A]">{getName(order)}</span>
                           </div>
                           <div className="flex items-center gap-2.5 text-sm">
-                            <Mail className="w-4 h-4 text-slate-400 shrink-0" />
-                            <span className="text-slate-600">{order.customer_email}</span>
+                            <Mail className="h-4 w-4 shrink-0 text-[#9A9A8A]" />
+                            <span className="text-[#6F675B]">{order.customer_email}</span>
                           </div>
                           {order.shipping_address?.phone && (
                             <div className="flex items-center gap-2.5 text-sm">
-                              <Phone className="w-4 h-4 text-slate-400 shrink-0" />
-                              <span className="text-slate-600">{order.shipping_address.phone}</span>
+                              <Phone className="h-4 w-4 shrink-0 text-[#9A9A8A]" />
+                              <span className="text-[#6F675B]">{order.shipping_address.phone}</span>
                             </div>
                           )}
                         </div>
@@ -255,15 +263,15 @@ export default function OrdersList() {
                         {/* Address */}
                         {order.shipping_address?.address && (
                           <div className="pt-2">
-                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Livraison</h3>
+                            <h3 className="mb-2 text-xs font-semibold uppercase tracking-[0.22em] text-[#9A9A8A]">Livraison</h3>
                             <div className="flex items-start gap-2.5 text-sm">
-                              <MapPin className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
-                              <div className="text-slate-600">
+                              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#9A9A8A]" />
+                              <div className="text-[#6F675B]">
                                 <p>{order.shipping_address.address}</p>
                                 <p>{order.shipping_address.postal_code} {order.shipping_address.city}</p>
                                 <p>{order.shipping_address.country}</p>
                                 {order.shipping_address.notes && (
-                                  <p className="mt-1 text-xs italic text-slate-400">{order.shipping_address.notes}</p>
+                                  <p className="mt-1 text-xs italic text-[#9A9A8A]">{order.shipping_address.notes}</p>
                                 )}
                               </div>
                             </div>
@@ -273,28 +281,28 @@ export default function OrdersList() {
 
                       {/* COL 2: Items */}
                       <div className="space-y-4">
-                        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Articles ({order.items?.length || 0})</h3>
+                        <h3 className="text-xs font-semibold uppercase tracking-[0.22em] text-[#9A9A8A]">Articles ({order.items?.length || 0})</h3>
                         <div className="space-y-2">
                           {order.items?.map((item, idx) => (
-                            <div key={idx} className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                            <div key={idx} className="flex items-center justify-between rounded-2xl border border-[#EDE7DD] bg-[#FAF7F2] p-3">
                               <div className="min-w-0 flex-1">
-                                <p className="text-sm font-medium text-slate-900 truncate">{item.name}</p>
-                                <p className="text-xs text-slate-400">Qté : {item.qty}</p>
+                                <p className="truncate text-sm font-medium text-[#0A0A0A]">{item.name}</p>
+                                <p className="text-xs text-[#9A9A8A]">Qté : {item.qty}</p>
                               </div>
-                              <p className="text-sm font-semibold text-slate-900 ml-3">{fmt(item.price * item.qty)}</p>
+                              <p className="ml-3 text-sm font-semibold text-[#0A0A0A]">{fmt(item.price * item.qty)}</p>
                             </div>
                           ))}
                         </div>
-                        <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg border border-green-100">
-                          <p className="text-sm font-semibold text-slate-900">Total</p>
-                          <p className="text-lg font-bold text-green-700">{fmt(order.total)}</p>
+                        <div className="flex items-center justify-between rounded-2xl border border-[#C9A84C]/20 bg-[#FBF7ED] p-3">
+                          <p className="text-sm font-semibold text-[#0A0A0A]">Total</p>
+                          <p className="text-lg font-semibold text-[#6D5622]">{fmt(order.total)}</p>
                         </div>
                       </div>
 
                       {/* COL 3: Status + Payment + Actions */}
                       <div className="space-y-4">
                         {/* Current status timeline */}
-                        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Statut & Suivi</h3>
+                        <h3 className="text-xs font-semibold uppercase tracking-[0.22em] text-[#9A9A8A]">Statut & Suivi</h3>
 
                         {/* Status timeline */}
                         <div className="space-y-2">
@@ -308,22 +316,22 @@ export default function OrdersList() {
 
                             return (
                               <div key={step} className="flex items-center gap-3">
-                                <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${isActive ? `${stepCfg.bg} ${stepCfg.text}` : 'bg-slate-100 text-slate-300'}`}>
+                                <div className={`h-7 w-7 shrink-0 rounded-full flex items-center justify-center ${isActive ? `${stepCfg.bg} ${stepCfg.text}` : 'bg-[#F5F3EF] text-[#C9C1B3]'}`}>
                                   {stepCfg.icon}
                                 </div>
-                                <p className={`text-sm ${isCurrent ? 'font-bold text-slate-900' : isActive ? 'text-slate-600' : 'text-slate-300'}`}>
+                                <p className={`text-sm ${isCurrent ? 'font-semibold text-[#0A0A0A]' : isActive ? 'text-[#6F675B]' : 'text-[#C9C1B3]'}`}>
                                   {stepCfg.label}
-                                  {isCurrent && <span className="ml-2 text-xs font-normal text-slate-400">(actuel)</span>}
+                                  {isCurrent && <span className="ml-2 text-xs font-normal text-[#9A9A8A]">(actuel)</span>}
                                 </p>
                               </div>
                             )
                           })}
                           {order.status === 'cancelled' && (
                             <div className="flex items-center gap-3">
-                              <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 bg-red-50 text-red-600">
+                              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#FBF1F0] text-[#7C2D2D]">
                                 <XCircle className="w-4 h-4" />
                               </div>
-                              <p className="text-sm font-bold text-red-600">Annulée</p>
+                              <p className="text-sm font-semibold text-[#7C2D2D]">Annulée</p>
                             </div>
                           )}
                         </div>
@@ -331,7 +339,7 @@ export default function OrdersList() {
                         {/* Action buttons */}
                         {transitions.length > 0 && (
                           <div className="pt-2">
-                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Changer le statut</h3>
+                            <h3 className="mb-2 text-xs font-semibold uppercase tracking-[0.22em] text-[#9A9A8A]">Changer le statut</h3>
                             <div className="flex flex-wrap gap-2">
                               {transitions.map(ns => {
                                 const nsCfg = statusConfig[ns]
@@ -340,7 +348,7 @@ export default function OrdersList() {
                                     key={ns}
                                     onClick={(e) => { e.stopPropagation(); updateStatus(order.id, ns) }}
                                     disabled={updatingId === order.id}
-                                    className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold transition-all disabled:opacity-50 border ${nsCfg.bg} ${nsCfg.text} border-current/20 hover:shadow-sm`}
+                                    className={`inline-flex items-center gap-1.5 rounded-2xl border px-4 py-2 text-xs font-semibold transition-all disabled:opacity-50 ${nsCfg.bg} ${nsCfg.text} ${nsCfg.border} hover:shadow-sm`}
                                   >
                                     {updatingId === order.id ? <Loader className="w-3.5 h-3.5 animate-spin" /> : nsCfg.icon}
                                     {nsCfg.label}
@@ -354,12 +362,12 @@ export default function OrdersList() {
                         {/* Payment info */}
                         {(order.fidepay_payment_id || order.fidepay_payment_url) && (
                           <div className="pt-2">
-                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Paiement</h3>
-                            <div className="p-3 bg-slate-50 rounded-lg space-y-2">
+                            <h3 className="mb-2 text-xs font-semibold uppercase tracking-[0.22em] text-[#9A9A8A]">Paiement</h3>
+                            <div className="space-y-2 rounded-2xl border border-[#EDE7DD] bg-[#FAF7F2] p-3">
                               {order.fidepay_payment_id && (
                                 <div className="flex items-center gap-2 text-sm">
-                                  <CreditCard className="w-4 h-4 text-slate-400 shrink-0" />
-                                  <code className="text-xs font-mono text-slate-600 break-all">{order.fidepay_payment_id}</code>
+                                  <CreditCard className="h-4 w-4 shrink-0 text-[#9A9A8A]" />
+                                  <code className="break-all text-xs font-mono text-[#6F675B]">{order.fidepay_payment_id}</code>
                                 </div>
                               )}
                               {order.fidepay_payment_url && (
@@ -367,7 +375,7 @@ export default function OrdersList() {
                                   href={order.fidepay_payment_url}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1.5 text-xs font-medium text-green-700 hover:text-green-800"
+                                  className="inline-flex items-center gap-1.5 text-xs font-medium text-[#C9A84C] hover:underline"
                                 >
                                   <ExternalLink className="w-3.5 h-3.5" />
                                   Voir sur FIDEPAY
@@ -378,7 +386,7 @@ export default function OrdersList() {
                         )}
 
                         {/* Dates */}
-                        <div className="pt-2 text-xs text-slate-400 space-y-1">
+                        <div className="space-y-1 pt-2 text-xs text-[#9A9A8A]">
                           <p>Créée : {fmtDate(order.created_at)} à {fmtTime(order.created_at)}</p>
                           {order.updated_at && order.updated_at !== order.created_at && (
                             <p>Mise à jour : {fmtDate(order.updated_at)} à {fmtTime(order.updated_at)}</p>
