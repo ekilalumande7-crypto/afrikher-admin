@@ -2,6 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { Save, CreditCard, Shield, TestTube, Zap, CheckCircle, AlertCircle, Eye, EyeOff, RefreshCw, Link2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { cn } from '../lib/utils';
+import {
+  AdminAlert,
+  AdminIconBadge,
+  AdminSectionHeader,
+  AdminSectionShell,
+  adminGhostButtonClass,
+  adminInputClass,
+  adminPrimaryButtonClass,
+} from '../components/AdminPrimitives';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://afrikher-client.vercel.app';
 
@@ -139,14 +148,14 @@ export default function SettingsPaiements() {
   if (loading) {
     return (
       <div className="space-y-8 animate-in fade-in duration-500">
-        <div className="h-12 bg-gray-100 rounded-2xl w-64 animate-pulse" />
-        <div className="bg-white p-8 rounded-[32px] border border-gray-50 shadow-sm">
+        <div className="h-12 w-64 animate-pulse rounded-lg bg-[#ECE7DF]" />
+        <div className="rounded-xl border border-[#E5E0D8] bg-white p-7 shadow-sm">
           <div className="space-y-6">
-            <div className="h-6 bg-gray-100 rounded-xl w-48 animate-pulse" />
-            <div className="h-14 bg-gray-100 rounded-2xl animate-pulse" />
-            <div className="h-14 bg-gray-100 rounded-2xl animate-pulse" />
-            <div className="h-14 bg-gray-100 rounded-2xl animate-pulse" />
-            <div className="h-14 bg-gray-100 rounded-2xl animate-pulse" />
+            <div className="h-6 w-48 animate-pulse rounded-lg bg-[#ECE7DF]" />
+            <div className="h-12 animate-pulse rounded-lg bg-[#F5F3EF]" />
+            <div className="h-12 animate-pulse rounded-lg bg-[#F5F3EF]" />
+            <div className="h-12 animate-pulse rounded-lg bg-[#F5F3EF]" />
+            <div className="h-12 animate-pulse rounded-lg bg-[#F5F3EF]" />
           </div>
         </div>
       </div>
@@ -154,31 +163,32 @@ export default function SettingsPaiements() {
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-6 animate-in fade-in duration-500">
       {/* Header */}
-      <div className="flex items-end justify-between">
+      <div className="flex items-end justify-between gap-6 border-b border-[#0A0A0A]/10 pb-6">
         <div>
-          <h1 className="text-4xl font-sans font-bold text-slate-900">Paiements</h1>
-          <p className="text-gray-400 text-sm mt-1">Configurez votre integration FIDEPAY pour recevoir les paiements.</p>
+          <p className="text-[10px] uppercase tracking-[0.32em] text-[#9A9A8A]">Paramètres financiers</p>
+          <h1 className="mt-3 font-display text-5xl font-semibold text-[#0A0A0A]">Paiements</h1>
+          <p className="mt-3 text-sm leading-relaxed text-[#6F675B]">Configurez FIDEPAY pour les transactions live et les tests de connexion.</p>
         </div>
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center px-8 py-3.5 bg-white text-slate-900 rounded-2xl hover:bg-slate-100 transition-all font-bold tracking-wide shadow-lg shadow-slate-200 disabled:opacity-50"
+          className={`${adminPrimaryButtonClass} rounded-xl px-6 py-3 disabled:opacity-50`}
         >
           {saving ? (
             <span className="flex items-center">
-              <div className="w-4 h-4 border-2 border-gold border-t-transparent rounded-full animate-spin mr-2" />
+              <div className="mr-2 h-4 w-4 rounded-full border-2 border-[#F5F0E8] border-t-transparent animate-spin" />
               Enregistrement...
             </span>
           ) : saved ? (
             <span className="flex items-center">
-              <CheckCircle size={20} className="mr-2 text-green-400" />
-              Enregistre !
+              <CheckCircle size={18} className="mr-2" />
+              Enregistré
             </span>
           ) : (
             <span className="flex items-center">
-              <Save size={20} className="mr-2 text-green-600" />
+              <Save size={18} className="mr-2" />
               Enregistrer
             </span>
           )}
@@ -187,44 +197,48 @@ export default function SettingsPaiements() {
 
       {/* Error message */}
       {error && (
-        <div className="bg-red-50 border border-red-100 rounded-2xl p-4 flex items-center space-x-3">
-          <AlertCircle size={20} className="text-red-500 shrink-0" />
-          <p className="text-sm text-red-600">{error}</p>
-        </div>
+        <AdminAlert tone="error">
+          <AlertCircle size={18} className="shrink-0" />
+          <p className="text-sm">{error}</p>
+        </AdminAlert>
       )}
 
       {/* Mode selector */}
-      <div className="bg-white p-8 rounded-[32px] border border-gray-50 shadow-sm space-y-6">
-        <div className="border-b border-gray-50 pb-6">
-          <h3 className="text-xl font-sans font-bold text-slate-900">Mode de paiement</h3>
-          <p className="text-sm text-gray-400 mt-1">Choisissez entre le mode test (sandbox) et le mode production (live).</p>
-        </div>
+      <AdminSectionShell className="rounded-xl">
+        <AdminSectionHeader
+          eyebrow="Mode de paiement"
+          title="Sandbox ou live"
+          description="Activez le bon environnement avant toute mise en production."
+          className="rounded-none px-6 py-5"
+        />
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3 p-6">
           <button
             onClick={() => setConfig({ ...config, fidepay_mode: 'test' })}
             className={cn(
-              "p-6 rounded-2xl border-2 transition-all text-left",
+              "rounded-lg border px-5 py-5 text-left transition-all",
               config.fidepay_mode === 'test'
-                ? "border-gold bg-green-50"
-                : "border-gray-100 hover:border-gray-200"
+                ? "border-[#0A0A0A] bg-[#0A0A0A] text-[#F5F0E8]"
+                : "border-[#E5E0D8] bg-[#F8F6F2] text-[#0A0A0A] hover:border-[#C9A84C]/35"
             )}
           >
-            <div className="flex items-center space-x-3 mb-3">
+            <div className="mb-3 flex items-center space-x-3">
               <div className={cn(
-                "w-10 h-10 rounded-xl flex items-center justify-center",
-                config.fidepay_mode === 'test' ? "bg-green-50 text-green-600" : "bg-gray-100 text-gray-400"
+                "flex h-9 w-9 items-center justify-center rounded-lg border",
+                config.fidepay_mode === 'test'
+                  ? "border-[#C9A84C]/35 bg-[#C9A84C]/10 text-[#C9A84C]"
+                  : "border-[#E5E0D8] bg-white text-[#9A9A8A]"
               )}>
                 <TestTube size={20} />
               </div>
               <div>
-                <h4 className="font-bold text-slate-900 text-sm">Mode Test (Sandbox)</h4>
+                <h4 className={cn("text-sm font-semibold", config.fidepay_mode === 'test' ? "text-[#F5F0E8]" : "text-[#0A0A0A]")}>Sandbox</h4>
                 {config.fidepay_mode === 'test' && (
-                  <span className="text-[10px] font-bold text-green-600 uppercase tracking-widest">Actif</span>
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#C9A84C]">Actif</span>
                 )}
               </div>
             </div>
-            <p className="text-xs text-gray-400 leading-relaxed">
+            <p className={cn("text-xs leading-relaxed", config.fidepay_mode === 'test' ? "text-[#D7CFBF]" : "text-[#6F675B]")}>
               Utilisez ce mode pour tester les paiements sans transactions reelles.
             </p>
           </button>
@@ -232,57 +246,46 @@ export default function SettingsPaiements() {
           <button
             onClick={() => setConfig({ ...config, fidepay_mode: 'live' })}
             className={cn(
-              "p-6 rounded-2xl border-2 transition-all text-left",
+              "rounded-lg border px-5 py-5 text-left transition-all",
               config.fidepay_mode === 'live'
-                ? "border-green-500 bg-green-50"
-                : "border-gray-100 hover:border-gray-200"
+                ? "border-[#0A0A0A] bg-[#0A0A0A] text-[#F5F0E8]"
+                : "border-[#E5E0D8] bg-[#F8F6F2] text-[#0A0A0A] hover:border-[#C9A84C]/35"
             )}
           >
-            <div className="flex items-center space-x-3 mb-3">
+            <div className="mb-3 flex items-center space-x-3">
               <div className={cn(
-                "w-10 h-10 rounded-xl flex items-center justify-center",
-                config.fidepay_mode === 'live' ? "bg-green-100 text-green-600" : "bg-gray-100 text-gray-400"
+                "flex h-9 w-9 items-center justify-center rounded-lg border",
+                config.fidepay_mode === 'live'
+                  ? "border-[#C9A84C]/35 bg-[#C9A84C]/10 text-[#C9A84C]"
+                  : "border-[#E5E0D8] bg-white text-[#9A9A8A]"
               )}>
                 <Zap size={20} />
               </div>
               <div>
-                <h4 className="font-bold text-slate-900 text-sm">Mode Production (Live)</h4>
+                <h4 className={cn("text-sm font-semibold", config.fidepay_mode === 'live' ? "text-[#F5F0E8]" : "text-[#0A0A0A]")}>Live</h4>
                 {config.fidepay_mode === 'live' && (
-                  <span className="text-[10px] font-bold text-green-600 uppercase tracking-widest">Actif</span>
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#C9A84C]">Actif</span>
                 )}
               </div>
             </div>
-            <p className="text-xs text-gray-400 leading-relaxed">
+            <p className={cn("text-xs leading-relaxed", config.fidepay_mode === 'live' ? "text-[#D7CFBF]" : "text-[#6F675B]")}>
               Mode de production pour les transactions reelles. Les clients seront debites.
             </p>
           </button>
         </div>
-      </div>
+      </AdminSectionShell>
 
-      {/* API URLs */}
-      <div className="bg-white p-8 rounded-[32px] border border-gray-50 shadow-sm space-y-6">
-        <div className="border-b border-gray-50 pb-6">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-500">
-              <Link2 size={20} />
-            </div>
-            <div>
-              <h3 className="text-xl font-sans font-bold text-slate-900">URLs API FIDEPAY</h3>
-              <p className="text-sm text-gray-400 mt-0.5">
-                Copiez les URLs depuis la page{' '}
-                <a href="https://merchant.fide-pay.com/dashboard/api-access-key" target="_blank" rel="noopener noreferrer" className="text-green-600 hover:underline font-medium">
-                  Cle d'acces API
-                </a>
-                {' '}de votre dashboard FIDEPAY.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="space-y-6">
-          {/* Access Token URL */}
+      <div className="grid gap-5 xl:grid-cols-[1.15fr_0.85fr]">
+        <AdminSectionShell className="rounded-xl">
+          <AdminSectionHeader
+            eyebrow="Configuration API"
+            title="Clés & endpoints"
+            description="Renseignez les URL et les clés FIDEPAY nécessaires au fonctionnement du paiement."
+            className="rounded-none px-6 py-5"
+          />
+          <div className="space-y-5 p-6">
           <div>
-            <label className="block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">
+            <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.22em] text-[#9A9A8A]">
               URL Access Token
             </label>
             <input
@@ -290,16 +293,15 @@ export default function SettingsPaiements() {
               value={config.fidepay_access_token_url}
               onChange={(e) => setConfig({ ...config, fidepay_access_token_url: e.target.value })}
               placeholder="https://admin.fide-pay.com/api/merchant/access-token"
-              className="w-full p-4 bg-gray-50 border-none rounded-2xl text-sm font-mono outline-none focus:ring-2 focus:ring-green-500/20 placeholder:text-gray-300"
+              className={`${adminInputClass} rounded-lg p-3 font-mono`}
             />
-            <p className="text-[11px] text-gray-400 mt-1.5">
+            <p className="mt-1.5 text-[11px] text-[#9A9A8A]">
               Endpoint pour obtenir le token d'authentification.
             </p>
           </div>
 
-          {/* Make Payment URL */}
           <div>
-            <label className="block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">
+            <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.22em] text-[#9A9A8A]">
               URL Make Payment
             </label>
             <input
@@ -307,98 +309,73 @@ export default function SettingsPaiements() {
               value={config.fidepay_make_payment_url}
               onChange={(e) => setConfig({ ...config, fidepay_make_payment_url: e.target.value })}
               placeholder="https://admin.fide-pay.com/api/merchant/make-payment"
-              className="w-full p-4 bg-gray-50 border-none rounded-2xl text-sm font-mono outline-none focus:ring-2 focus:ring-green-500/20 placeholder:text-gray-300"
+              className={`${adminInputClass} rounded-lg p-3 font-mono`}
             />
-            <p className="text-[11px] text-gray-400 mt-1.5">
+            <p className="mt-1.5 text-[11px] text-[#9A9A8A]">
               Endpoint pour creer un paiement.
             </p>
           </div>
-        </div>
-      </div>
 
-      {/* API Keys */}
-      <div className="bg-white p-8 rounded-[32px] border border-gray-50 shadow-sm space-y-6">
-        <div className="border-b border-gray-50 pb-6">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center text-green-600">
-              <CreditCard size={20} />
-            </div>
+          <div className="grid gap-5 md:grid-cols-2">
             <div>
-              <h3 className="text-xl font-sans font-bold text-slate-900">Cles API FIDEPAY</h3>
-              <p className="text-sm text-gray-400 mt-0.5">
-                Obtenez vos cles depuis votre{' '}
-                <a href="https://merchant.fide-pay.com/dashboard/api-access-key" target="_blank" rel="noopener noreferrer" className="text-green-600 hover:underline font-medium">
-                  dashboard FIDEPAY
-                </a>
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="space-y-6">
-          {/* Public Key */}
-          <div>
-            <label className="block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">
-              Cle publique (Public Key)
-            </label>
-            <input
-              type="text"
-              value={config.fidepay_public_key}
-              onChange={(e) => setConfig({ ...config, fidepay_public_key: e.target.value })}
-              placeholder="Entrez votre cle publique FIDEPAY..."
-              autoComplete="off"
-              className="w-full p-4 bg-gray-50 border-none rounded-2xl text-sm font-mono outline-none focus:ring-2 focus:ring-green-500/20 placeholder:text-gray-300"
-            />
-            <p className="text-[11px] text-gray-400 mt-1.5">
-              Utilisee pour obtenir le token d'acces.
-            </p>
-          </div>
-
-          {/* Secret Key */}
-          <div>
-            <label className="block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">
-              Cle secrete (Secret Key)
-            </label>
-            <div className="relative">
+              <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.22em] text-[#9A9A8A]">
+                Clé publique
+              </label>
               <input
-                type={showSecret ? 'text' : 'password'}
-                value={config.fidepay_secret_key}
-                onChange={(e) => setConfig({ ...config, fidepay_secret_key: e.target.value })}
-                placeholder="Entrez votre cle secrete FIDEPAY..."
+                type="text"
+                value={config.fidepay_public_key}
+                onChange={(e) => setConfig({ ...config, fidepay_public_key: e.target.value })}
+                placeholder="Entrez votre cle publique FIDEPAY..."
                 autoComplete="off"
-                className="w-full p-4 pr-12 bg-gray-50 border-none rounded-2xl text-sm font-mono outline-none focus:ring-2 focus:ring-green-500/20 placeholder:text-gray-300"
+                className={`${adminInputClass} rounded-lg p-3 font-mono`}
               />
-              <button
-                type="button"
-                onClick={() => setShowSecret(!showSecret)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-slate-900 transition-colors"
-              >
-                {showSecret ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
             </div>
-            <p className="text-[11px] text-gray-400 mt-1.5">
-              Utilisee pour verifier les signatures des webhooks (IPN). Ne jamais exposer cote client.
-            </p>
+
+            <div>
+              <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.22em] text-[#9A9A8A]">
+                Clé secrète
+              </label>
+              <div className="relative">
+                <input
+                  type={showSecret ? 'text' : 'password'}
+                  value={config.fidepay_secret_key}
+                  onChange={(e) => setConfig({ ...config, fidepay_secret_key: e.target.value })}
+                  placeholder="Entrez votre cle secrete FIDEPAY..."
+                  autoComplete="off"
+                  className={`${adminInputClass} rounded-lg p-3 pr-12 font-mono`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowSecret(!showSecret)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#9A9A8A] transition-colors hover:text-[#0A0A0A]"
+                >
+                  {showSecret ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+          <p className="text-[11px] leading-relaxed text-[#9A9A8A]">
+            Copiez ces informations depuis la page <a href="https://merchant.fide-pay.com/dashboard/api-access-key" target="_blank" rel="noopener noreferrer" className="font-medium text-[#C9A84C] hover:underline">Clé d’accès API</a> de votre dashboard FIDEPAY.
+          </p>
+          </div>
+        </AdminSectionShell>
 
-      {/* Test connection */}
-      <div className="bg-white p-8 rounded-[32px] border border-gray-50 shadow-sm space-y-6">
-        <div className="border-b border-gray-50 pb-6">
-          <h3 className="text-xl font-sans font-bold text-slate-900">Tester la connexion</h3>
-          <p className="text-sm text-gray-400 mt-1">Verifiez que vos cles API fonctionnent correctement.</p>
-        </div>
-
-        <div className="flex items-center space-x-4 flex-wrap gap-y-3">
+        <AdminSectionShell className="rounded-xl">
+          <AdminSectionHeader
+            eyebrow="Vérification"
+            title="Tester la connexion"
+            description="Vérifiez rapidement si les informations de connexion FIDEPAY répondent correctement."
+            className="rounded-none px-6 py-5"
+          />
+          <div className="space-y-4 p-6">
           <button
             onClick={handleTestConnection}
             disabled={testing || !config.fidepay_public_key}
             className={cn(
-              "flex items-center px-6 py-3 rounded-2xl font-bold text-sm transition-all",
+              "inline-flex items-center rounded-lg border px-5 py-3 text-sm font-semibold transition-all",
               testing
-                ? "bg-gray-100 text-gray-400"
-                : "bg-green-50 text-green-600 hover:bg-green-600/20"
+                ? "border-[#E5E0D8] bg-[#F5F3EF] text-[#9A9A8A]"
+                : "border-[#0A0A0A] bg-[#0A0A0A] text-[#F5F0E8] hover:border-[#C9A84C] hover:bg-[#1A1A1A]"
             )}
           >
             {testing ? (
@@ -415,40 +392,22 @@ export default function SettingsPaiements() {
           </button>
 
           {testResult && (
-            <div className={cn(
-              "flex items-center space-x-2 px-4 py-2.5 rounded-xl text-sm font-medium",
-              testResult.success
-                ? "bg-green-50 text-green-700"
-                : "bg-red-50 text-red-600"
-            )}>
-              {testResult.success
-                ? <CheckCircle size={16} />
-                : <AlertCircle size={16} />
-              }
-              <span>{testResult.message}</span>
-            </div>
+            <AdminAlert tone={testResult.success ? 'success' : 'error'}>
+              {testResult.success ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
+              <span className="text-sm">{testResult.message}</span>
+            </AdminAlert>
           )}
-        </div>
+          </div>
+        </AdminSectionShell>
       </div>
 
-      {/* Security notice */}
-      <div className="bg-green-50 p-8 rounded-[32px] border border-gold/10 flex items-start space-x-6">
-        <div className="w-12 h-12 bg-green-600 rounded-2xl flex items-center justify-center text-slate-900 shrink-0">
-          <Shield size={24} />
-        </div>
+      <div className="flex items-start gap-4 rounded-lg border border-[#E5E0D8] bg-[#FBF8F2] px-5 py-4">
+        <AdminIconBadge icon={Shield} className="h-10 w-10 rounded-lg" />
         <div>
-          <h4 className="text-lg font-sans font-bold text-slate-900">Securite</h4>
-          <p className="text-sm text-gray-500 mt-1 leading-relaxed">
-            Vos cles API sont stockees de maniere securisee dans la base de donnees. La cle secrete n'est jamais exposee cote client.
-            Les paiements sont traites exclusivement par FIDEPAY, qui integre Stripe et Mobile Money.
+          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#9A9A8A]">Sécurité</p>
+          <p className="mt-2 text-sm leading-relaxed text-[#6F675B]">
+            La clé secrète doit rester côté serveur. Les paiements sont traités uniquement via FIDEPAY.
           </p>
-          <div className="flex flex-wrap gap-2 mt-4">
-            <span className="px-3 py-1 bg-white rounded-full text-[10px] font-bold text-gray-500 border border-gray-100">Visa / Mastercard</span>
-            <span className="px-3 py-1 bg-white rounded-full text-[10px] font-bold text-gray-500 border border-gray-100">Orange Money</span>
-            <span className="px-3 py-1 bg-white rounded-full text-[10px] font-bold text-gray-500 border border-gray-100">M-Pesa</span>
-            <span className="px-3 py-1 bg-white rounded-full text-[10px] font-bold text-gray-500 border border-gray-100">Airtel Money</span>
-            <span className="px-3 py-1 bg-white rounded-full text-[10px] font-bold text-gray-500 border border-gray-100">QR Code</span>
-          </div>
         </div>
       </div>
     </div>
