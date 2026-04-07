@@ -1,18 +1,4 @@
 import { useEffect, useState } from 'react';
-import {
-  FileText,
-  ShoppingBag,
-  Users,
-  Handshake,
-  ArrowUpRight,
-  TrendingUp,
-  TrendingDown,
-  MoreHorizontal,
-  Eye,
-  Package,
-  CreditCard,
-  UserPlus
-} from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
@@ -46,14 +32,14 @@ interface RecentArticle {
   category_name?: string;
 }
 
-const statusColors: Record<string, { bg: string; text: string }> = {
-  paid: { bg: 'bg-emerald-50', text: 'text-emerald-700' },
-  pending: { bg: 'bg-amber-50', text: 'text-amber-700' },
-  shipped: { bg: 'bg-blue-50', text: 'text-blue-700' },
-  delivered: { bg: 'bg-emerald-50', text: 'text-emerald-700' },
-  cancelled: { bg: 'bg-red-50', text: 'text-red-700' },
-  published: { bg: 'bg-emerald-50', text: 'text-emerald-700' },
-  draft: { bg: 'bg-gray-100', text: 'text-gray-600' },
+const statusColors: Record<string, { bg: string; text: string; border: string }> = {
+  paid: { bg: 'bg-[#EFE6D0]', text: 'text-[#8A6E2F]', border: 'border-[#C9A84C]/25' },
+  pending: { bg: 'bg-[#F5F0E8]', text: 'text-[#9A9A8A]', border: 'border-[#0A0A0A]/8' },
+  shipped: { bg: 'bg-[#EEE7DB]', text: 'text-[#6F6656]', border: 'border-[#0A0A0A]/8' },
+  delivered: { bg: 'bg-[#EFE6D0]', text: 'text-[#8A6E2F]', border: 'border-[#C9A84C]/25' },
+  cancelled: { bg: 'bg-[#F7E3DE]', text: 'text-[#9C4C3A]', border: 'border-[#9C4C3A]/18' },
+  published: { bg: 'bg-[#EFE6D0]', text: 'text-[#8A6E2F]', border: 'border-[#C9A84C]/25' },
+  draft: { bg: 'bg-[#F5F0E8]', text: 'text-[#9A9A8A]', border: 'border-[#0A0A0A]/8' },
 };
 
 const statusLabels: Record<string, string> = {
@@ -66,7 +52,6 @@ const statusLabels: Record<string, string> = {
   draft: 'Brouillon',
 };
 
-// French month names for chart labels
 const MONTH_NAMES_FR = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
 const FULL_MONTH_NAMES_FR = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
 
@@ -84,7 +69,6 @@ export default function Dashboard() {
 
   async function fetchDashboardData() {
     try {
-      // Fetch all stats in parallel from Supabase
       const [
         articlesRes,
         publishedRes,
@@ -96,32 +80,21 @@ export default function Dashboard() {
         recentOrdersRes,
         recentArticlesRes,
       ] = await Promise.all([
-        // Total articles
         supabase.from('articles').select('id', { count: 'exact', head: true }),
-        // Published articles
         supabase.from('articles').select('id', { count: 'exact', head: true }).eq('status', 'published'),
-        // Total orders
         supabase.from('orders').select('id, total', { count: 'exact', head: true }),
-        // Active subscribers
         supabase.from('subscriptions').select('id', { count: 'exact', head: true }).eq('status', 'active'),
-        // Total readers
         supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'reader'),
-        // Total partners
         supabase.from('profiles').select('id', { count: 'exact', head: true }).in('role', ['partner', 'pending_partner']),
-        // Pending partners
         supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'pending_partner'),
-        // Recent orders (last 5)
         supabase.from('orders').select('id, customer_email, total, status, created_at').order('created_at', { ascending: false }).limit(5),
-        // Recent articles with category
         supabase.from('articles').select('id, title, slug, status, created_at, categories(name)').order('created_at', { ascending: false }).limit(5),
       ]);
 
-      // Fetch ALL orders with totals for revenue calculations (paid + pending)
       const now = new Date();
       const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-
-      // Get all orders for revenue calculations (last 6 months)
       const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1).toISOString();
+
       const allOrdersRes = await supabase
         .from('orders')
         .select('total, status, created_at')
@@ -129,20 +102,14 @@ export default function Dashboard() {
 
       const allOrders = allOrdersRes.data || [];
 
-      // Revenue this month (paid orders only)
       const revenueMonth = allOrders
         .filter((o: any) => o.status === 'paid' && o.created_at >= startOfMonth)
         .reduce((sum: number, o: any) => sum + (parseFloat(o.total) || 0), 0);
 
-      // Total revenue (all paid orders)
-      const allPaidRes = await supabase
-        .from('orders')
-        .select('total')
-        .eq('status', 'paid');
+      const allPaidRes = await supabase.from('orders').select('total').eq('status', 'paid');
       const totalRev = (allPaidRes.data || []).reduce((sum: number, o: any) => sum + (parseFloat(o.total) || 0), 0);
       setTotalRevenue(totalRev);
 
-      // Build monthly revenue data for chart (last 6 months)
       const monthlyRevData: { month: string; revenue: number }[] = [];
       for (let i = 5; i >= 0; i--) {
         const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
@@ -161,7 +128,6 @@ export default function Dashboard() {
       }
       setMonthlyData(monthlyRevData);
 
-      // Also fetch blog_posts count
       const blogRes = await supabase.from('blog_posts').select('id', { count: 'exact', head: true });
       const totalArticlesCount = (articlesRes.count || 0) + (blogRes.count || 0);
       const publishedBlogRes = await supabase.from('blog_posts').select('id', { count: 'exact', head: true }).eq('status', 'published');
@@ -178,21 +144,18 @@ export default function Dashboard() {
         pendingPartners: pendingPartnersRes.count || 0,
       });
 
-      // Process recent orders
       const orders = (recentOrdersRes.data || []).map((o: any) => ({
         ...o,
         customer_name: o.customer_email ? o.customer_email.split('@')[0] : 'Client',
       }));
       setRecentOrders(orders);
 
-      // Fetch recent blog posts too
       const recentBlogRes = await supabase
         .from('blog_posts')
         .select('id, title, slug, status, created_at')
         .order('created_at', { ascending: false })
         .limit(5);
 
-      // Merge articles and blog posts, sort by date, take top 5
       const allArticles = [
         ...(recentArticlesRes.data || []).map((a: any) => ({
           ...a,
@@ -206,7 +169,6 @@ export default function Dashboard() {
         .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
         .slice(0, 5);
       setRecentArticles(allArticles);
-
     } catch (err) {
       console.error('Dashboard fetch error:', err);
     } finally {
@@ -216,10 +178,12 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-[60vh]">
+      <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
-          <div className="w-10 h-10 border-3 border-[#C9A84C] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-[#9A9A8A] text-sm font-medium">Chargement du tableau de bord...</p>
+          <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-2 border-[#C9A84C] border-t-transparent" />
+          <p className="text-sm uppercase tracking-[0.2em] text-[#9A9A8A]">
+            Chargement de l’administration
+          </p>
         </div>
       </div>
     );
@@ -227,102 +191,90 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8">
-      {/* Welcome Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-[#0A0A0A]" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
-          Bienvenue
-        </h1>
-        <p className="text-[#9A9A8A] text-sm mt-1">
-          Vue d'ensemble de votre plateforme AFRIKHER
-        </p>
-      </div>
-
-      {/* KPI Cards Row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
-        {/* Articles */}
-        <KPICard
-          label="Articles"
-          value={stats?.totalArticles || 0}
-          subtitle={`${stats?.publishedArticles || 0} publiés`}
-          icon={FileText}
-          link="/admin/articles"
-        />
-        {/* Commandes */}
-        <KPICard
-          label="Commandes"
-          value={stats?.totalOrders || 0}
-          subtitle="Total commandes"
-          icon={Package}
-          link="/admin/boutique/commandes"
-        />
-        {/* Lecteurs */}
-        <KPICard
-          label="Lecteurs"
-          value={stats?.totalReaders || 0}
-          subtitle="Inscrits sur le site"
-          icon={Users}
-          link="/admin/utilisateurs/lecteurs"
-        />
-        {/* Partenaires */}
-        <KPICard
-          label="Partenaires"
-          value={stats?.totalPartners || 0}
-          subtitle={stats?.pendingPartners ? `${stats.pendingPartners} en attente` : 'Aucun en attente'}
-          icon={Handshake}
-          link="/admin/utilisateurs/partenaires"
-          highlight={stats?.pendingPartners ? true : false}
-        />
-      </div>
-
-      {/* Second Row: Revenue + Revenue Chart */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        {/* Revenue Card + Subscribers */}
-        <div className="space-y-5">
-          {/* Revenue This Month */}
-          <div className="bg-white rounded-2xl p-6 text-slate-900 border border-slate-200">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-[#9A9A8A] text-xs font-medium uppercase tracking-wider">Revenu du mois</span>
-              <CreditCard size={18} className="text-[#C9A84C]" />
-            </div>
-            <p className="text-3xl font-bold" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
-              {(stats?.revenueMonth || 0).toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €
-            </p>
-            <p className="text-[#9A9A8A] text-xs mt-2">{FULL_MONTH_NAMES_FR[new Date().getMonth()]} {new Date().getFullYear()}</p>
-          </div>
-
-          {/* Total Revenue */}
-          <div className="bg-white rounded-2xl p-6 border border-gray-100">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-[#9A9A8A] text-xs font-medium uppercase tracking-wider">Revenu total</span>
-              <TrendingUp size={18} className="text-[#C9A84C]" />
-            </div>
-            <p className="text-3xl font-bold text-[#0A0A0A]" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
-              {totalRevenue.toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €
-            </p>
-            <p className="text-[#9A9A8A] text-xs mt-2">
-              {stats?.activeSubscribers || 0} abonné{(stats?.activeSubscribers || 0) > 1 ? 's' : ''} actif{(stats?.activeSubscribers || 0) > 1 ? 's' : ''}
-            </p>
-          </div>
+      <section className="grid grid-cols-1 gap-5 xl:grid-cols-[1.1fr_0.9fr]">
+        <div className="border border-[#0A0A0A]/10 bg-white p-6 md:p-8">
+          <p className="text-[0.68rem] uppercase tracking-[0.28em] text-[#C9A84C]">
+            Synthèse éditoriale
+          </p>
+          <h2 className="mt-3 max-w-2xl font-serif text-[2.2rem] leading-[0.95] tracking-[-0.03em] text-[#0A0A0A] md:text-[3rem]">
+            Une lecture claire du magazine, des membres et des revenus.
+          </h2>
+          <p className="mt-5 max-w-2xl text-[0.96rem] leading-8 text-[#9A9A8A]">
+            L’administration AFRIKHER doit rester sobre, précise et pilotable. Cette vue met en avant
+            les signaux vraiment utiles pour la rédaction, la boutique et l’écosystème de marque.
+          </p>
         </div>
 
-        {/* Revenue Chart */}
-        <div className="lg:col-span-2 bg-white rounded-2xl p-6 border border-gray-100">
-          <div className="flex items-center justify-between mb-6">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+          <EditorialMetric
+            label="Articles"
+            value={stats?.totalArticles || 0}
+            detail={`${stats?.publishedArticles || 0} publiés`}
+            link="/admin/articles"
+          />
+          <EditorialMetric
+            label="Commandes"
+            value={stats?.totalOrders || 0}
+            detail="Suivi boutique"
+            link="/admin/boutique/commandes"
+          />
+          <EditorialMetric
+            label="Lecteurs"
+            value={stats?.totalReaders || 0}
+            detail="Communauté inscrite"
+            link="/admin/utilisateurs/lecteurs"
+          />
+          <EditorialMetric
+            label="Partenaires"
+            value={stats?.totalPartners || 0}
+            detail={stats?.pendingPartners ? `${stats.pendingPartners} en attente` : 'Réseau stable'}
+            link="/admin/utilisateurs/partenaires"
+            accent={Boolean(stats?.pendingPartners)}
+          />
+        </div>
+      </section>
+
+      <section className="grid grid-cols-1 gap-5 xl:grid-cols-[0.95fr_1.05fr]">
+        <div className="space-y-5">
+          <SurfaceCard>
+            <SectionLabel>Revenu du mois</SectionLabel>
+            <p className="mt-3 font-serif text-[2.5rem] leading-none tracking-[-0.03em] text-[#0A0A0A]">
+              {(stats?.revenueMonth || 0).toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €
+            </p>
+            <p className="mt-3 text-sm leading-7 text-[#9A9A8A]">
+              Encaissements confirmés sur {FULL_MONTH_NAMES_FR[new Date().getMonth()]} {new Date().getFullYear()}.
+            </p>
+          </SurfaceCard>
+
+          <SurfaceCard dark>
+            <SectionLabel dark>Total consolidé</SectionLabel>
+            <p className="mt-3 font-serif text-[2.5rem] leading-none tracking-[-0.03em] text-[#F5F0E8]">
+              {totalRevenue.toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €
+            </p>
+            <p className="mt-3 text-sm leading-7 text-[#F5F0E8]/58">
+              {stats?.activeSubscribers || 0} abonnement{(stats?.activeSubscribers || 0) > 1 ? 's' : ''} actif
+              {(stats?.activeSubscribers || 0) > 1 ? 's' : ''} soutiennent actuellement la marque.
+            </p>
+          </SurfaceCard>
+        </div>
+
+        <SurfaceCard>
+          <div className="flex flex-col gap-3 border-b border-[#0A0A0A]/8 pb-5 md:flex-row md:items-end md:justify-between">
             <div>
-              <h2 className="text-lg font-bold text-[#0A0A0A]" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
-                Revenus
-              </h2>
-              <p className="text-[#9A9A8A] text-xs mt-0.5">6 derniers mois</p>
+              <SectionLabel>Revenus</SectionLabel>
+              <h3 className="mt-2 font-serif text-[1.7rem] leading-none tracking-[-0.02em] text-[#0A0A0A]">
+                Six derniers mois
+              </h3>
             </div>
-            <div className="flex items-center gap-2 text-xs">
-              <span className="w-3 h-3 rounded-sm bg-[#C9A84C]" />
-              <span className="text-[#9A9A8A]">Revenus (€)</span>
-            </div>
+            <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[#9A9A8A]">
+              Lecture glissante des ventes
+            </p>
           </div>
-          <div className="h-[220px]">
+
+          <div className="mt-6 h-[260px]">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={monthlyData} barSize={32}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+              <BarChart data={monthlyData} barSize={34}>
+                <CartesianGrid vertical={false} stroke="#E7DED0" strokeDasharray="2 6" />
                 <XAxis
                   dataKey="month"
                   axisLine={false}
@@ -333,61 +285,57 @@ export default function Dashboard() {
                   axisLine={false}
                   tickLine={false}
                   tick={{ fontSize: 12, fill: '#9A9A8A' }}
-                  tickFormatter={(v) => `${v}€`}
+                  tickFormatter={(value) => `${value}€`}
                 />
                 <Tooltip
+                  cursor={{ fill: 'rgba(201,168,76,0.06)' }}
                   contentStyle={{
-                    borderRadius: '12px',
-                    border: '1px solid #f0f0f0',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-                    padding: '10px 14px',
-                    fontSize: '13px',
+                    background: '#FBF8F2',
+                    border: '1px solid rgba(10,10,10,0.08)',
+                    borderRadius: 0,
+                    boxShadow: 'none',
+                    padding: '10px 12px',
+                    color: '#0A0A0A',
+                    fontSize: '12px',
                   }}
                   formatter={(value: number) => [`${value.toLocaleString('fr-FR')} €`, 'Revenu']}
                 />
-                <Bar
-                  dataKey="revenue"
-                  fill="#C9A84C"
-                  radius={[6, 6, 0, 0]}
-                  opacity={0.9}
-                />
+                <Bar dataKey="revenue" fill="#C9A84C" radius={[0, 0, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
-        </div>
-      </div>
+        </SurfaceCard>
+      </section>
 
-      {/* Third Row: Recent Articles + Recent Orders */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        {/* Recent Articles */}
-        <div className="bg-white rounded-2xl p-6 border border-gray-100">
-          <div className="flex items-center justify-between mb-5">
-            <h2 className="text-lg font-bold text-[#0A0A0A]" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
-              Articles récents
-            </h2>
-            <Link to="/admin/articles" className="text-[#C9A84C] text-xs font-semibold hover:underline">
-              Voir tout
-            </Link>
-          </div>
+      <section className="grid grid-cols-1 gap-5 xl:grid-cols-2">
+        <SurfaceCard>
+          <CardHeader
+            eyebrow="Éditorial"
+            title="Publications récentes"
+            link="/admin/articles"
+            linkLabel="Voir l’ensemble"
+          />
 
           {recentArticles.length === 0 ? (
-            <div className="text-center py-10">
-              <FileText size={32} className="mx-auto text-gray-200 mb-3" />
-              <p className="text-[#9A9A8A] text-sm">Aucun article pour le moment</p>
-              <Link to="/admin/articles/new" className="text-[#C9A84C] text-xs font-semibold mt-2 inline-block hover:underline">
-                Créer un article
-              </Link>
-            </div>
+            <EmptyBlock
+              text="Aucun article n’a encore été publié ou préparé."
+              actionLabel="Créer un article"
+              actionTo="/admin/articles/new"
+            />
           ) : (
-            <div className="space-y-4">
+            <div className="mt-6 divide-y divide-[#0A0A0A]/8">
               {recentArticles.map((article) => (
-                <div key={article.id} className="flex items-center justify-between py-2 group">
-                  <div className="flex-1 min-w-0 mr-4">
-                    <p className="text-sm font-semibold text-[#0A0A0A] truncate group-hover:text-[#C9A84C] transition-colors">
+                <div key={article.id} className="flex flex-col gap-3 py-4 md:flex-row md:items-center md:justify-between">
+                  <div className="min-w-0">
+                    <p className="truncate font-serif text-[1.3rem] leading-none tracking-[-0.02em] text-[#0A0A0A]">
                       {article.title}
                     </p>
-                    <p className="text-xs text-[#9A9A8A] mt-0.5">
-                      {article.category_name} · {new Date(article.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
+                    <p className="mt-2 text-sm text-[#9A9A8A]">
+                      {article.category_name} ·{' '}
+                      {new Date(article.created_at).toLocaleDateString('fr-FR', {
+                        day: 'numeric',
+                        month: 'short',
+                      })}
                     </p>
                   </div>
                   <StatusBadge status={article.status} />
@@ -395,96 +343,193 @@ export default function Dashboard() {
               ))}
             </div>
           )}
-        </div>
+        </SurfaceCard>
 
-        {/* Recent Orders */}
-        <div className="bg-white rounded-2xl p-6 border border-gray-100">
-          <div className="flex items-center justify-between mb-5">
-            <h2 className="text-lg font-bold text-[#0A0A0A]" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
-              Dernières commandes
-            </h2>
-            <Link to="/admin/boutique/commandes" className="text-[#C9A84C] text-xs font-semibold hover:underline">
-              Voir tout
-            </Link>
-          </div>
+        <SurfaceCard>
+          <CardHeader
+            eyebrow="Boutique"
+            title="Dernières commandes"
+            link="/admin/boutique/commandes"
+            linkLabel="Voir l’ensemble"
+          />
 
           {recentOrders.length === 0 ? (
-            <div className="text-center py-10">
-              <Package size={32} className="mx-auto text-gray-200 mb-3" />
-              <p className="text-[#9A9A8A] text-sm">Aucune commande pour le moment</p>
-            </div>
+            <EmptyBlock text="Aucune commande n’a encore été enregistrée." />
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-gray-100">
-                    <th className="pb-3 text-left text-[10px] font-semibold text-[#9A9A8A] uppercase tracking-wider">Client</th>
-                    <th className="pb-3 text-left text-[10px] font-semibold text-[#9A9A8A] uppercase tracking-wider">Statut</th>
-                    <th className="pb-3 text-left text-[10px] font-semibold text-[#9A9A8A] uppercase tracking-wider">Date</th>
-                    <th className="pb-3 text-right text-[10px] font-semibold text-[#9A9A8A] uppercase tracking-wider">Montant</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {recentOrders.map((order) => (
-                    <tr key={order.id} className="border-b border-gray-50 last:border-0">
-                      <td className="py-3">
-                        <p className="text-sm font-medium text-[#0A0A0A]">{order.customer_name}</p>
-                      </td>
-                      <td className="py-3">
-                        <StatusBadge status={order.status} />
-                      </td>
-                      <td className="py-3 text-xs text-[#9A9A8A]">
-                        {new Date(order.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
-                      </td>
-                      <td className="py-3 text-right text-sm font-semibold text-[#0A0A0A]">
-                        {parseFloat(String(order.total)).toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="mt-6 divide-y divide-[#0A0A0A]/8">
+              {recentOrders.map((order) => (
+                <div key={order.id} className="flex flex-col gap-4 py-4 md:flex-row md:items-center md:justify-between">
+                  <div className="min-w-0">
+                    <p className="font-serif text-[1.25rem] leading-none tracking-[-0.02em] text-[#0A0A0A]">
+                      {order.customer_name}
+                    </p>
+                    <p className="mt-2 text-sm text-[#9A9A8A]">
+                      {new Date(order.created_at).toLocaleDateString('fr-FR', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric',
+                      })}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <StatusBadge status={order.status} />
+                    <p className="font-serif text-[1.2rem] leading-none text-[#0A0A0A]">
+                      {parseFloat(String(order.total)).toLocaleString('fr-FR', {
+                        minimumFractionDigits: 2,
+                      })}{' '}
+                      €
+                    </p>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
-        </div>
-      </div>
+        </SurfaceCard>
+      </section>
     </div>
   );
 }
 
-/* ─── Sub-components ─── */
-
-function KPICard({
-  label, value, subtitle, icon: Icon, link, highlight
+function SurfaceCard({
+  children,
+  dark = false,
 }: {
-  label: string; value: number; subtitle: string; icon: React.ElementType; link: string; highlight?: boolean
+  children: React.ReactNode;
+  dark?: boolean;
 }) {
   return (
-    <Link to={link} className="bg-white rounded-2xl p-5 border border-gray-100 hover:border-[#C9A84C]/30 transition-all group">
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-[#9A9A8A] text-xs font-medium uppercase tracking-wider">{label}</span>
-        <div className="w-9 h-9 rounded-xl bg-[#C9A84C]/10 flex items-center justify-center group-hover:bg-[#C9A84C] transition-colors">
-          <Icon size={16} className="text-[#C9A84C] group-hover:text-slate-900 transition-colors" />
-        </div>
-      </div>
-      <p className="text-3xl font-bold text-[#0A0A0A]" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
+    <div
+      className={
+        dark
+          ? 'border border-[#C9A84C]/18 bg-[#0A0A0A] p-6 md:p-7'
+          : 'border border-[#0A0A0A]/10 bg-white p-6 md:p-7'
+      }
+    >
+      {children}
+    </div>
+  );
+}
+
+function SectionLabel({
+  children,
+  dark = false,
+}: {
+  children: React.ReactNode;
+  dark?: boolean;
+}) {
+  return (
+    <p
+      className={
+        dark
+          ? 'text-[0.68rem] uppercase tracking-[0.26em] text-[#C9A84C]'
+          : 'text-[0.68rem] uppercase tracking-[0.26em] text-[#9A9A8A]'
+      }
+    >
+      {children}
+    </p>
+  );
+}
+
+function EditorialMetric({
+  label,
+  value,
+  detail,
+  link,
+  accent = false,
+}: {
+  label: string;
+  value: number;
+  detail: string;
+  link: string;
+  accent?: boolean;
+}) {
+  return (
+    <Link
+      to={link}
+      className="border border-[#0A0A0A]/10 bg-white p-5 transition-colors hover:border-[#C9A84C]/35"
+    >
+      <p className="text-[0.62rem] uppercase tracking-[0.24em] text-[#9A9A8A]">
+        {label}
+      </p>
+      <p className="mt-3 font-serif text-[2.3rem] leading-none tracking-[-0.03em] text-[#0A0A0A]">
         {value}
       </p>
-      <p className={`text-xs mt-1 ${highlight ? 'text-[#C9A84C] font-semibold' : 'text-[#9A9A8A]'}`}>
-        {subtitle}
-      </p>
-      <div className="mt-4 pt-3 border-t border-gray-50 flex items-center text-[10px] font-semibold text-[#9A9A8A] uppercase tracking-wider group-hover:text-[#C9A84C] transition-colors">
-        <span>Voir détails</span>
-        <ArrowUpRight size={12} className="ml-1" />
+      <div className="mt-4 border-t border-[#0A0A0A]/8 pt-4">
+        <p className={accent ? 'text-sm leading-6 text-[#8A6E2F]' : 'text-sm leading-6 text-[#9A9A8A]'}>
+          {detail}
+        </p>
       </div>
     </Link>
   );
 }
 
-function StatusBadge({ status }: { status: string }) {
-  const colors = statusColors[status] || { bg: 'bg-gray-100', text: 'text-gray-600' };
-  const label = statusLabels[status] || status;
+function CardHeader({
+  eyebrow,
+  title,
+  link,
+  linkLabel,
+}: {
+  eyebrow: string;
+  title: string;
+  link: string;
+  linkLabel: string;
+}) {
   return (
-    <span className={`inline-block px-2.5 py-1 rounded-full text-[10px] font-semibold ${colors.bg} ${colors.text}`}>
+    <div className="flex flex-col gap-3 border-b border-[#0A0A0A]/8 pb-5 md:flex-row md:items-end md:justify-between">
+      <div>
+        <SectionLabel>{eyebrow}</SectionLabel>
+        <h3 className="mt-2 font-serif text-[1.7rem] leading-none tracking-[-0.02em] text-[#0A0A0A]">
+          {title}
+        </h3>
+      </div>
+
+      <Link
+        to={link}
+        className="text-[0.68rem] uppercase tracking-[0.22em] text-[#C9A84C] transition-opacity hover:opacity-75"
+      >
+        {linkLabel}
+      </Link>
+    </div>
+  );
+}
+
+function EmptyBlock({
+  text,
+  actionLabel,
+  actionTo,
+}: {
+  text: string;
+  actionLabel?: string;
+  actionTo?: string;
+}) {
+  return (
+    <div className="py-12 text-center">
+      <p className="mx-auto max-w-md text-sm leading-7 text-[#9A9A8A]">{text}</p>
+      {actionLabel && actionTo ? (
+        <Link
+          to={actionTo}
+          className="mt-5 inline-flex border-b border-[#C9A84C] pb-1 text-[0.68rem] uppercase tracking-[0.22em] text-[#C9A84C] transition-opacity hover:opacity-75"
+        >
+          {actionLabel}
+        </Link>
+      ) : null}
+    </div>
+  );
+}
+
+function StatusBadge({ status }: { status: string }) {
+  const colors = statusColors[status] || {
+    bg: 'bg-[#F5F0E8]',
+    text: 'text-[#9A9A8A]',
+    border: 'border-[#0A0A0A]/8',
+  };
+  const label = statusLabels[status] || status;
+
+  return (
+    <span
+      className={`inline-flex border px-3 py-1.5 text-[0.62rem] uppercase tracking-[0.2em] ${colors.bg} ${colors.text} ${colors.border}`}
+    >
       {label}
     </span>
   );

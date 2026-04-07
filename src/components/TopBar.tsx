@@ -1,70 +1,139 @@
 import React from 'react';
-import { Bell, Search, Plus, MoreVertical } from 'lucide-react';
 import { useLocation, Link } from 'react-router-dom';
 
-const pageTitles: Record<string, string> = {
-  admin: 'Tableau de bord',
-  articles: 'Contenus',
-  categories: 'Catégories',
-  galerie: 'Galerie',
-  produits: 'Produits',
-  commandes: 'Commandes',
-  lecteurs: 'Lecteurs',
-  partenaires: 'Partenaires',
-  abonnements: 'Abonnements',
-  config: 'Configuration',
-  design: 'Design & Thème',
-  newsletter: 'Newsletter',
-  publicites: 'Publicités',
-  paiements: 'Paiements',
-  notifications: 'Notifications',
-  accueil: 'Accueil',
-  magazine: 'Magazine',
-  rubriques: 'Les Rubriques',
-  'qui-sommes-nous': 'Qui sommes-nous',
-  abonnement: 'Abonnement',
-  contact: 'Contact',
+const pageMeta: Record<
+  string,
+  { title: string; subtitle: string; actionLabel?: string; actionTo?: string }
+> = {
+  admin: {
+    title: 'Tableau de bord',
+    subtitle: "Vue d'ensemble de la rédaction, de la boutique et de l'écosystème AFRIKHER.",
+    actionLabel: 'Nouvel article',
+    actionTo: '/admin/articles/new',
+  },
+  articles: {
+    title: 'Contenus',
+    subtitle: 'Pilotez les publications, les brouillons et la cadence éditoriale.',
+    actionLabel: 'Nouvel article',
+    actionTo: '/admin/articles/new',
+  },
+  categories: {
+    title: 'Catégories',
+    subtitle: 'Structurez les univers éditoriaux avec une hiérarchie claire.',
+  },
+  galerie: {
+    title: 'Galerie',
+    subtitle: 'Centralisez les visuels qui portent l’image de la marque.',
+  },
+  produits: {
+    title: 'Produits',
+    subtitle: 'Orchestrez les références boutique et leur mise en valeur.',
+  },
+  commandes: {
+    title: 'Commandes',
+    subtitle: 'Suivez les achats, paiements et livraisons avec précision.',
+  },
+  lecteurs: {
+    title: 'Lecteurs',
+    subtitle: 'Gardez une lecture claire de votre communauté et de ses accès.',
+  },
+  partenaires: {
+    title: 'Partenaires',
+    subtitle: "Développez l'écosystème AFRIKHER avec cohérence et exigence.",
+  },
+  abonnements: {
+    title: 'Abonnements',
+    subtitle: 'Supervisez les membres actifs et le revenu récurrent.',
+  },
+  config: {
+    title: 'Configuration',
+    subtitle: "Affinez les paramètres qui soutiennent l'identité du site.",
+  },
+  newsletter: {
+    title: 'Newsletter',
+    subtitle: 'Préparez des prises de parole soignées et régulières.',
+  },
+  publicites: {
+    title: 'Publicités',
+    subtitle: 'Cadrez les espaces de visibilité et les activations de marque.',
+  },
+  paiements: {
+    title: 'Paiements',
+    subtitle: 'Sécurisez les flux transactionnels et les intégrations.',
+  },
+  notifications: {
+    title: 'Notifications',
+    subtitle: 'Gérez les alertes et messages utiles au back-office.',
+  },
+  accueil: {
+    title: 'Accueil',
+    subtitle: "Pilotez la première impression éditoriale de l'univers AFRIKHER.",
+  },
+  magazine: {
+    title: 'Magazine',
+    subtitle: 'Orchestrez les éléments majeurs de la section magazine.',
+  },
+  rubriques: {
+    title: 'Les Rubriques',
+    subtitle: 'Cadrez les rubriques dans une narration cohérente.',
+  },
+  'qui-sommes-nous': {
+    title: 'Qui sommes-nous',
+    subtitle: "Alignez la page institutionnelle avec la promesse de marque.",
+  },
+  abonnement: {
+    title: 'Abonnement',
+    subtitle: "Affinez l'offre premium et sa mise en scène.",
+  },
+  contact: {
+    title: 'Contact',
+    subtitle: 'Structurez les prises de contact et les signaux de confiance.',
+  },
 };
 
-export default function TopBar() {
+interface TopBarProps {
+  onOpenMenu: () => void;
+}
+
+export default function TopBar({ onOpenMenu }: TopBarProps) {
   const location = useLocation();
-  const pathnames = location.pathname.split('/').filter((x) => x);
+  const pathnames = location.pathname.split('/').filter(Boolean);
   const lastSegment = pathnames[pathnames.length - 1] || 'admin';
-  const pageTitle = pageTitles[lastSegment] || lastSegment.charAt(0).toUpperCase() + lastSegment.slice(1);
+  const meta = pageMeta[lastSegment] || {
+    title: lastSegment.charAt(0).toUpperCase() + lastSegment.slice(1),
+    subtitle: "Section d'administration AFRIKHER.",
+  };
 
   return (
-    <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 sticky top-0 z-10">
-      <h2 className="text-lg font-semibold text-slate-900">{pageTitle}</h2>
+    <header className="sticky top-0 z-10 border-b border-[#0A0A0A]/10 bg-[#F5F0E8]/95 backdrop-blur">
+      <div className="flex flex-col gap-4 px-5 py-5 md:px-8 lg:flex-row lg:items-end lg:justify-between xl:px-10">
+        <div className="min-w-0">
+          <button
+            onClick={onOpenMenu}
+            className="mb-3 inline-block text-[0.65rem] uppercase tracking-[0.22em] text-[#9A9A8A] transition-colors hover:text-[#C9A84C] md:hidden"
+          >
+            Navigation
+          </button>
 
-      <div className="flex items-center gap-4">
-        {/* Search */}
-        <div className="relative hidden md:block">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-          <input
-            type="text"
-            placeholder="Rechercher..."
-            className="pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all w-56"
-          />
+          <p className="text-[0.65rem] uppercase tracking-[0.28em] text-[#C9A84C]">
+            Administration
+          </p>
+          <h1 className="mt-2 font-serif text-[2rem] leading-none tracking-[-0.03em] text-[#0A0A0A] md:text-[2.6rem]">
+            {meta.title}
+          </h1>
+          <p className="mt-3 max-w-2xl text-sm leading-7 text-[#9A9A8A] md:text-[0.96rem]">
+            {meta.subtitle}
+          </p>
         </div>
 
-        {/* Notifications */}
-        <button className="relative p-2 text-slate-400 hover:text-slate-600 transition-colors rounded-lg hover:bg-slate-50">
-          <Bell size={20} />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
-        </button>
-
-        {/* New Article Button */}
-        <Link
-          to="/admin/articles/new"
-          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors shadow-sm"
-        >
-          <Plus size={16} />
-          <span className="hidden sm:inline">Nouvel Article</span>
-        </Link>
-
-        <button className="p-2 text-slate-400 hover:text-slate-600 transition-colors rounded-lg hover:bg-slate-50">
-          <MoreVertical size={18} />
-        </button>
+        {meta.actionLabel && meta.actionTo ? (
+          <Link
+            to={meta.actionTo}
+            className="inline-flex items-center justify-center border border-[#0A0A0A] bg-[#0A0A0A] px-6 py-3 text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-[#F5F0E8] transition-colors hover:border-[#C9A84C] hover:bg-[#C9A84C] hover:text-[#0A0A0A]"
+          >
+            {meta.actionLabel}
+          </Link>
+        ) : null}
       </div>
     </header>
   );
