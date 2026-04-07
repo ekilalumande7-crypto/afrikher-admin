@@ -3,7 +3,7 @@ import { useLocation, Link } from 'react-router-dom';
 
 const pageMeta: Record<
   string,
-  { title: string; subtitle: string; actionLabel?: string; actionTo?: string }
+  { title: string; subtitle: string; actionLabel?: string; actionTo?: string; hideHeader?: boolean }
 > = {
   admin: {
     title: 'Tableau de bord',
@@ -60,6 +60,7 @@ const pageMeta: Record<
   paiements: {
     title: 'Paiements',
     subtitle: 'Sécurisez les flux transactionnels et les intégrations.',
+    hideHeader: true,
   },
   notifications: {
     title: 'Notifications',
@@ -103,6 +104,21 @@ export default function TopBar({ onOpenMenu }: TopBarProps) {
     title: lastSegment.charAt(0).toUpperCase() + lastSegment.slice(1),
     subtitle: "Section d'administration AFRIKHER.",
   };
+
+  if (meta.hideHeader) {
+    return (
+      <header className="sticky top-0 z-10 border-b border-[#0A0A0A]/10 bg-[#F5F0E8]/95 backdrop-blur md:hidden">
+        <div className="px-5 py-4">
+          <button
+            onClick={onOpenMenu}
+            className="inline-block text-[0.65rem] uppercase tracking-[0.22em] text-[#9A9A8A] transition-colors hover:text-[#C9A84C]"
+          >
+            Navigation
+          </button>
+        </div>
+      </header>
+    );
+  }
 
   return (
     <header className="sticky top-0 z-10 border-b border-[#0A0A0A]/10 bg-[#F5F0E8]/95 backdrop-blur">
