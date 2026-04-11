@@ -405,7 +405,7 @@ export default function CMSMagazine() {
           <div className="flex items-center gap-4">
             <button
               onClick={() => { setViewMode('list'); setEditingMagazine(null); }}
-              className={`${adminGhostButtonClass} px-3 py-2 text-[11px]`}
+              className={`${adminGhostButtonClass} !tracking-[0.08em] px-3 py-2 text-[11px]`}
             >
               ← Retour
             </button>
@@ -417,7 +417,7 @@ export default function CMSMagazine() {
             <button
               onClick={handleSave}
               disabled={saving}
-              className={`${adminPrimaryButtonClass} ${saved ? 'bg-[#3A342A]' : ''}`}
+              className={`${adminPrimaryButtonClass} !tracking-[0.08em] ${saved ? 'bg-[#3A342A]' : ''}`}
             >
               {saving ? <><RefreshCw size={14} className="mr-2 animate-spin" /> Enregistrement...</>
                 : saved ? <><Check size={14} className="mr-2" /> Enregistré</>
@@ -507,7 +507,7 @@ export default function CMSMagazine() {
                   )}
                 </div>
                 <div className="flex flex-col gap-3">
-                  <label className={`${adminGhostButtonClass} cursor-pointer ${uploading === 'cover' ? 'opacity-50 cursor-wait' : ''}`}>
+                  <label className={`${adminGhostButtonClass} !tracking-[0.08em] cursor-pointer ${uploading === 'cover' ? 'opacity-50 cursor-wait' : ''}`}>
                     {uploading === 'cover' ? (
                       <><RefreshCw size={14} className="mr-2 animate-spin" /> Upload...</>
                     ) : (
@@ -538,7 +538,7 @@ export default function CMSMagazine() {
             <AdminFieldRow label="Pages du magazine" description="Uploadez les pages JPEG du magazine (format A4). Vous pouvez réordonner les pages après upload." noBorder>
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
-                  <label className={`inline-flex cursor-pointer items-center rounded-2xl border border-dashed border-[#C9A84C]/35 bg-[#FBF8F2] px-5 py-3 text-xs font-semibold uppercase tracking-[0.22em] text-[#0A0A0A] transition-all hover:border-[#C9A84C] hover:bg-white ${uploading === 'pages' ? 'opacity-50 cursor-wait' : ''}`}>
+                  <label className={`inline-flex cursor-pointer items-center rounded-2xl border border-dashed border-[#C9A84C]/35 bg-[#FBF8F2] px-5 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-[#0A0A0A] transition-all hover:border-[#C9A84C] hover:bg-white ${uploading === 'pages' ? 'opacity-50 cursor-wait' : ''}`}>
                     {uploading === 'pages' ? (
                       <><RefreshCw size={14} className="mr-2 animate-spin" /> Upload {uploadProgress}%...</>
                     ) : (
@@ -623,7 +623,7 @@ export default function CMSMagazine() {
     <div className="max-w-6xl mx-auto">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <p className="text-[10px] uppercase tracking-[0.32em] text-[#9A9A8A]">Editions & numéros</p>
+          <p className="text-[10px] uppercase tracking-[0.1em] text-[#9A9A8A]">Editions & numéros</p>
           <h1 className="mt-3 font-display text-5xl font-semibold text-[#0A0A0A]">Magazines</h1>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[#6F675B]">Pilotez la collection des numéros digitaux, leur pricing et la mise en scene de la page magazine publique.</p>
         </div>
@@ -632,14 +632,14 @@ export default function CMSMagazine() {
             href="https://afrikher-client.vercel.app/magazine"
             target="_blank"
             rel="noopener noreferrer"
-            className={adminGhostButtonClass}
+            className={`${adminGhostButtonClass} !tracking-[0.08em]`}
           >
             <ExternalLink size={16} className="mr-2" />
             Voir le site
           </a>
           <button
             onClick={startNewMagazine}
-            className={adminPrimaryButtonClass}
+            className={`${adminPrimaryButtonClass} !tracking-[0.08em]`}
           >
             <Plus size={14} className="mr-2" />
             Nouveau magazine
@@ -676,7 +676,7 @@ export default function CMSMagazine() {
           <button
             onClick={saveHeroConfig}
             disabled={heroSaving}
-            className={`${adminPrimaryButtonClass} px-4 py-2.5 ${heroSaved ? 'bg-[#3A342A]' : ''}`}
+            className={`${adminPrimaryButtonClass} !tracking-[0.08em] px-4 py-2.5 ${heroSaved ? 'bg-[#3A342A]' : ''}`}
           >
             {heroSaving ? <><RefreshCw size={14} className="mr-2 animate-spin" /> Enregistrement...</>
               : heroSaved ? <><Check size={14} className="mr-2" /> Enregistre !</>
@@ -699,11 +699,11 @@ export default function CMSMagazine() {
               )}
             </div>
             <div className="flex flex-col gap-3 flex-1">
-              <label className="text-xs font-semibold uppercase tracking-[0.24em] text-[#9A9A8A]">Image de banniere</label>
+              <label className="text-xs font-semibold uppercase tracking-[0.08em] text-[#9A9A8A]">Image de banniere</label>
               <p className="text-xs text-[#6F675B]">
                 Cette image s'affiche en grand en haut de la page Magazine. Format recommande : 1920x800px minimum, paysage.
               </p>
-              <label className={`${adminGhostButtonClass} w-fit cursor-pointer ${heroUploading ? 'opacity-50 cursor-wait' : ''}`}>
+              <label className={`${adminGhostButtonClass} !tracking-[0.08em] w-fit cursor-pointer ${heroUploading ? 'opacity-50 cursor-wait' : ''}`}>
                 {heroUploading ? (
                   <><RefreshCw size={14} className="mr-2 animate-spin" /> Upload...</>
                 ) : (
@@ -730,7 +730,7 @@ export default function CMSMagazine() {
           </div>
 
           <div className="mb-4">
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.24em] text-[#9A9A8A]">
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.08em] text-[#9A9A8A]">
               Titre principal
             </label>
             <input
@@ -743,7 +743,7 @@ export default function CMSMagazine() {
           </div>
 
           <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.24em] text-[#9A9A8A]">
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.08em] text-[#9A9A8A]">
               Sous-titre
             </label>
             <textarea
@@ -767,7 +767,7 @@ export default function CMSMagazine() {
           </p>
           <button
             onClick={startNewMagazine}
-            className={adminPrimaryButtonClass}
+            className={`${adminPrimaryButtonClass} !tracking-[0.08em]`}
           >
             <Plus size={14} className="mr-2" />
             Créer un magazine
@@ -794,7 +794,7 @@ export default function CMSMagazine() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-3 mb-1">
                     <h3 className="truncate font-display text-xl font-semibold text-[#0A0A0A]">{mag.title}</h3>
-                    <span className={`inline-flex items-center rounded-full border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] ${
+                    <span className={`inline-flex items-center rounded-full border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] ${
                       mag.status === 'published'
                         ? 'border-[#C9A84C]/30 bg-[#FBF7ED] text-[#6D5622]'
                         : mag.status === 'archived'
@@ -815,7 +815,7 @@ export default function CMSMagazine() {
                 <div className="flex items-center gap-2 shrink-0">
                   <button
                     onClick={() => togglePublish(mag)}
-                    className={`inline-flex items-center rounded-2xl border px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] transition-colors ${
+                    className={`inline-flex items-center rounded-2xl border px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.06em] transition-colors ${
                       mag.status === 'published'
                         ? 'border-[#C9A84C]/35 text-[#6D5622] hover:bg-[#FBF7ED]'
                         : 'border-[#D9D1C2] text-[#0A0A0A] hover:bg-[#F5F3EF]'
@@ -825,7 +825,7 @@ export default function CMSMagazine() {
                   </button>
                   <button
                     onClick={() => startEditMagazine(mag)}
-                    className={adminSecondaryButtonClass}
+                    className={`${adminSecondaryButtonClass} !tracking-[0.06em]`}
                   >
                     Modifier
                   </button>

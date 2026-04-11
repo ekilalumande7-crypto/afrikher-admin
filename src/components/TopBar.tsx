@@ -73,6 +73,7 @@ const pageMeta: Record<
   magazine: {
     title: 'Magazine',
     subtitle: 'Orchestrez les éléments majeurs de la section magazine.',
+    hideHeader: true,
   },
   rubriques: {
     title: 'Les Rubriques',
