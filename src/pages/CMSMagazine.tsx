@@ -157,11 +157,22 @@ export default function CMSMagazine() {
 
   const convertImageToJpeg = (file: File): Promise<File> => {
     return new Promise((resolve, reject) => {
-      const supportedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'];
-      if (supportedTypes.includes(file.type)) { resolve(file); return; }
+      const supportedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+      const lowerName = (file.name || '').toLowerCase();
+      const isHeic = file.type === 'image/heic' || file.type === 'image/heif' || lowerName.endsWith('.heic') || lowerName.endsWith('.heif');
+      if (isHeic) {
+        reject(new Error("Les images HEIC/HEIF (iPhone) ne sont pas supportées par le navigateur. Exportez en JPG ou PNG avant d'uploader (sur iPhone : Réglages → Appareil photo → Formats → Le plus compatible)."));
+        return;
+      }
+      if (supportedTypes.includes(file.type) || file.type === '') { resolve(file); return; }
       const img = new Image();
       const url = URL.createObjectURL(file);
+      const timeoutId = window.setTimeout(() => {
+        URL.revokeObjectURL(url);
+        reject(new Error(`Format non supporté ou image illisible: ${file.type || 'inconnu'}. Utilisez un JPG ou PNG.`));
+      }, 15000);
       img.onload = () => {
+        window.clearTimeout(timeoutId);
         const canvas = document.createElement('canvas');
         canvas.width = img.naturalWidth;
         canvas.height = img.naturalHeight;
@@ -176,7 +187,11 @@ export default function CMSMagazine() {
           resolve(converted);
         }, 'image/jpeg', 0.92);
       };
-      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error(`Format non supporté: ${file.type}`)); };
+      img.onerror = () => {
+        window.clearTimeout(timeoutId);
+        URL.revokeObjectURL(url);
+        reject(new Error(`Format non supporté: ${file.type || 'inconnu'}. Utilisez un JPG ou PNG.`));
+      };
       img.src = url;
     });
   };
