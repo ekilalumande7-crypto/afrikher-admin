@@ -58,6 +58,11 @@ const pageMeta: Record<
     subtitle: 'Sécurisez les flux transactionnels et les intégrations.',
     hideHeader: true,
   },
+  email: {
+    title: 'Emails',
+    subtitle: 'Configurez Brevo pour les emails transactionnels et les newsletters.',
+    hideHeader: true,
+  },
   notifications: {
     title: 'Notifications',
     subtitle: 'Gérez les alertes et messages utiles au back-office.',
