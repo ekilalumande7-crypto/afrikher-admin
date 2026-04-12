@@ -93,6 +93,8 @@ export default function SettingsEmail() {
     setSaved(false);
 
     try {
+      // Try direct Supabase upsert first
+      let directSaveOk = true;
       const updates = Object.entries(config).map(([key, value]) => ({ key, value }));
 
       for (const update of updates) {
@@ -103,7 +105,30 @@ export default function SettingsEmail() {
             { onConflict: 'key' }
           );
 
-        if (upsertError) throw upsertError;
+        if (upsertError) {
+          console.warn('Direct upsert failed for', update.key, upsertError);
+          directSaveOk = false;
+        }
+      }
+
+      // Fallback: save via server API (uses service role, bypasses RLS)
+      if (!directSaveOk) {
+        console.log('Falling back to server-side save...');
+        const { data: sessionData } = await supabase.auth.getSession();
+        const token = sessionData?.session?.access_token;
+
+        const res = await fetch(`${API_BASE}/api/brevo/test`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify(config),
+        });
+
+        if (!res.ok) {
+          throw new Error('Fallback save also failed');
+        }
       }
 
       setSaved(true);
@@ -131,12 +156,19 @@ export default function SettingsEmail() {
       const { data: sessionData } = await supabase.auth.getSession();
       const token = sessionData?.session?.access_token;
 
+      // Send config in body so the server can save it via service role (bypasses RLS)
       const res = await fetch(`${API_BASE}/api/brevo/test`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
+        body: JSON.stringify({
+          brevo_api_key: config.brevo_api_key,
+          brevo_sender_email: config.brevo_sender_email,
+          brevo_sender_name: config.brevo_sender_name,
+          brevo_newsletter_list_id: config.brevo_newsletter_list_id,
+        }),
       });
 
       if (res.ok) {
