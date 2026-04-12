@@ -160,12 +160,12 @@ export default function CMSContact() {
             href="https://afrikher-client.vercel.app/contact"
             target="_blank"
             rel="noopener noreferrer"
-            className={ghostButtonClass}
+            className={adminGhostButtonClass}
           >
             <ExternalLink size={16} />
             Voir la page
           </a>
-          <button onClick={handleSave} disabled={saving} className={primaryButtonClass}>
+          <button onClick={handleSave} disabled={saving} className={adminPrimaryButtonClass}>
             {saving ? <RefreshCw size={16} className="animate-spin" /> : saved ? <Check size={16} /> : <Save size={16} />}
             {saving ? 'Sauvegarde...' : saved ? 'Sauvegardé !' : 'Enregistrer'}
           </button>
