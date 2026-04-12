@@ -19,10 +19,11 @@ const menuGroups = [
       { name: 'Abonnement', path: '/admin/cms/abonnement' },
       { name: 'Contact', path: '/admin/cms/contact' },
       { name: 'Partenaires', path: '/admin/cms/partenaires' },
+      { name: 'Mentions l\u00e9gales', path: '/admin/cms/legal' },
     ],
   },
   {
-    title: 'Éditorial',
+    title: '\u00c9ditorial',
     items: [
       { name: 'Contenus', path: '/admin/articles' },
       { name: 'Catégories', path: '/admin/categories' },

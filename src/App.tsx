@@ -22,6 +22,7 @@ const CMSQuiSommesNous = lazy(() => import('./pages/CMSQuiSommesNous'));
 const CMSAbonnement = lazy(() => import('./pages/CMSAbonnement'));
 const CMSContact = lazy(() => import('./pages/CMSContact'));
 const CMSPartenaires = lazy(() => import('./pages/CMSPartenaires'));
+const CMSLegal = lazy(() => import('./pages/CMSLegal'));
 const SettingsPaiements = lazy(() => import('./pages/SettingsPaiements'));
 
 // Placeholder for other pages
@@ -116,6 +117,7 @@ export default function App() {
             <Route path="cms/abonnement" element={withRouteSuspense(<CMSAbonnement />)} />
             <Route path="cms/contact" element={withRouteSuspense(<CMSContact />)} />
             <Route path="cms/partenaires" element={withRouteSuspense(<CMSPartenaires />)} />
+            <Route path="cms/legal" element={withRouteSuspense(<CMSLegal />)} />
 
             {/* CMS & Design */}
             <Route path="cms/config" element={withRouteSuspense(<CMSConfig />)} />
