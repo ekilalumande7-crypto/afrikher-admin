@@ -49,7 +49,6 @@ const menuGroups = [
     title: 'Marketing',
     items: [
       { name: 'Newsletter', path: '/admin/marketing/newsletter' },
-      { name: 'Publicités', path: '/admin/marketing/publicites' },
     ],
   },
   {

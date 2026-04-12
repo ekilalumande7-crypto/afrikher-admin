@@ -125,7 +125,6 @@ export default function App() {
 
             {/* Marketing */}
             <Route path="marketing/newsletter" element={<Placeholder title="Newsletter Marketing" />} />
-            <Route path="marketing/publicites" element={<Placeholder title="Gestion des Publicités" />} />
 
             {/* Paramètres */}
             <Route path="parametres/paiements" element={withRouteSuspense(<SettingsPaiements />)} />

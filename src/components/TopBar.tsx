@@ -53,10 +53,6 @@ const pageMeta: Record<
     title: 'Newsletter',
     subtitle: 'Préparez des prises de parole soignées et régulières.',
   },
-  publicites: {
-    title: 'Publicités',
-    subtitle: 'Cadrez les espaces de visibilité et les activations de marque.',
-  },
   paiements: {
     title: 'Paiements',
     subtitle: 'Sécurisez les flux transactionnels et les intégrations.',
