@@ -32,6 +32,8 @@ interface Magazine {
   published_at: string | null;
   created_at: string;
   updated_at: string;
+  heyzine_url: string | null;
+  pdf_url: string | null;
 }
 
 type ViewMode = 'list' | 'editor';
@@ -295,6 +297,8 @@ export default function CMSMagazine() {
         page_count: (editingMagazine.pages || []).length,
         pages: editingMagazine.pages || [],
         status: editingMagazine.status || 'draft',
+        heyzine_url: editingMagazine.heyzine_url?.trim() || null,
+        pdf_url: editingMagazine.pdf_url?.trim() || null,
         updated_at: new Date().toISOString(),
       };
 
@@ -373,6 +377,8 @@ export default function CMSMagazine() {
       page_count: 0,
       pages: [],
       status: 'draft',
+      heyzine_url: '',
+      pdf_url: '',
     });
     setPriceText('9.99');
     setViewMode('editor');
@@ -609,6 +615,26 @@ export default function CMSMagazine() {
                   </div>
                 )}
               </div>
+            </AdminFieldRow>
+
+            <AdminFieldRow label="URL Flipbook Heyzine" description="Collez l'URL de partage Heyzine pour la lecture en ligne.">
+              <input
+                type="text"
+                value={editingMagazine.heyzine_url || ''}
+                onChange={(e) => setEditingMagazine(prev => prev ? { ...prev, heyzine_url: e.target.value } : null)}
+                className={`${adminInputClass} rounded-2xl`}
+                placeholder="https://heyzine.com/flip-book/..."
+              />
+            </AdminFieldRow>
+
+            <AdminFieldRow label="URL du PDF" description="Lien direct vers le fichier PDF pour le téléchargement." noBorder>
+              <input
+                type="text"
+                value={editingMagazine.pdf_url || ''}
+                onChange={(e) => setEditingMagazine(prev => prev ? { ...prev, pdf_url: e.target.value } : null)}
+                className={`${adminInputClass} rounded-2xl`}
+                placeholder="https://..."
+              />
             </AdminFieldRow>
           </div>
         </AdminSectionShell>
