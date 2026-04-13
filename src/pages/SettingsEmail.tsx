@@ -9,6 +9,9 @@ import {
   EyeOff,
   RefreshCw,
   Send,
+  UserCheck,
+  Clock,
+  Plus,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { cn } from '../lib/utils';
@@ -28,6 +31,13 @@ interface BrevoConfig {
   brevo_sender_email: string;
   brevo_sender_name: string;
   brevo_newsletter_list_id: string;
+}
+
+interface BrevoSender {
+  id: number;
+  name: string;
+  email: string;
+  active: boolean;
 }
 
 const ALL_KEYS = [
@@ -52,9 +62,20 @@ export default function SettingsEmail() {
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
 
+  // Senders state
+  const [senders, setSenders] = useState<BrevoSender[]>([]);
+  const [loadingSenders, setLoadingSenders] = useState(false);
+  const [addingSender, setAddingSender] = useState(false);
+  const [senderResult, setSenderResult] = useState<{ success: boolean; verified: boolean; message: string } | null>(null);
+
   useEffect(() => {
     loadConfig();
   }, []);
+
+  async function getAuthToken(): Promise<string | null> {
+    const { data } = await supabase.auth.getSession();
+    return data?.session?.access_token || null;
+  }
 
   async function loadConfig() {
     setLoading(true);
@@ -73,17 +94,46 @@ export default function SettingsEmail() {
         }
       }
 
-      setConfig({
+      const loaded: BrevoConfig = {
         brevo_api_key: configMap['brevo_api_key'] || '',
         brevo_sender_email: configMap['brevo_sender_email'] || 'noreply@afrikher.com',
         brevo_sender_name: configMap['brevo_sender_name'] || 'AFRIKHER',
         brevo_newsletter_list_id: configMap['brevo_newsletter_list_id'] || '2',
-      });
+      };
+
+      setConfig(loaded);
+
+      // Auto-load senders if API key exists
+      if (loaded.brevo_api_key) {
+        loadSenders();
+      }
     } catch (err) {
       console.error('Error loading Brevo config:', err);
       setError('Impossible de charger la configuration email.');
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function loadSenders() {
+    setLoadingSenders(true);
+    try {
+      const token = await getAuthToken();
+      const res = await fetch(`${API_BASE}/api/brevo/senders`, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setSenders(data.senders || []);
+      }
+    } catch (err) {
+      console.error('Error loading senders:', err);
+    } finally {
+      setLoadingSenders(false);
     }
   }
 
@@ -93,49 +143,27 @@ export default function SettingsEmail() {
     setSaved(false);
 
     try {
-      // Try direct Supabase upsert first
-      let directSaveOk = true;
-      const updates = Object.entries(config).map(([key, value]) => ({ key, value }));
+      // Save via server API (uses service role, bypasses RLS)
+      const token = await getAuthToken();
+      const res = await fetch(`${API_BASE}/api/brevo/test`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify(config),
+      });
 
-      for (const update of updates) {
-        const { error: upsertError } = await supabase
-          .from('site_config')
-          .upsert(
-            { key: update.key, value: update.value, updated_at: new Date().toISOString() },
-            { onConflict: 'key' }
-          );
-
-        if (upsertError) {
-          console.warn('Direct upsert failed for', update.key, upsertError);
-          directSaveOk = false;
-        }
-      }
-
-      // Fallback: save via server API (uses service role, bypasses RLS)
-      if (!directSaveOk) {
-        console.log('Falling back to server-side save...');
-        const { data: sessionData } = await supabase.auth.getSession();
-        const token = sessionData?.session?.access_token;
-
-        const res = await fetch(`${API_BASE}/api/brevo/test`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
-          body: JSON.stringify(config),
-        });
-
-        if (!res.ok) {
-          throw new Error('Fallback save also failed');
-        }
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({ error: 'Erreur réseau' }));
+        throw new Error(data.error || 'Erreur lors de la sauvegarde');
       }
 
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error saving Brevo config:', err);
-      setError('Erreur lors de la sauvegarde. Veuillez réessayer.');
+      setError(err.message || 'Erreur lors de la sauvegarde. Veuillez réessayer.');
     } finally {
       setSaving(false);
     }
@@ -152,23 +180,14 @@ export default function SettingsEmail() {
         return;
       }
 
-      // Call the Brevo API to get account info — simplest test
-      const { data: sessionData } = await supabase.auth.getSession();
-      const token = sessionData?.session?.access_token;
-
-      // Send config in body so the server can save it via service role (bypasses RLS)
+      const token = await getAuthToken();
       const res = await fetch(`${API_BASE}/api/brevo/test`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify({
-          brevo_api_key: config.brevo_api_key,
-          brevo_sender_email: config.brevo_sender_email,
-          brevo_sender_name: config.brevo_sender_name,
-          brevo_newsletter_list_id: config.brevo_newsletter_list_id,
-        }),
+        body: JSON.stringify(config),
       });
 
       if (res.ok) {
@@ -177,6 +196,8 @@ export default function SettingsEmail() {
           success: true,
           message: data.message || `Connexion réussie. Compte : ${data.email || 'vérifié'}`,
         });
+        // Refresh senders list after successful test
+        loadSenders();
       } else {
         const data = await res.json().catch(() => ({ error: 'Erreur réseau' }));
         setTestResult({
@@ -184,7 +205,7 @@ export default function SettingsEmail() {
           message: data.error || 'Échec de la connexion.',
         });
       }
-    } catch (err) {
+    } catch {
       setTestResult({
         success: false,
         message: 'Impossible de joindre le serveur.',
@@ -193,6 +214,74 @@ export default function SettingsEmail() {
       setTesting(false);
     }
   }
+
+  async function handleAddSender() {
+    if (!config.brevo_sender_email) return;
+
+    setAddingSender(true);
+    setSenderResult(null);
+
+    try {
+      const token = await getAuthToken();
+      const res = await fetch(`${API_BASE}/api/brevo/senders`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          email: config.brevo_sender_email,
+          name: config.brevo_sender_name,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setSenderResult({
+          success: true,
+          verified: data.verified || false,
+          message: data.message,
+        });
+
+        // If already verified, update config and reload senders
+        if (data.verified) {
+          loadSenders();
+        }
+      } else {
+        setSenderResult({
+          success: false,
+          verified: false,
+          message: data.error || 'Erreur lors de l\'ajout de l\'expéditeur.',
+        });
+      }
+    } catch {
+      setSenderResult({
+        success: false,
+        verified: false,
+        message: 'Impossible de joindre le serveur.',
+      });
+    } finally {
+      setAddingSender(false);
+    }
+  }
+
+  function selectSender(sender: BrevoSender) {
+    setConfig({
+      ...config,
+      brevo_sender_email: sender.email,
+      brevo_sender_name: sender.name,
+    });
+    setSenderResult(null);
+  }
+
+  // Check if current sender is verified
+  const currentSenderVerified = senders.some(
+    (s) => s.email.toLowerCase() === config.brevo_sender_email.toLowerCase() && s.active
+  );
+  const currentSenderPending = senders.some(
+    (s) => s.email.toLowerCase() === config.brevo_sender_email.toLowerCase() && !s.active
+  );
 
   if (loading) {
     return (
@@ -300,13 +389,45 @@ export default function SettingsEmail() {
                 <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.15em] text-[#9A9A8A]">
                   Email expéditeur
                 </label>
-                <input
-                  type="email"
-                  value={config.brevo_sender_email}
-                  onChange={(e) => setConfig({ ...config, brevo_sender_email: e.target.value })}
-                  placeholder="noreply@afrikher.com"
-                  className={`${adminInputClass} rounded-lg p-3`}
-                />
+                <div className="relative">
+                  <input
+                    type="email"
+                    value={config.brevo_sender_email}
+                    onChange={(e) => {
+                      setConfig({ ...config, brevo_sender_email: e.target.value });
+                      setSenderResult(null);
+                    }}
+                    placeholder="contact@afrikher.com"
+                    className={`${adminInputClass} rounded-lg p-3 pr-10`}
+                  />
+                  {/* Verification status icon */}
+                  {config.brevo_sender_email && senders.length > 0 && (
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2">
+                      {currentSenderVerified ? (
+                        <CheckCircle size={16} className="text-emerald-500" />
+                      ) : currentSenderPending ? (
+                        <Clock size={16} className="text-amber-500" />
+                      ) : (
+                        <AlertCircle size={16} className="text-red-400" />
+                      )}
+                    </span>
+                  )}
+                </div>
+                {/* Status text */}
+                {config.brevo_sender_email && senders.length > 0 && (
+                  <p className={cn(
+                    'mt-1.5 text-[11px]',
+                    currentSenderVerified ? 'text-emerald-600' :
+                    currentSenderPending ? 'text-amber-600' :
+                    'text-red-500'
+                  )}>
+                    {currentSenderVerified
+                      ? 'Adresse vérifiée et active'
+                      : currentSenderPending
+                      ? 'En attente de vérification — consultez votre boîte mail'
+                      : 'Adresse non enregistrée dans Brevo'}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -322,6 +443,60 @@ export default function SettingsEmail() {
                 />
               </div>
             </div>
+
+            {/* Add/verify sender button */}
+            {config.brevo_sender_email && !currentSenderVerified && config.brevo_api_key && (
+              <div className="rounded-lg border border-amber-200 bg-amber-50/60 p-4">
+                <p className="text-sm text-amber-800 mb-3">
+                  {currentSenderPending
+                    ? 'Cette adresse est enregistrée mais pas encore vérifiée. Consultez la boîte mail pour cliquer sur le lien de vérification Brevo.'
+                    : `L'adresse ${config.brevo_sender_email} doit être enregistrée et vérifiée dans Brevo avant de pouvoir envoyer des emails.`
+                  }
+                </p>
+                <button
+                  onClick={handleAddSender}
+                  disabled={addingSender}
+                  className={cn(
+                    'inline-flex items-center rounded-lg px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.1em] transition-all',
+                    addingSender
+                      ? 'bg-amber-100 text-amber-400'
+                      : 'bg-[#0A0A0A] text-[#F5F0E8] hover:bg-[#1A1A1A]'
+                  )}
+                >
+                  {addingSender ? (
+                    <>
+                      <RefreshCw size={14} className="mr-2 animate-spin" />
+                      Enregistrement...
+                    </>
+                  ) : currentSenderPending ? (
+                    <>
+                      <RefreshCw size={14} className="mr-2" />
+                      Vérifier le statut
+                    </>
+                  ) : (
+                    <>
+                      <Plus size={14} className="mr-2" />
+                      Enregistrer cette adresse dans Brevo
+                    </>
+                  )}
+                </button>
+
+                {senderResult && (
+                  <div className={cn(
+                    'mt-3 rounded-lg px-3 py-2.5 text-sm',
+                    senderResult.verified
+                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                      : senderResult.success
+                      ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                      : 'bg-red-50 text-red-600 border border-red-200'
+                  )}>
+                    {senderResult.verified && <CheckCircle size={14} className="inline mr-1.5 -mt-0.5" />}
+                    {!senderResult.success && <AlertCircle size={14} className="inline mr-1.5 -mt-0.5" />}
+                    {senderResult.message}
+                  </div>
+                )}
+              </div>
+            )}
 
             <div>
               <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.15em] text-[#9A9A8A]">
@@ -341,46 +516,125 @@ export default function SettingsEmail() {
           </div>
         </AdminSectionShell>
 
-        {/* Test connection */}
-        <AdminSectionShell className="rounded-xl">
-          <AdminSectionHeader
-            eyebrow="Vérification"
-            title="Tester la connexion"
-            description="Vérifiez que la clé API Brevo est valide et que le compte répond."
-            className="rounded-none px-6 py-5"
-          />
-          <div className="space-y-4 p-6">
-            <button
-              onClick={handleTestConnection}
-              disabled={testing || !config.brevo_api_key}
-              className={cn(
-                'inline-flex items-center rounded-lg border px-5 py-3 text-sm font-semibold transition-all',
-                testing
-                  ? 'border-[#E5E0D8] bg-[#F5F3EF] text-[#9A9A8A]'
-                  : 'border-[#0A0A0A] bg-[#0A0A0A] text-[#F5F0E8] hover:border-[#C9A84C] hover:bg-[#1A1A1A]'
+        <div className="space-y-5">
+          {/* Test connection */}
+          <AdminSectionShell className="rounded-xl">
+            <AdminSectionHeader
+              eyebrow="Vérification"
+              title="Tester la connexion"
+              description="Vérifiez que la clé API Brevo est valide et que le compte répond."
+              className="rounded-none px-6 py-5"
+            />
+            <div className="space-y-4 p-6">
+              <button
+                onClick={handleTestConnection}
+                disabled={testing || !config.brevo_api_key}
+                className={cn(
+                  'inline-flex items-center rounded-lg border px-5 py-3 text-sm font-semibold transition-all',
+                  testing
+                    ? 'border-[#E5E0D8] bg-[#F5F3EF] text-[#9A9A8A]'
+                    : 'border-[#0A0A0A] bg-[#0A0A0A] text-[#F5F0E8] hover:border-[#C9A84C] hover:bg-[#1A1A1A]'
+                )}
+              >
+                {testing ? (
+                  <>
+                    <RefreshCw size={18} className="mr-2 animate-spin" />
+                    Test en cours...
+                  </>
+                ) : (
+                  <>
+                    <Send size={18} className="mr-2" />
+                    Tester la connexion
+                  </>
+                )}
+              </button>
+
+              {testResult && (
+                <AdminAlert tone={testResult.success ? 'success' : 'error'}>
+                  {testResult.success ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
+                  <span className="text-sm">{testResult.message}</span>
+                </AdminAlert>
               )}
-            >
-              {testing ? (
-                <>
-                  <RefreshCw size={18} className="mr-2 animate-spin" />
-                  Test en cours...
-                </>
+            </div>
+          </AdminSectionShell>
+
+          {/* Verified senders */}
+          <AdminSectionShell className="rounded-xl">
+            <AdminSectionHeader
+              eyebrow="Expéditeurs Brevo"
+              title="Adresses vérifiées"
+              description="Adresses email autorisées à envoyer des emails via Brevo."
+              className="rounded-none px-6 py-5"
+            />
+            <div className="space-y-2 p-6">
+              {loadingSenders ? (
+                <div className="flex items-center gap-2 text-sm text-[#9A9A8A]">
+                  <RefreshCw size={14} className="animate-spin" />
+                  Chargement...
+                </div>
+              ) : senders.length === 0 ? (
+                <p className="text-sm text-[#9A9A8A]">
+                  {config.brevo_api_key
+                    ? 'Aucun expéditeur trouvé. Cliquez sur "Tester la connexion" pour charger.'
+                    : 'Renseignez d\'abord la clé API Brevo.'
+                  }
+                </p>
               ) : (
                 <>
-                  <Send size={18} className="mr-2" />
-                  Tester la connexion
+                  {senders.map((sender) => (
+                    <button
+                      key={sender.id}
+                      onClick={() => selectSender(sender)}
+                      className={cn(
+                        'flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left transition-all',
+                        sender.email.toLowerCase() === config.brevo_sender_email.toLowerCase()
+                          ? 'border-[#C9A84C] bg-[#C9A84C]/5'
+                          : 'border-[#E5E0D8] bg-white hover:border-[#C9A84C]/40 hover:bg-[#FBF8F2]'
+                      )}
+                    >
+                      {sender.active ? (
+                        <UserCheck size={16} className="shrink-0 text-emerald-500" />
+                      ) : (
+                        <Clock size={16} className="shrink-0 text-amber-500" />
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium text-[#0A0A0A]">{sender.email}</p>
+                        <p className="text-[11px] text-[#9A9A8A]">{sender.name}</p>
+                      </div>
+                      {sender.active ? (
+                        <span className="shrink-0 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-600">
+                          Vérifié
+                        </span>
+                      ) : (
+                        <span className="shrink-0 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-600">
+                          En attente
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                  <p className="mt-2 text-[11px] text-[#9A9A8A]">
+                    Cliquez sur une adresse pour la sélectionner comme expéditeur.
+                  </p>
                 </>
               )}
-            </button>
 
-            {testResult && (
-              <AdminAlert tone={testResult.success ? 'success' : 'error'}>
-                {testResult.success ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
-                <span className="text-sm">{testResult.message}</span>
-              </AdminAlert>
-            )}
+              {/* Refresh button */}
+              {config.brevo_api_key && (
+                <button
+                  onClick={loadSenders}
+                  disabled={loadingSenders}
+                  className="mt-2 inline-flex items-center text-xs text-[#9A9A8A] hover:text-[#C9A84C] transition-colors"
+                >
+                  <RefreshCw size={12} className={cn('mr-1.5', loadingSenders && 'animate-spin')} />
+                  Actualiser la liste
+                </button>
+              )}
+            </div>
+          </AdminSectionShell>
 
-            <div className="mt-4 space-y-3 border-t border-[#0A0A0A]/8 pt-4">
+          {/* Automatic emails list */}
+          <AdminSectionShell className="rounded-xl">
+            <div className="space-y-3 p-6">
               <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#9A9A8A]">
                 Emails automatiques activés
               </p>
@@ -399,6 +653,10 @@ export default function SettingsEmail() {
                 </li>
                 <li className="flex items-center gap-2">
                   <Mail size={14} className="text-[#C9A84C]" />
+                  Confirmation d'achat magazine
+                </li>
+                <li className="flex items-center gap-2">
+                  <Mail size={14} className="text-[#C9A84C]" />
                   Réception de soumission partenaire
                 </li>
                 <li className="flex items-center gap-2">
@@ -407,8 +665,8 @@ export default function SettingsEmail() {
                 </li>
               </ul>
             </div>
-          </div>
-        </AdminSectionShell>
+          </AdminSectionShell>
+        </div>
       </div>
 
       <div className="flex items-start gap-4 rounded-lg border border-[#E5E0D8] bg-[#FBF8F2] px-5 py-4">
