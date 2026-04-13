@@ -63,6 +63,11 @@ const pageMeta: Record<
     subtitle: 'Configurez Brevo pour les emails transactionnels et les newsletters.',
     hideHeader: true,
   },
+  'templates-email': {
+    title: 'Templates Email',
+    subtitle: 'Personnalisez le contenu des emails automatiques.',
+    hideHeader: true,
+  },
   notifications: {
     title: 'Notifications',
     subtitle: 'Gérez les alertes et messages utiles au back-office.',

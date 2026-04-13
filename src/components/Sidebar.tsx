@@ -57,6 +57,7 @@ const menuGroups = [
       { name: 'Configuration', path: '/admin/cms/config' },
       { name: 'Paiements', path: '/admin/parametres/paiements' },
       { name: 'Emails (Brevo)', path: '/admin/parametres/email' },
+      { name: 'Templates Email', path: '/admin/parametres/templates-email' },
       { name: 'Notifications', path: '/admin/parametres/notifications' },
     ],
   },

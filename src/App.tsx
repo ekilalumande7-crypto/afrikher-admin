@@ -26,6 +26,7 @@ const CMSLegal = lazy(() => import('./pages/CMSLegal'));
 const SettingsPaiements = lazy(() => import('./pages/SettingsPaiements'));
 const NewsletterMarketing = lazy(() => import('./pages/NewsletterMarketing'));
 const SettingsEmail = lazy(() => import('./pages/SettingsEmail'));
+const EmailTemplates = lazy(() => import('./pages/EmailTemplates'));
 
 // Placeholder for other pages
 const Placeholder = ({ title }: { title: string }) => (
@@ -131,6 +132,7 @@ export default function App() {
             {/* Paramètres */}
             <Route path="parametres/paiements" element={withRouteSuspense(<SettingsPaiements />)} />
             <Route path="parametres/email" element={withRouteSuspense(<SettingsEmail />)} />
+            <Route path="parametres/templates-email" element={withRouteSuspense(<EmailTemplates />)} />
             <Route path="parametres/notifications" element={<Placeholder title="Paramètres de Notifications" />} />
           </Route>
 
